@@ -1,0 +1,92 @@
+
+@layer base {
+  /* Explicitly set the default font for all UI elements */
+  .font-sans {
+    font-family: Arial, system-ui, sans-serif !important;
+  }
+  
+  /* Make sure all popover and dropdown content uses the same font */
+  [data-radix-popper-content-wrapper], 
+  [role="listbox"],
+  [role="menu"],
+  .radix-dropdown-content,
+  .radix-select-content {
+    font-family: Arial, system-ui, sans-serif !important;
+  }
+  
+  /* Target select content specifically */
+  [data-radix-select-content] {
+    font-family: Arial, system-ui, sans-serif !important;
+  }
+  
+  /* Ensure all form inputs and textareas have consistent font */
+  input, textarea, button, select, option {
+    font-family: Arial, system-ui, sans-serif !important;
+  }
+
+  /* Add more specific font weight classes */
+  .font-normal {
+    font-weight: 400;
+  }
+  
+  .font-medium {
+    font-weight: 500;
+  }
+  
+  .font-semibold {
+    font-weight: 600;
+  }
+  
+  .font-bold {
+    font-weight: 700;
+  }
+}
+
+/* Prose styling for markdown content */
+.prose {
+  @apply text-foreground;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  @apply text-foreground font-semibold;
+}
+
+.prose h1 {
+  @apply text-2xl mb-4;
+}
+
+.prose h2 {
+  @apply text-xl mb-3;
+}
+
+.prose h3 {
+  @apply text-lg mb-2;
+}
+
+.prose p {
+  @apply text-foreground/90;
+}
+
+.prose ul {
+  @apply list-disc pl-5 my-2;
+}
+
+.prose ol {
+  @apply list-decimal pl-5 my-2;
+}
+
+.prose li {
+  @apply my-1;
+}
+
+.prose strong {
+  @apply text-primary-400 font-semibold;
+}
+
+.prose code {
+  @apply bg-white/10 px-1 py-0.5 rounded text-sm text-primary-300;
+}
+
+.prose blockquote {
+  @apply border-l-2 border-primary-500 pl-4 italic text-foreground/70;
+}

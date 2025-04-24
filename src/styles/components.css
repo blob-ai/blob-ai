@@ -1,0 +1,80 @@
+
+@tailwind components;
+
+@layer components {
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl;
+  }
+  
+  .gradient-primary {
+    @apply bg-gradient-to-r from-primary-700 to-primary-500;
+  }
+
+  .btn-primary {
+    @apply gradient-primary text-white font-medium rounded-xl px-6 py-3 transition-all shadow-md hover:shadow-lg focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-primary-700 font-medium rounded-xl px-6 py-3 border border-primary-500 transition-all hover:bg-primary-100 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50;
+  }
+
+  .btn-tertiary {
+    @apply bg-transparent text-primary-700 font-medium px-4 py-2 transition-all hover:text-primary-900 focus:outline-none;
+  }
+
+  .card {
+    @apply bg-white/5 rounded-xl shadow-sm border border-white/20 overflow-hidden transition-all duration-300;
+  }
+
+  .card-header {
+    @apply p-5 border-b border-white/20;
+  }
+
+  .card-content {
+    @apply p-5;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 rounded-xl border border-white/20 bg-white/5 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-white;
+  }
+
+  .input-error {
+    @apply border-red-500 focus:ring-red-500 focus:border-red-500;
+  }
+
+  .input-label {
+    @apply block text-sm font-medium text-white/80 mb-1;
+  }
+
+  .error-message {
+    @apply mt-1 text-sm text-red-500;
+  }
+
+  .progress-bar {
+    @apply w-full bg-white/20 rounded-full h-2 overflow-hidden;
+  }
+
+  .progress-bar-fill {
+    @apply h-full gradient-primary transition-all duration-500;
+  }
+
+  .status-indicator {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .status-success {
+    @apply status-indicator bg-green-900/50 text-green-400;
+  }
+
+  .status-warning {
+    @apply status-indicator bg-yellow-900/50 text-yellow-400;
+  }
+
+  .status-error {
+    @apply status-indicator bg-red-900/50 text-red-400;
+  }
+
+  .loading-spinner {
+    @apply animate-spin h-5 w-5 text-primary-600;
+  }
+}

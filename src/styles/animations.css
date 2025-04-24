@@ -1,0 +1,79 @@
+
+@tailwind utilities;
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink {
+  from, to { border-color: transparent }
+  50% { border-color: white }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes rainbow-soft {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: 0% 0; }
+}
+
+@layer utilities {
+  .animate-typing {
+    animation: typing 3.5s steps(40, end), blink .75s step-end infinite;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  
+  .animate-pulse-subtle {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .animate-rainbow {
+    animation: rainbow 8s linear infinite;
+  }
+  
+  .animate-rainbow-soft {
+    animation: rainbow-soft 3s ease-in-out infinite alternate;
+  }
+  
+  .animate-shimmer {
+    animation: shimmer var(--duration, 2s) linear infinite;
+  }
+  
+  .ai-message-glow {
+    @apply relative;
+    box-shadow: 0 0 25px 5px rgba(65, 105, 225, 0.3);
+  }
+}
+
+/* Hide scrollbar utility class */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

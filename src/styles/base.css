@@ -1,0 +1,62 @@
+
+@tailwind base;
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 214 73% 57%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 214 73% 57%;
+    --radius: 0.75rem;
+    
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 214 73% 57%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 214 73% 57%;
+    
+    /* Original Rainbow colors */
+    --color-1: 240 100% 50%;
+    --color-2: 180 100% 50%;
+    --color-3: 120 100% 50%;
+    --color-4: 60 100% 50%;
+    --color-5: 0 100% 50%;
+    
+    /* Softer Rainbow colors */
+    --color-soft-1: 240 80% 70%;
+    --color-soft-2: 180 80% 70%;
+    --color-soft-3: 120 80% 70%;
+    --color-soft-4: 60 80% 70%;
+    --color-soft-5: 0 80% 70%;
+  }
+}
+
+@layer base {
+  * {
+    font-family: Arial, system-ui, sans-serif;
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased font-medium;
+    font-family: Arial, system-ui, sans-serif;
+  }
+}
