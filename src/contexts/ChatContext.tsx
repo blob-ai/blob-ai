@@ -82,14 +82,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isTyping, setIsTyping] = useState(false);
   const { user } = useAuth();
 
-  // Load user's threads on initial load
   useEffect(() => {
     if (user) {
       loadThreads();
     }
   }, [user]);
 
-  // Load messages whenever the current thread changes
   useEffect(() => {
     if (currentThread) {
       loadMessages(currentThread.id);
@@ -98,99 +96,82 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [currentThread]);
 
-// Parse OpenAI analysis response into structured format
-const parseAnalysisResponse = (content: string): AnalysisSection[] => {
-  try {
-    const sections: AnalysisSection[] = [];
-    const sectionTitles = [
-      "CONTENT SNAPSHOT",
-      "HOOK BREAKDOWN",
-      "STRUCTURAL FORMULA",
-      "ENGAGEMENT TRIGGERS",
-      "REPLICATION BLUEPRINT"
-    ];
-    
-    let currentSection: AnalysisSection | null = null;
-    const lines = content.split('\n');
-    
-    for (const line of lines) {
-      const trimmedLine = line.trim();
-      if (!trimmedLine) continue;
+  const parseAnalysisResponse = (content: string): AnalysisSection[] => {
+    try {
+      const sections: AnalysisSection[] = [];
+      const sectionTitles = [
+        "CONTENT SNAPSHOT",
+        "HOOK BREAKDOWN",
+        "STRUCTURAL FORMULA",
+        "ENGAGEMENT TRIGGERS",
+        "REPLICATION BLUEPRINT"
+      ];
       
-      // Check for main section headers
-      const sectionMatch = sectionTitles.find(title => 
-        trimmedLine.toUpperCase().includes(title)
-      );
+      let currentSection: AnalysisSection | null = null;
+      const lines = content.split('\n');
       
-      if (sectionMatch) {
-        // Add previous section if exists
-        if (currentSection && currentSection.items.length > 0) {
-          sections.push(currentSection);
-        }
-        // Start new section
-        currentSection = {
-          title: sectionMatch,
-          items: []
-        };
-      } 
-      // Handle bullet points that contain key-value pairs
-      else if (trimmedLine.match(/^\s*(-|\*|\d+\.)\s*.*?:\s*/) && currentSection) {
-        // Extract content after the bullet
-        const bulletContent = trimmedLine.replace(/^\s*(-|\*|\d+\.)\s*/, '').trim();
+      for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine) continue;
         
-        // Check if it's a key-value pattern with "Key:" format
-        const keyValueMatch = bulletContent.match(/^([^:]+):\s*(.*)/);
+        const sectionMatch = sectionTitles.find(title => 
+          trimmedLine.toUpperCase().includes(title)
+        );
         
-        if (keyValueMatch) {
-          const [_, key, value] = keyValueMatch;
-          // Clean any existing formatting marks
-          const cleanKey = key.replace(/\*\*/g, '').trim();
-          // Format as clean bullet with bold key
-          currentSection.items.push(`• **${cleanKey}**: ${value}`);
-        } else {
-          // Regular bullet point without key-value structure
-          currentSection.items.push(`• ${bulletContent}`);
+        if (sectionMatch) {
+          if (currentSection && currentSection.items.length > 0) {
+            sections.push(currentSection);
+          }
+          currentSection = {
+            title: sectionMatch,
+            items: []
+          };
+        } 
+        else if (trimmedLine.match(/^\s*(-|\*|\d+\.)\s*.*?:\s*/) && currentSection) {
+          const bulletContent = trimmedLine.replace(/^\s*(-|\*|\d+\.)\s*/, '').trim();
+          
+          const keyValueMatch = bulletContent.match(/^([^:]+):\s*(.*)/);
+          
+          if (keyValueMatch) {
+            const [_, key, value] = keyValueMatch;
+            const cleanKey = key.replace(/\*\*/g, '').trim();
+            currentSection.items.push(`• **${cleanKey}**: ${value}`);
+          } else {
+            currentSection.items.push(`• ${bulletContent}`);
+          }
+        }
+        else if (trimmedLine.match(/^\s*(-|\*|\d+\.)\s*/) && currentSection) {
+          const bulletContent = trimmedLine.replace(/^\s*(-|\*|\d+\.)\s*/, '').trim();
+          const cleanContent = bulletContent.replace(/\*\*/g, '').trim();
+          currentSection.items.push(`• ${cleanContent}`);
+        }
+        else if (currentSection && currentSection.items.length > 0) {
+          const lastItem = currentSection.items[currentSection.items.length - 1];
+          if (trimmedLine.match(/^[A-Z].*?:/)) {
+            currentSection.items.push(`• ${trimmedLine}`);
+          } else {
+            currentSection.items[currentSection.items.length - 1] += ` ${trimmedLine}`;
+          }
         }
       }
-      // Handle regular bullet points
-      else if (trimmedLine.match(/^\s*(-|\*|\d+\.)\s*/) && currentSection) {
-        const bulletContent = trimmedLine.replace(/^\s*(-|\*|\d+\.)\s*/, '').trim();
-        // Clean any existing formatting marks
-        const cleanContent = bulletContent.replace(/\*\*/g, '').trim();
-        currentSection.items.push(`• ${cleanContent}`);
+      
+      if (currentSection && currentSection.items.length > 0) {
+        sections.push(currentSection);
       }
-      // Handle continuation lines or non-bullet content
-      else if (currentSection && currentSection.items.length > 0) {
-        const lastItem = currentSection.items[currentSection.items.length - 1];
-        // If this looks like a new item without a bullet, add it with a bullet
-        if (trimmedLine.match(/^[A-Z].*?:/)) {
-          currentSection.items.push(`• ${trimmedLine}`);
-        } else {
-          // Otherwise append to the last item
-          currentSection.items[currentSection.items.length - 1] += ` ${trimmedLine}`;
-        }
-      }
+      
+      return sections.length > 0 ? sections : [{
+        title: "Analysis",
+        items: [content.trim()]
+      }];
+    } catch (error) {
+      console.error("Error parsing analysis response:", error);
+      return [{
+        title: "Analysis",
+        items: [content.trim()]
+      }];
     }
-    
-    // Add the last section if exists
-    if (currentSection && currentSection.items.length > 0) {
-      sections.push(currentSection);
-    }
-    
-    return sections.length > 0 ? sections : [{
-      title: "Analysis",
-      items: [content.trim()]
-    }];
-  } catch (error) {
-    console.error("Error parsing analysis response:", error);
-    return [{
-      title: "Analysis",
-      items: [content.trim()]
-    }];
-  }
-};
+  };
 
-  // Save a message to the database
   const saveMessage = async (message: ChatMessage, threadId: string) => {
     if (!user) return;
 
@@ -201,7 +182,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
         role: message.sender,
       });
       
-      // Update the thread's last_message_at time
       await supabase
         .from("chat_threads")
         .update({ last_message_at: new Date().toISOString() })
@@ -212,35 +192,34 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     }
   };
 
-  // Send a message to OpenAI
   const sendMessage = async (content: string, threadId: string, promptType: string = "DEFAULT") => {
     if (!user || !threadId) return;
 
     try {
-      // Add user message to UI immediately
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
         text: content,
-        sender: "user"
+        sender: "user",
+        threadId: threadId,
+        timestamp: Date.now()
       };
       
       setMessages(prev => [...prev, userMessage]);
       
-      // Add a typing indicator for the AI
       const typingMessageId = `ai-typing-${Date.now()}`;
       setMessages(prev => [...prev, {
         id: typingMessageId,
         text: "",
         sender: "assistant",
-        isTyping: true
+        isTyping: true,
+        threadId: threadId,
+        timestamp: Date.now()
       }]);
       
       setIsTyping(true);
       
-      // Save user message to database
       await saveMessage(userMessage, threadId);
       
-      // Call the edge function
       const response = await supabase.functions.invoke("chat-completions", {
         body: {
           threadId,
@@ -254,17 +233,17 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
         throw new Error(response.error.message || "Failed to send message");
       }
 
-      // Remove typing indicator and add actual response
       setMessages(prev => {
         const filtered = prev.filter(msg => msg.id !== typingMessageId);
         return [...filtered, {
           id: response.data.id || `ai-${Date.now()}`,
           text: response.data.content,
-          sender: "assistant"
+          sender: "assistant",
+          threadId: threadId,
+          timestamp: Date.now()
         }];
       });
       
-      // If this is the first message, update the thread title
       if (messages.length <= 1) {
         const title = content.length > 30 
           ? content.substring(0, 27) + '...' 
@@ -276,13 +255,14 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     } catch (error) {
       console.error("Error sending message:", error);
       
-      // Remove typing indicator and add error message
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isTyping);
         return [...filtered, {
           id: `error-${Date.now()}`,
           text: "Sorry, I encountered an error. Please try again.",
-          sender: "assistant"
+          sender: "assistant",
+          threadId: threadId,
+          timestamp: Date.now()
         }];
       });
       
@@ -296,7 +276,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     }
   };
 
-  // Analyze content using the AI
   const handleAnalyzeContent = async (posts: any[], threadId: string) => {
     if (!user || !threadId || posts.length === 0) return;
     
@@ -304,29 +283,30 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
       const postsContent = posts.map(post => post.content).join("\n\n---\n\n");
       const analysisPrompt = `Please analyze these posts for what makes them successful:\n\n${postsContent}`;
       
-      // First, add the user prompt to UI and database
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
         text: `Analyze ${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`,
-        sender: "user"
+        sender: "user",
+        threadId: threadId,
+        timestamp: Date.now()
       };
       
       setMessages(prev => [...prev, userMessage]);
       await saveMessage(userMessage, threadId);
       
-      // Add a typing indicator for the AI
       const typingMessageId = `ai-typing-${Date.now()}`;
       setMessages(prev => [...prev, {
         id: typingMessageId,
         text: "",
         sender: "assistant",
         isTyping: true,
-        analysisResult: true
+        analysisResult: true,
+        threadId: threadId,
+        timestamp: Date.now()
       }]);
       
       setIsTyping(true);
       
-      // Call the edge function
       const response = await supabase.functions.invoke("chat-completions", {
         body: {
           threadId,
@@ -345,7 +325,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
       
       console.log("Parsed analysis:", parsedAnalysis);
       
-      // Remove typing indicator and add actual response
       setMessages(prev => {
         const filtered = prev.filter(msg => msg.id !== typingMessageId);
         return [...filtered, {
@@ -353,11 +332,12 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
           text: `I've analyzed ${posts.length} ${posts.length === 1 ? 'post' : 'posts'} and identified key patterns that drive engagement.`,
           sender: "assistant",
           analysisResult: true,
-          analysisData: parsedAnalysis
+          analysisData: parsedAnalysis,
+          threadId: threadId,
+          timestamp: Date.now()
         }];
       });
       
-      // If this is the first message, update the thread title
       if (messages.length <= 1) {
         const title = `Analysis of ${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`;
         await updateThreadTitle(threadId, title);
@@ -366,13 +346,14 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     } catch (error) {
       console.error("Error analyzing content:", error);
       
-      // Remove typing indicator and add error message
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isTyping);
         return [...filtered, {
           id: `error-${Date.now()}`,
           text: "Sorry, I encountered an error analyzing the posts. Please try again.",
-          sender: "assistant"
+          sender: "assistant",
+          threadId: threadId,
+          timestamp: Date.now()
         }];
       });
       
@@ -386,7 +367,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     }
   };
 
-  // Create content using the AI
   const handleCreateContent = async (contentData: any, threadId: string) => {
     if (!user || !threadId) return null;
     
@@ -406,29 +386,30 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
         });
       }
       
-      // First, add the user prompt to UI and database
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
         text: `Create a ${format} about ${goal}`,
-        sender: "user"
+        sender: "user",
+        threadId: threadId,
+        timestamp: Date.now()
       };
       
       setMessages(prev => [...prev, userMessage]);
       await saveMessage(userMessage, threadId);
       
-      // Add a typing indicator for the AI
       const typingMessageId = `ai-typing-${Date.now()}`;
       setMessages(prev => [...prev, {
         id: typingMessageId,
         text: "",
         sender: "assistant",
         isTyping: true,
-        contentPreview: null
+        contentPreview: null,
+        threadId: threadId,
+        timestamp: Date.now()
       }]);
       
       setIsTyping(true);
       
-      // Call the edge function
       const response = await supabase.functions.invoke("chat-completions", {
         body: {
           threadId,
@@ -448,18 +429,18 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
         title: title || "New Content"
       };
 
-      // Remove typing indicator and add actual response
       setMessages(prev => {
         const filtered = prev.filter(msg => msg.id !== typingMessageId);
         return [...filtered, {
           id: response.data.id || `ai-${Date.now()}`,
           text: `✅ Created "${generatedContent.title}"`,
           sender: "assistant",
-          contentPreview: generatedContent
+          contentPreview: generatedContent,
+          threadId: threadId,
+          timestamp: Date.now()
         }];
       });
       
-      // If this is the first message, update the thread title
       if (messages.length <= 1) {
         const threadTitle = `Content: ${generatedContent.title}`;
         await updateThreadTitle(threadId, threadTitle);
@@ -470,13 +451,14 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     } catch (error) {
       console.error("Error creating content:", error);
       
-      // Remove typing indicator and add error message
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isTyping);
         return [...filtered, {
           id: `error-${Date.now()}`,
           text: "Sorry, I encountered an error creating the content. Please try again.",
-          sender: "assistant"
+          sender: "assistant",
+          threadId: threadId,
+          timestamp: Date.now()
         }];
       });
       
@@ -492,7 +474,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     }
   };
 
-  // Load messages for a thread
   const loadMessages = async (threadId: string) => {
     if (!user) return;
 
@@ -513,15 +494,14 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
           id: msg.id,
           text: msg.content as string,
           sender: msg.role as "user" | "assistant",
+          threadId: threadId,
+          timestamp: new Date(msg.created_at).getTime(),
         };
 
-        // Check content for analysis markers
         if (message.sender === 'assistant' && message.text.includes("analyzed") && message.text.includes("posts")) {
           try {
-            // This message is likely an analysis result
             message.analysisResult = true;
             
-            // Try to extract structured analysis from metadata or regenerate it
             const sections = parseAnalysisResponse(message.text);
             if (sections.length > 0) {
               message.analysisData = sections;
@@ -531,7 +511,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
           }
         }
 
-        // Check for content preview marker
         if (message.sender === 'assistant' && message.text.includes("Created") && message.text.includes("✅")) {
           message.contentPreview = { title: "Generated Content" };
         }
@@ -553,7 +532,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     }
   };
 
-  // Load user's chat threads
   const loadThreads = async () => {
     if (!user) return;
 
@@ -569,7 +547,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
         throw error;
       }
 
-      // Transform the data to match the ChatThread interface
       const formattedThreads: ChatThread[] = data.map(thread => ({
         id: thread.id,
         title: thread.title,
@@ -591,7 +568,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     }
   };
 
-  // Create a new chat thread
   const createThread = async (title = "New Chat") => {
     if (!user) throw new Error("User not authenticated");
 
@@ -629,7 +605,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     }
   };
 
-  // Update a thread's title
   const updateThreadTitle = async (threadId: string, title: string) => {
     if (!user) return;
 
@@ -663,12 +638,10 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     }
   };
 
-  // Delete a thread
   const deleteThread = async (threadId: string) => {
     if (!user) return;
 
     try {
-      // Delete the thread
       const { error } = await supabase
         .from("chat_threads")
         .delete()
@@ -679,10 +652,8 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
         throw error;
       }
 
-      // Update the threads list
       setThreads((prev) => prev.filter((thread) => thread.id !== threadId));
 
-      // If the current thread is deleted, set it to null
       if (currentThread?.id === threadId) {
         setCurrentThread(null);
         setMessages([]);
@@ -702,7 +673,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     }
   };
 
-  // Save a content setup
   const saveContentSetup = async (setup: ContentSetup) => {
     if (!user) throw new Error("User not authenticated");
 
@@ -739,7 +709,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
     }
   };
 
-  // Load user's content setups
   const loadContentSetups = async (): Promise<ContentSetup[]> => {
     if (!user) return [];
 
@@ -755,7 +724,6 @@ const parseAnalysisResponse = (content: string): AnalysisSection[] => {
       }
 
       return data.map((setup) => {
-        // Parse configuration and examples safely
         let configuration = { goal: "", format: "", hook: "", tone: "" };
         let examples: Array<{ name: string; content: string }> = [];
         

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileCode, CheckCircle, AlertCircle, Info, Upload, Pencil, Clipboard } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useChat } from "@/contexts/ChatContext";
 import type { ContentSetup, TemplateVariable } from "@/types/setup";
 
 interface SelectExistingTemplateCardProps {
@@ -21,6 +22,7 @@ const SelectExistingTemplateCard: React.FC<SelectExistingTemplateCardProps> = ({
   onTemplateSelect,
   templates
 }) => {
+  const { currentThread } = useChat();
   const [selectedTemplate, setSelectedTemplate] = useState<ContentSetup | null>(null);
   const [variables, setVariables] = useState<Record<string, string>>({});
   const [processedContent, setProcessedContent] = useState<string>("");
@@ -73,7 +75,7 @@ const SelectExistingTemplateCard: React.FC<SelectExistingTemplateCardProps> = ({
       return;
     }
     
-    if (!threadId) {
+    if (!currentThread?.id) {
       toast({
         title: "Error",
         description: "No active chat thread",
