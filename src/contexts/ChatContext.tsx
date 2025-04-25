@@ -114,8 +114,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const trimmedLine = line.trim();
         if (!trimmedLine) continue;
         
+        // Check for section titles with or without markdown formatting
         const sectionMatch = sectionTitles.find(title => 
-          trimmedLine.toUpperCase().includes(title)
+          trimmedLine.toUpperCase().includes(title) || 
+          trimmedLine.toUpperCase().includes(`**${title}**`)
         );
         
         if (sectionMatch) {
@@ -126,30 +128,50 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             title: sectionMatch,
             items: []
           };
-        } 
-        else if (trimmedLine.match(/^\s*(-|\*|\d+\.)\s*.*?:\s*/) && currentSection) {
-          const bulletContent = trimmedLine.replace(/^\s*(-|\*|\d+\.)\s*/, '').trim();
+        }
+        // Handle bullet points with markdown formatting (• or - or * or numbers)
+        else if (trimmedLine.match(/^\s*(•|-|\*|\d+\.)\s*.*?:\s*/) && currentSection) {
+          const bulletContent = trimmedLine.replace(/^\s*(•|-|\*|\d+\.)\s*/, '').trim();
           
           const keyValueMatch = bulletContent.match(/^([^:]+):\s*(.*)/);
           
           if (keyValueMatch) {
             const [_, key, value] = keyValueMatch;
+            // Clean any markdown from the key
             const cleanKey = key.replace(/\*\*/g, '').trim();
             currentSection.items.push(`• **${cleanKey}**: ${value}`);
           } else {
             currentSection.items.push(`• ${bulletContent}`);
           }
         }
-        else if (trimmedLine.match(/^\s*(-|\*|\d+\.)\s*/) && currentSection) {
-          const bulletContent = trimmedLine.replace(/^\s*(-|\*|\d+\.)\s*/, '').trim();
+        // Handle regular bullet points without colons
+        else if (trimmedLine.match(/^\s*(•|-|\*|\d+\.)\s*/) && currentSection) {
+          const bulletContent = trimmedLine.replace(/^\s*(•|-|\*|\d+\.)\s*/, '').trim();
           const cleanContent = bulletContent.replace(/\*\*/g, '').trim();
           currentSection.items.push(`• ${cleanContent}`);
         }
+        // Handle markdown headings (## Heading)
+        else if (trimmedLine.match(/^#+\s+.*$/) && !currentSection) {
+          const headingText = trimmedLine.replace(/^#+\s+/, '').trim();
+          // Try to match with a section title
+          const matchedSection = sectionTitles.find(title => 
+            headingText.toUpperCase().includes(title)
+          );
+          
+          if (matchedSection) {
+            currentSection = {
+              title: matchedSection,
+              items: []
+            };
+          }
+        }
+        // Continue adding to the last item or create a new one
         else if (currentSection && currentSection.items.length > 0) {
-          const lastItem = currentSection.items[currentSection.items.length - 1];
+          // If line starts with a capitalized word and colon, it might be a new item
           if (trimmedLine.match(/^[A-Z].*?:/)) {
             currentSection.items.push(`• ${trimmedLine}`);
           } else {
+            // Otherwise, append to the existing item
             currentSection.items[currentSection.items.length - 1] += ` ${trimmedLine}`;
           }
         }

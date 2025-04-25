@@ -33,6 +33,7 @@ import SelectExistingTemplateCard from '@/components/chat/template/SelectExistin
 import { v4 as uuidv4 } from 'uuid';
 import { TemplateDialog } from "@/components/chat/template/TemplateDialog";
 import UserMessageContent from "@/components/chat/UserMessageContent";
+import AssistantMessageContent from '@/components/chat/AssistantMessageContent';
 
 type AccountTag = {
   handle: string;
@@ -190,10 +191,37 @@ const ChatInterface = () => {
       
       await sendMessage(fullMessage.trim(), activeThreadId);
       
-      if (fullMessage.toLowerCase().includes("analyze") || fullMessage.toLowerCase().includes("viral")) {
+      // Check for feature-triggering messages
+      const lowercasedMessage = fullMessage.toLowerCase();
+      
+      // Analyze posts patterns
+      if (
+        lowercasedMessage.includes("analyze") || 
+        lowercasedMessage.includes("viral") ||
+        lowercasedMessage.includes("performance") ||
+        lowercasedMessage.includes("trending") || 
+        lowercasedMessage.includes("what makes posts successful")
+      ) {
         handleStartAnalyze();
-      } else if (fullMessage.toLowerCase().includes("create") || fullMessage.toLowerCase().includes("content")) {
+      } 
+      // Content creation patterns
+      else if (
+        lowercasedMessage.includes("create content") || 
+        lowercasedMessage.includes("write a post") ||
+        lowercasedMessage.includes("draft") || 
+        lowercasedMessage.includes("generate content") ||
+        lowercasedMessage.includes("content creation") ||
+        lowercasedMessage.includes("help me write")
+      ) {
         handleStartContentCreation();
+      }
+      // Template patterns
+      else if (
+        lowercasedMessage.includes("template") ||
+        lowercasedMessage.includes("format") && lowercasedMessage.includes("content") ||
+        lowercasedMessage.includes("reuse") && lowercasedMessage.includes("structure")
+      ) {
+        handleStartTemplate();
       }
     }
   };
@@ -300,6 +328,13 @@ const ChatInterface = () => {
       ? "Use a content template"
       : "Create a content draft";
     
+    // Select the appropriate prompt type for each action
+    const promptType = isAnalyze 
+      ? "QUICK_ANALYZE" 
+      : isTemplate 
+      ? "QUICK_TEMPLATE"
+      : "QUICK_CREATE";
+    
     let activeThreadId = threadId;
     
     if (!activeThreadId) {
@@ -317,7 +352,8 @@ const ChatInterface = () => {
       }
     }
     
-    await sendMessage(actionText, activeThreadId);
+    // Send the message with our specialized prompt type
+    await sendMessage(actionText, activeThreadId, promptType);
     
     if (isAnalyze) {
       handleStartAnalyze();
@@ -784,10 +820,14 @@ const ChatInterface = () => {
                         {!message.icon && message.sender === 'user' ? (
                           <UserMessageContent content={message.text} />
                         ) : (
-                          !message.icon && 
-                          <div className="whitespace-pre-wrap text-[15px] leading-relaxed">
-                            {message.text}
-                          </div>
+                          !message.icon && !message.isTyping ? (
+                            <AssistantMessageContent content={message.text} />
+                          ) : (
+                            !message.icon && 
+                            <div className="whitespace-pre-wrap text-[15px] leading-relaxed">
+                              {message.text}
+                            </div>
+                          )
                         )}
                         
                         {message.isTyping && (
