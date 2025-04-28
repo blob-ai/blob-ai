@@ -73,13 +73,31 @@ const Auth = () => {
     } else {
       registerForm.reset();
     }
+    setShowPassword(false);
   }, [mode, loginForm, registerForm]);
 
   // Handle login submit
   const onLoginSubmit = async (values: LoginFormValues) => {
+    if (isSubmitting) return; // Prevent double submission
+    
     setIsSubmitting(true);
     try {
-      await signIn(values.email, values.password);
+      const { email, password } = values;
+      console.log("Submitting login form:", { email });
+      
+      const result = await signIn(email, password);
+      
+      if (!result.success) {
+        // Error message is already displayed via toast in signIn function
+        console.error("Login failed:", result.error);
+      }
+    } catch (error) {
+      console.error("Login form submission error:", error);
+      toast({
+        title: "Login failed",
+        description: "There was a problem signing in. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -87,6 +105,8 @@ const Auth = () => {
 
   // Handle register submit
   const onRegisterSubmit = async (values: RegisterFormValues) => {
+    if (isSubmitting) return; // Prevent double submission
+    
     setIsSubmitting(true);
     try {
       const { email, password } = values;

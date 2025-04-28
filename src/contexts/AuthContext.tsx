@@ -31,7 +31,7 @@ type AuthContextType = {
   user: User | null;
   profile: Profile | null;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<{success: boolean, error?: string}>;
   signUp: (email: string, password: string, userData?: any) => Promise<{success: boolean, error?: string}>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -114,38 +114,56 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Sign in with email and password
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<{success: boolean, error?: string}> => {
     try {
       setIsLoading(true);
+      
+      console.log("Starting sign in process for:", email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error("Sign in error:", error);
         toast({
           title: "Sign in failed",
           description: error.message,
           variant: "destructive",
         });
-        return;
+        return { success: false, error: error.message };
       }
+
+      console.log("Sign in successful:", data);
 
       if (data.user) {
         const profileData = await fetchProfile(data.user.id);
+        
+        if (!profileData) {
+          console.log("Creating default profile for user");
+          await createDefaultProfile(data.user.id);
+        }
+        
         setProfile(profileData);
+        
         toast({
           title: "Signed in successfully",
           description: `Welcome back${profileData && profileData.username ? `, ${profileData.username}` : ''}!`,
         });
         navigate("/dashboard");
+        return { success: true };
+      } else {
+        return { success: false, error: "No user returned from authentication" };
       }
     } catch (error: any) {
+      console.error("Unexpected sign in error:", error);
       toast({
         title: "Sign in failed",
-        description: error.message,
+        description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
+      return { success: false, error: error.message };
     } finally {
       setIsLoading(false);
     }
