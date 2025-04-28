@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { useSearchParams, Link, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { 
   Card, 
@@ -19,6 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 // Login schema
 const loginSchema = z.object({
@@ -40,9 +41,10 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const Auth = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const mode = searchParams.get("mode") || "login";
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, signIn, signUp, isLoading } = useAuth();
   
   // Form setup for login
@@ -64,14 +66,48 @@ const Auth = () => {
     },
   });
 
+  // Reset form when mode changes
+  useEffect(() => {
+    if (mode === "login") {
+      loginForm.reset();
+    } else {
+      registerForm.reset();
+    }
+  }, [mode, loginForm, registerForm]);
+
   // Handle login submit
   const onLoginSubmit = async (values: LoginFormValues) => {
-    await signIn(values.email, values.password);
+    setIsSubmitting(true);
+    try {
+      await signIn(values.email, values.password);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Handle register submit
   const onRegisterSubmit = async (values: RegisterFormValues) => {
-    await signUp(values.email, values.password);
+    setIsSubmitting(true);
+    try {
+      const { email, password } = values;
+      console.log("Submitting registration form:", { email });
+      
+      const result = await signUp(email, password);
+      
+      if (!result.success) {
+        // If signUp returned an error but didn't throw
+        console.error("Registration failed with result:", result);
+      }
+    } catch (error) {
+      console.error("Registration form submission error:", error);
+      toast({
+        title: "Registration failed",
+        description: "There was a problem creating your account. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Redirect if already authenticated
@@ -127,7 +163,7 @@ const Auth = () => {
                             <Input 
                               placeholder="your@email.com" 
                               className="pl-10" 
-                              disabled={isLoading}
+                              disabled={isLoading || isSubmitting}
                               {...field} 
                             />
                           </div>
@@ -150,7 +186,7 @@ const Auth = () => {
                               type={showPassword ? "text" : "password"} 
                               placeholder="••••••••" 
                               className="pl-10 pr-10" 
-                              disabled={isLoading}
+                              disabled={isLoading || isSubmitting}
                               {...field} 
                             />
                             <Button
@@ -176,9 +212,9 @@ const Auth = () => {
                   <Button 
                     type="submit" 
                     className="w-full bg-primary-600 hover:bg-primary-700"
-                    disabled={isLoading}
+                    disabled={isLoading || isSubmitting}
                   >
-                    {isLoading ? "Signing in..." : "Sign In"}
+                    {isSubmitting ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
               </Form>
@@ -197,7 +233,7 @@ const Auth = () => {
                             <Input 
                               placeholder="your@email.com" 
                               className="pl-10" 
-                              disabled={isLoading}
+                              disabled={isLoading || isSubmitting}
                               {...field} 
                             />
                           </div>
@@ -220,7 +256,7 @@ const Auth = () => {
                               type={showPassword ? "text" : "password"} 
                               placeholder="••••••••" 
                               className="pl-10 pr-10" 
-                              disabled={isLoading}
+                              disabled={isLoading || isSubmitting}
                               {...field} 
                             />
                             <Button
@@ -256,7 +292,7 @@ const Auth = () => {
                               type={showPassword ? "text" : "password"} 
                               placeholder="••••••••" 
                               className="pl-10" 
-                              disabled={isLoading}
+                              disabled={isLoading || isSubmitting}
                               {...field} 
                             />
                           </div>
@@ -269,9 +305,9 @@ const Auth = () => {
                   <Button 
                     type="submit" 
                     className="w-full bg-primary-600 hover:bg-primary-700"
-                    disabled={isLoading}
+                    disabled={isLoading || isSubmitting}
                   >
-                    {isLoading ? "Creating Account..." : "Create Account"}
+                    {isSubmitting ? "Creating Account..." : "Create Account"}
                   </Button>
                 </form>
               </Form>
