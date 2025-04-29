@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useSidebar } from "./SidebarProvider";
 import { cn } from "@/lib/utils";
 import { 
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useChat } from "@/contexts/ChatContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Import refactored sidebar components
 import SidebarHeader from "./sidebar/SidebarHeader";
@@ -20,12 +21,23 @@ import SidebarFooter from "./sidebar/SidebarFooter";
 
 const Sidebar = () => {
   const { isSidebarOpen } = useSidebar();
-  const { createThread, threads } = useChat();
+  const { createThread, threads, loadThreads } = useChat();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (user) {
+      loadThreads();
+    }
+  }, [user, loadThreads]);
+
   const handleNewChat = async () => {
-    const threadId = await createThread();
-    navigate(`/dashboard/chat/${threadId}`);
+    try {
+      const threadId = await createThread();
+      navigate(`/dashboard/chat/${threadId}`);
+    } catch (error) {
+      console.error("Error creating new chat:", error);
+    }
   };
 
   // Main navigation items

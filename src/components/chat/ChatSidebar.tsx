@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChat } from "@/contexts/ChatContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 interface ChatSidebarProps {
   visible: boolean;
@@ -22,7 +23,8 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
     createThread,
     updateThreadTitle,
     deleteThread,
-    loadThreads
+    loadThreads,
+    loadMessages
   } = useChat();
   
   const { user } = useAuth();
@@ -47,8 +49,17 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
     try {
       const threadId = await createThread();
       navigate(`/dashboard/chat/${threadId}`);
+      toast({
+        title: "New chat created",
+        description: "Start a new conversation with AI assistant"
+      });
     } catch (error) {
       console.error("Error creating new chat:", error);
+      toast({
+        title: "Error",
+        description: "Could not create a new chat thread",
+        variant: "destructive"
+      });
     }
   };
 
@@ -56,6 +67,7 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
     const thread = threads.find((t) => t.id === threadId);
     if (thread) {
       setCurrentThread(thread);
+      loadMessages(threadId);
       navigate(`/dashboard/chat/${threadId}`);
     }
   };
@@ -68,8 +80,20 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
   const handleSaveEdit = async (threadId: string) => {
     if (editedTitle.trim() === "") return;
     
-    await updateThreadTitle(threadId, editedTitle);
-    setEditingThread(null);
+    try {
+      await updateThreadTitle(threadId, editedTitle);
+      setEditingThread(null);
+      toast({
+        title: "Chat renamed",
+        description: "Chat title updated successfully"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update chat title",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleCancelEdit = () => {
@@ -77,16 +101,24 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
   };
 
   const handleDeleteThread = async (threadId: string) => {
-    await deleteThread(threadId);
-    if (threads.length > 1) {
-      // If there are other threads, navigate to the first one that's not the deleted one
-      const nextThread = threads.find((t) => t.id !== threadId);
-      if (nextThread) {
-        navigate(`/dashboard/chat/${nextThread.id}`);
+    try {
+      await deleteThread(threadId);
+      if (threads.length > 1) {
+        // If there are other threads, navigate to the first one that's not the deleted one
+        const nextThread = threads.find((t) => t.id !== threadId);
+        if (nextThread) {
+          navigate(`/dashboard/chat/${nextThread.id}`);
+        }
+      } else {
+        // If this was the last thread, create a new one
+        handleCreateNewChat();
       }
-    } else {
-      // If this was the last thread, create a new one
-      handleCreateNewChat();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete chat thread",
+        variant: "destructive"
+      });
     }
   };
 
@@ -244,7 +276,10 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
                               variant="ghost"
                               size="icon"
                               className="h-7 w-7 text-white/50 hover:text-white"
-                              onClick={() => handleStartEdit(thread.id, thread.title)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleStartEdit(thread.id, thread.title);
+                              }}
                             >
                               <Edit className="h-3.5 w-3.5" />
                             </Button>
@@ -252,7 +287,10 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
                               variant="ghost"
                               size="icon"
                               className="h-7 w-7 text-white/50 hover:text-red-500"
-                              onClick={() => handleDeleteThread(thread.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteThread(thread.id);
+                              }}
                             >
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
