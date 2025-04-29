@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { MessageSquare, Plus, Search, Trash2, Edit, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,8 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
   const [editingThread, setEditingThread] = useState<string | null>(null);
   const [editedTitle, setEditedTitle] = useState("");
   const navigate = useNavigate();
+  const params = useParams();
+  const threadId = params.threadId;
 
   // Load threads when user authenticates
   useEffect(() => {
@@ -39,6 +41,17 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
       loadThreads();
     }
   }, [user, loadThreads]);
+  
+  // Set current thread and load messages when thread ID in URL changes
+  useEffect(() => {
+    if (threadId && threads.length > 0) {
+      const thread = threads.find(t => t.id === threadId);
+      if (thread) {
+        setCurrentThread(thread);
+        loadMessages(threadId);
+      }
+    }
+  }, [threadId, threads, setCurrentThread, loadMessages]);
 
   // Filter threads based on search query
   const filteredThreads = threads.filter((thread) =>
@@ -67,7 +80,7 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
     const thread = threads.find((t) => t.id === threadId);
     if (thread) {
       setCurrentThread(thread);
-      loadMessages(threadId);
+      loadMessages(threadId); // Explicitly load messages when a thread is selected
       navigate(`/dashboard/chat/${threadId}`);
     }
   };
