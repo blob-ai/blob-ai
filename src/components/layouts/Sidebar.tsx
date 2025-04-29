@@ -1,11 +1,10 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useSidebar } from "./SidebarProvider";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
   MessageSquare, 
-  FileText, 
   Users,
   PlusCircle
 } from "lucide-react";
@@ -25,7 +24,7 @@ const Sidebar = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (user) {
       loadThreads();
     }

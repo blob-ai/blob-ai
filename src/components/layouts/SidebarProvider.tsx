@@ -1,7 +1,6 @@
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useChat } from "@/contexts/ChatContext";
 
 interface SidebarContextType {
   isSidebarOpen: boolean;
@@ -14,13 +13,6 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { user } = useAuth();
-  const { loadThreads } = useChat();
-
-  useEffect(() => {
-    if (user) {
-      loadThreads();
-    }
-  }, [user, loadThreads]);
 
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
   const closeSidebar = () => setIsSidebarOpen(false);

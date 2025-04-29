@@ -46,14 +46,14 @@ const App = () => (
               {/* Redirect /chat to dashboard/chat */}
               <Route path="/chat" element={<Navigate to="/dashboard/chat" replace />} />
               
-              {/* Dashboard routes wrapped in SidebarProvider and Layout, protected by AuthGuard */}
+              {/* Dashboard routes wrapped in ChatProvider and SidebarProvider, protected by AuthGuard */}
               <Route path="/dashboard" element={
                 <AuthGuard>
-                  <SidebarProvider>
-                    <ChatProvider>
+                  <ChatProvider>
+                    <SidebarProvider>
                       <Layout />
-                    </ChatProvider>
-                  </SidebarProvider>
+                    </SidebarProvider>
+                  </ChatProvider>
                 </AuthGuard>
               }>
                 {/* Redirect /dashboard to /dashboard/chat for default view */}
