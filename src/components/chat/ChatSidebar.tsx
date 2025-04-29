@@ -203,6 +203,13 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
                             onChange={(e) => setEditedTitle(e.target.value)}
                             className="h-8 flex-1 bg-white/5 border-white/10"
                             autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleSaveEdit(thread.id);
+                              } else if (e.key === 'Escape') {
+                                handleCancelEdit();
+                              }
+                            }}
                           />
                           <Button
                             variant="ghost"
