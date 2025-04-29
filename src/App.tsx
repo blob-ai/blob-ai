@@ -60,6 +60,7 @@ const App = () => (
                 <Route index element={<Navigate to="/dashboard/chat" replace />} />
                 <Route path="chat" element={<ChatInterface />} />
                 <Route path="chat/:threadId" element={<ChatInterface />} />
+                <Route path="chat/new" element={<ChatInterface />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="workspace" element={<Workspace />} />
                 <Route path="workspace/:id" element={<Workspace />} />

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageSquare, Plus, Search, Trash2, Edit, Check, X } from "lucide-react";
@@ -5,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChat } from "@/contexts/ChatContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
 interface ChatSidebarProps {
@@ -20,11 +22,21 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
     createThread,
     updateThreadTitle,
     deleteThread,
+    loadThreads
   } = useChat();
+  
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [editingThread, setEditingThread] = useState<string | null>(null);
   const [editedTitle, setEditedTitle] = useState("");
   const navigate = useNavigate();
+
+  // Load threads when user authenticates
+  useEffect(() => {
+    if (user) {
+      loadThreads();
+    }
+  }, [user, loadThreads]);
 
   // Filter threads based on search query
   const filteredThreads = threads.filter((thread) =>
@@ -150,7 +162,9 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
             ) : filteredThreads.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-4 text-center">
                 <MessageSquare className="h-8 w-8 text-white/30 mb-2" />
-                <div className="text-sm text-white/50">No chats found</div>
+                <div className="text-sm text-white/50">
+                  {searchQuery ? "No chats found" : "No chat history yet"}
+                </div>
                 {searchQuery && (
                   <Button
                     variant="link"
@@ -159,6 +173,11 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
                   >
                     Clear search
                   </Button>
+                )}
+                {!searchQuery && !user && (
+                  <div className="text-xs text-white/50 mt-1">
+                    Please sign in to see your chat history
+                  </div>
                 )}
               </div>
             ) : (
