@@ -10,7 +10,7 @@ interface ContentCanvasProps {
   initialContent: string;
   onPublish: (content: string) => void;
   onSaveDraft: (content: string) => void;
-  onSchedule: (content: string) => void;
+  onSchedule: (content: string, date?: Date) => void;
 }
 
 const ContentCanvas: React.FC<ContentCanvasProps> = ({
