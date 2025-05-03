@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthGuard from "./components/auth/AuthGuard";
+import ContentCreationPage from "./pages/ContentCreationPage";
 
 // Create a query client for React Query
 const queryClient = new QueryClient({
@@ -64,6 +65,7 @@ const App = () => (
                 <Route path="workspace" element={<Workspace />} />
                 <Route path="workspace/:id" element={<Workspace />} />
                 <Route path="templates" element={<Templates />} />
+                <Route path="content" element={<ContentCreationPage />} />
               </Route>
               
               {/* 404 page */}

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useSidebar } from "./SidebarProvider";
 import { cn } from "@/lib/utils";
@@ -5,7 +6,8 @@ import {
   LayoutDashboard, 
   MessageSquare, 
   FileText, 
-  Users
+  Users,
+  Edit
 } from "lucide-react";
 
 // Import refactored sidebar components
@@ -26,6 +28,13 @@ const Sidebar = () => {
       exact: false,
       hasAction: true,
       action: () => window.location.href = '/dashboard/chat/new'
+    },
+    {
+      name: "Content Creation",
+      path: "/dashboard/content",
+      icon: <Edit className="h-6 w-6" />,
+      exact: true,
+      hasAction: false
     },
     {
       name: "Dashboard",
