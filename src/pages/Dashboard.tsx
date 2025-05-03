@@ -12,13 +12,11 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  Pencil
 } from "lucide-react";
 import { DraggableKanbanBoard } from "@/components/dashboard/DraggableKanbanBoard";
 import { useRef, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useContentCreation } from "@/hooks/use-content-creation";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -26,8 +24,7 @@ const Dashboard = () => {
   const isMobile = useIsMobile();
   const [sortBy, setSortBy] = useState<string>("dueDate");
   const boardRef = useRef<any>(null);
-  const { handleCreateClick } = useContentCreation();
-
+  
   // Function to scroll the taskboard
   const scrollTaskboard = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -49,11 +46,6 @@ const Dashboard = () => {
     if (boardRef.current) {
       boardRef.current.addTaskToColumn("not-started");
     }
-  };
-  
-  // Function to handle "Create posts" button click
-  const handleCreatePostsClick = () => {
-    navigate('/dashboard/content');
   };
 
   return (
@@ -83,10 +75,10 @@ const Dashboard = () => {
           <Button
             variant="outline"
             className="bg-white/5 border-white/10 hover:bg-white/10 hover:text-primary-400 transition-all justify-start h-12 text-sm w-full"
-            onClick={handleCreatePostsClick}
+            onClick={() => navigate('/dashboard/content')}
           >
-            <Pencil className="w-4 h-4 text-primary-400 mr-2 flex-shrink-0" />
-            <span className="truncate">Create Posts</span>
+            <FileText className="w-4 h-4 text-primary-400 mr-2 flex-shrink-0" />
+            <span className="truncate">Find Templates</span>
           </Button>
           
           <Button
@@ -182,14 +174,6 @@ const Dashboard = () => {
         onClick={() => navigate('/dashboard/chat')}
       >
         <MessageSquare className="h-6 w-6" />
-      </Button>
-      
-      {/* Create Posts Button - Mobile only - Fixed positioning */}
-      <Button 
-        className="fixed bottom-6 left-6 w-12 h-12 rounded-full bg-blue-600 shadow-lg flex items-center justify-center p-0 z-20 hover:bg-blue-500 md:hidden"
-        onClick={handleCreatePostsClick}
-      >
-        <Pencil className="h-6 w-6" />
       </Button>
     </div>
   );
