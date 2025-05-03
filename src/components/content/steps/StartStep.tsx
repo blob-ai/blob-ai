@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 
 interface StartStepProps {
   onCreateClick: () => void;
@@ -20,9 +21,10 @@ const StartStep: React.FC<StartStepProps> = ({ onCreateClick }) => {
         multiple creation methods to get started.
       </p>
       <Button 
-        className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-6 rounded-xl text-lg"
+        className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-6 rounded-xl text-lg flex items-center gap-2"
         onClick={onCreateClick}
       >
+        <Pencil className="h-5 w-5" />
         Create posts
       </Button>
     </div>

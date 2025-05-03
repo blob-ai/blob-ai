@@ -30,6 +30,7 @@ export function useContentCreation() {
   const [usageCount, setUsageCount] = useState(2);
   const [maxUsage] = useState(5);
 
+  // Modified to skip intermediate steps and go directly to modal
   const handleCreateClick = () => {
     setShowCreationModal(true);
   };
