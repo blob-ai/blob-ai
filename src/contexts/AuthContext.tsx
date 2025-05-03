@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,8 +30,8 @@ type AuthContextType = {
   user: User | null;
   profile: Profile | null;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<{success: boolean, error?: string}>;
-  signUp: (email: string, password: string, userData?: any) => Promise<{success: boolean, error?: string}>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, userData?: any) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
@@ -114,56 +113,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Sign in with email and password
-  const signIn = async (email: string, password: string): Promise<{success: boolean, error?: string}> => {
+  const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      
-      console.log("Starting sign in process for:", email);
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        console.error("Sign in error:", error);
         toast({
           title: "Sign in failed",
           description: error.message,
           variant: "destructive",
         });
-        return { success: false, error: error.message };
+        return;
       }
-
-      console.log("Sign in successful:", data);
 
       if (data.user) {
         const profileData = await fetchProfile(data.user.id);
-        
-        if (!profileData) {
-          console.log("Creating default profile for user");
-          await createDefaultProfile(data.user.id);
-        }
-        
         setProfile(profileData);
-        
         toast({
           title: "Signed in successfully",
           description: `Welcome back${profileData && profileData.username ? `, ${profileData.username}` : ''}!`,
         });
         navigate("/dashboard");
-        return { success: true };
-      } else {
-        return { success: false, error: "No user returned from authentication" };
       }
     } catch (error: any) {
-      console.error("Unexpected sign in error:", error);
       toast({
         title: "Sign in failed",
-        description: error.message || "An unexpected error occurred",
+        description: error.message,
         variant: "destructive",
       });
-      return { success: false, error: error.message };
     } finally {
       setIsLoading(false);
     }
@@ -173,9 +154,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string, userData?: any) => {
     try {
       setIsLoading(true);
-      
-      console.log("Starting signup process for:", email);
-      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -185,17 +163,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (error) {
-        console.error("Signup error:", error);
         toast({
           title: "Sign up failed",
           description: error.message,
           variant: "destructive",
         });
-        return { success: false, error: error.message };
+        return;
       }
-
-      // Log successful signup
-      console.log("Signup successful:", data);
 
       toast({
         title: "Sign up successful",
@@ -204,32 +178,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Auto-sign in after registration if email confirmation is disabled
       if (data.session) {
-        console.log("Session created immediately:", data.session);
-        
         if (data.user) {
           const profileData = await fetchProfile(data.user.id);
-          
-          if (!profileData) {
-            console.log("Creating default profile for new user");
-            await createDefaultProfile(data.user.id);
-          }
-          
           setProfile(profileData);
         }
         navigate("/dashboard");
       } else {
         navigate("/auth?mode=login");
       }
-      
-      return { success: true };
     } catch (error: any) {
-      console.error("Unexpected signup error:", error);
       toast({
         title: "Sign up failed",
-        description: error.message || "An unexpected error occurred",
+        description: error.message,
         variant: "destructive",
       });
-      return { success: false, error: error.message };
     } finally {
       setIsLoading(false);
     }

@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarContextType {
   isSidebarOpen: boolean;
@@ -12,7 +11,6 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const { user } = useAuth();
 
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
   const closeSidebar = () => setIsSidebarOpen(false);

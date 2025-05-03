@@ -1,16 +1,12 @@
-
 import React from "react";
 import { useSidebar } from "./SidebarProvider";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
   MessageSquare, 
-  Users,
-  PlusCircle
+  FileText, 
+  Users
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useChat } from "@/contexts/ChatContext";
-import { useAuth } from "@/contexts/AuthContext";
 
 // Import refactored sidebar components
 import SidebarHeader from "./sidebar/SidebarHeader";
@@ -20,24 +16,6 @@ import SidebarFooter from "./sidebar/SidebarFooter";
 
 const Sidebar = () => {
   const { isSidebarOpen } = useSidebar();
-  const { createThread, threads, loadThreads } = useChat();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
-  React.useEffect(() => {
-    if (user) {
-      loadThreads();
-    }
-  }, [user, loadThreads]);
-
-  const handleNewChat = async () => {
-    try {
-      const threadId = await createThread();
-      navigate(`/dashboard/chat/${threadId}`);
-    } catch (error) {
-      console.error("Error creating new chat:", error);
-    }
-  };
 
   // Main navigation items
   const navItems = [
@@ -47,7 +25,7 @@ const Sidebar = () => {
       icon: <MessageSquare className="h-6 w-6" />,
       exact: false,
       hasAction: true,
-      action: handleNewChat
+      action: () => window.location.href = '/dashboard/chat/new'
     },
     {
       name: "Dashboard",
@@ -58,19 +36,17 @@ const Sidebar = () => {
     }
   ];
 
-  // Get recent chats from threads context (limited to 3)
-  const recentChats = threads
-    .slice(0, 3)
-    .map(thread => ({ 
-      name: thread.title || "Untitled Chat", 
-      path: `/dashboard/chat/${thread.id}`,
-      icon: <MessageSquare className="h-5 w-5 text-white/60" />
-    }));
-
   // Your workspaces data
   const workspaces = [
     { name: "Personal X Account", path: "/dashboard/workspace/personal-x", icon: <Users className="h-5 w-5 text-primary-400" /> },
     { name: "Web3 Posts", path: "/dashboard/workspace/web3", icon: <Users className="h-5 w-5 text-primary-400" /> }
+  ];
+
+  // Recent chats data
+  const recentChats = [
+    { name: "Content Strategy Chat 1", path: "/dashboard/chat/1" },
+    { name: "Content Strategy Chat 2", path: "/dashboard/chat/2" },
+    { name: "Content Strategy Chat 3", path: "/dashboard/chat/3" }
   ];
 
   return (
@@ -103,16 +79,7 @@ const Sidebar = () => {
             <SidebarSection title="Your workspaces" items={workspaces} />
 
             {/* Recent Chats Section */}
-            <SidebarSection 
-              title="Recent chats" 
-              items={recentChats} 
-              actionItem={{
-                name: "New Chat",
-                path: "",
-                icon: <PlusCircle className="h-4 w-4" />,
-                action: handleNewChat
-              }}
-            />
+            <SidebarSection title="Recent chats" items={recentChats} />
           </nav>
 
           <SidebarFooter />
