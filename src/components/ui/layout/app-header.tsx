@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Bell, LogOut, Menu, User, Settings, CreditCard } from "lucide-react";
+import { Bell, LogOut, Menu, User, Settings, CreditCard, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import UpgradePlan from "@/pages/UpgradePlan";
+import { useNavigate } from "react-router-dom";
+import { useContentCreation } from "@/hooks/use-content-creation";
 
 interface AppHeaderProps {
   className?: string;
@@ -25,6 +27,8 @@ export function AppHeader({ className }: AppHeaderProps) {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const { user, profile, signOut } = useAuth();
   const [showUpgradePlan, setShowUpgradePlan] = useState(false);
+  const navigate = useNavigate();
+  const { handleCreateClick } = useContentCreation();
   
   const getInitials = () => {
     if (profile?.full_name) {
@@ -64,6 +68,23 @@ export function AppHeader({ className }: AppHeaderProps) {
           </div>
           
           <div className="flex items-center gap-2">
+            {/* Create Posts Button */}
+            <Button 
+              className="bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-2 mr-2 hidden md:flex"
+              onClick={() => {
+                if (window.location.pathname === '/dashboard/content') {
+                  // If we're already on the content page, just open modal
+                  handleCreateClick();
+                } else {
+                  // Navigate to content page
+                  navigate('/dashboard/content');
+                }
+              }}
+            >
+              <Pencil className="h-4 w-4" />
+              Create posts
+            </Button>
+            
             <Button 
               variant="ghost" 
               size="icon" 
