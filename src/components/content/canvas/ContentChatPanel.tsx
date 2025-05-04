@@ -2,23 +2,37 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowUp, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowUp, Sparkles, ChevronDown, ChevronUp, Wand2, MessageSquare, PenTool, Lightbulb } from "lucide-react";
 import { useChat } from "@/contexts/ChatContext";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 
 interface Message {
   id: string;
   text: string;
-  sender: "user" | "ai";  // Strict union type for sender
+  sender: "user" | "ai";
+}
+
+interface ContentAnalysis {
+  tone?: string;
+  wordCount?: number;
+  readingLevel?: string;
+  improvements?: string[];
 }
 
 interface ContentChatPanelProps {
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, selection?: string) => void;
+  selectedText?: string;
+  content?: string;
 }
 
-const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) => {
+const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ 
+  onSendMessage,
+  selectedText = "",
+  content = "" 
+}) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { 
@@ -45,6 +59,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
   ]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(true);
+  const [contentAnalysis, setContentAnalysis] = useState<ContentAnalysis | null>(null);
 
   // Initialize a thread on component mount
   useEffect(() => {
@@ -64,6 +79,13 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
     initializeThread();
   }, [currentThread, createThread]);
 
+  // Analyze content when it changes or selection changes
+  useEffect(() => {
+    if (content) {
+      analyzeContent(content, selectedText);
+    }
+  }, [content, selectedText]);
+
   // Scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -75,7 +97,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
       const mappedMessages = chatMessages.map(msg => ({
         id: msg.id,
         text: msg.text,
-        sender: msg.sender === "assistant" ? "ai" : "user" as "ai" | "user"  // Explicit type casting
+        sender: msg.sender === "assistant" ? "ai" : "user" as "ai" | "user"
       }));
       
       if (mappedMessages.length > 0) {
@@ -83,6 +105,27 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
       }
     }
   }, [chatMessages, activeThreadId]);
+
+  // Update suggested prompts based on selected text
+  useEffect(() => {
+    if (selectedText) {
+      setSuggestedPrompts([
+        "Improve this selection",
+        "Make this more concise",
+        "Rewrite in a professional tone",
+        "Fix grammar and spelling",
+        "Make this more engaging"
+      ]);
+    } else {
+      setSuggestedPrompts([
+        "Analyze my content tone",
+        "Suggest improvements",
+        "Help me with my conclusion",
+        "Make my content more engaging",
+        "Check overall readability"
+      ]);
+    }
+  }, [selectedText]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -94,7 +137,9 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
       sender: "user",
     };
     setLocalMessages(prev => [...prev, userMessage]);
-    onSendMessage(input);
+    
+    // Send message via onSendMessage prop
+    onSendMessage(input, selectedText);
     
     // Send message via ChatContext if we have an active thread
     if (activeThreadId) {
@@ -118,6 +163,37 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
     setTimeout(() => {
       generateLocalAIResponse(userInput);
     }, 1000);
+  };
+
+  const analyzeContent = (fullContent: string, selection: string = "") => {
+    // This would ideally be done by a real AI model
+    // Here we're generating mock analysis
+    
+    const textToAnalyze = selection || fullContent;
+    const wordCount = textToAnalyze.split(/\s+/).filter(Boolean).length;
+    
+    let tone = "Neutral";
+    if (textToAnalyze.includes("!")) tone = "Enthusiastic";
+    else if (textToAnalyze.includes("?")) tone = "Inquisitive";
+    else if (textToAnalyze.toLowerCase().includes("we")) tone = "Inclusive";
+    
+    let readingLevel = "Intermediate";
+    const avgWordLength = textToAnalyze.split(/\s+/).filter(Boolean).reduce((sum, word) => sum + word.length, 0) / wordCount;
+    if (avgWordLength > 6) readingLevel = "Advanced";
+    else if (avgWordLength < 4) readingLevel = "Elementary";
+    
+    const improvements = [];
+    if (wordCount < 50) improvements.push("Add more detail");
+    if (!textToAnalyze.includes(",")) improvements.push("Consider using more complex sentences");
+    if (textToAnalyze.split(".").length < 3) improvements.push("Break content into more paragraphs");
+    if (textToAnalyze.includes("very")) improvements.push("Replace intensifiers with stronger words");
+    
+    setContentAnalysis({
+      tone,
+      wordCount,
+      readingLevel,
+      improvements
+    });
   };
 
   const generateLocalAIResponse = (userInput: string) => {
@@ -146,6 +222,14 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
         "Simplify my complex sentences",
         "Make my tone more professional",
         "Check for consistency in tense"
+      ]);
+    } else if (userInput.toLowerCase().includes("tone")) {
+      response = `I've analyzed your content's tone. It appears to be ${contentAnalysis?.tone || "neutral"}. To make it more persuasive, consider:\n\n1. Using more emotional language\n2. Adding rhetorical questions\n3. Incorporating personal anecdotes\n4. Addressing the reader directly with "you"`;
+      setSuggestedPrompts([
+        "Make the tone more professional",
+        "Make the tone more conversational",
+        "Make the tone more authoritative",
+        "Add more emotional language"
       ]);
     } else if (userInput.toLowerCase().includes("conclusion")) {
       response = "Here's a stronger conclusion for your piece:\n\n\"With these strategies in place, you're now equipped to create content that not only resonates with your audience but drives meaningful engagement. The key is consistency and authentic value—delivering insights your readers can't find elsewhere.\"";
@@ -177,12 +261,32 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
     setInput(prompt);
   };
 
+  const handleQuickAction = (action: string) => {
+    if (selectedText) {
+      let actionPrompt = "";
+      switch(action) {
+        case "improve":
+          actionPrompt = `Improve this selected text: "${selectedText}"`;
+          break;
+        case "tone":
+          actionPrompt = `Analyze and suggest a better tone for: "${selectedText}"`;
+          break;
+        case "rewrite":
+          actionPrompt = `Rewrite this to be more engaging: "${selectedText}"`;
+          break;
+      }
+      setInput(actionPrompt);
+    } else {
+      toast.info("Please select text to use quick actions");
+    }
+  };
+
   // Determine which messages to show - ChatContext if available, otherwise local
   const displayMessages = chatMessages.length > 0 && activeThreadId ? 
     chatMessages.map(msg => ({
       id: msg.id,
       text: msg.text,
-      sender: msg.sender === "assistant" ? "ai" : "user" as "ai" | "user"  // Explicit type casting
+      sender: msg.sender === "assistant" ? "ai" : "user" as "ai" | "user"
     })) : 
     localMessages;
 
@@ -194,6 +298,47 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
           AI Assistant
         </h2>
       </div>
+
+      {contentAnalysis && (
+        <div className="p-4 border-b border-white/10">
+          <Accordion type="single" collapsible defaultValue="analysis">
+            <AccordionItem value="analysis" className="border-none">
+              <AccordionTrigger className="py-1 text-sm font-medium hover:no-underline">
+                Content Analysis
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Tone:</span>
+                    <Badge variant="outline" className="bg-white/5">{contentAnalysis.tone}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Words:</span>
+                    <Badge variant="outline" className="bg-white/5">{contentAnalysis.wordCount}</Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Reading level:</span>
+                    <Badge variant="outline" className="bg-white/5">{contentAnalysis.readingLevel}</Badge>
+                  </div>
+                  {contentAnalysis.improvements && contentAnalysis.improvements.length > 0 && (
+                    <>
+                      <div className="text-white/70 pt-1">Suggested improvements:</div>
+                      <ul className="space-y-1">
+                        {contentAnalysis.improvements.map((improvement, i) => (
+                          <li key={i} className="text-xs flex items-center">
+                            <span className="h-1 w-1 rounded-full bg-blue-400 mr-2"></span>
+                            {improvement}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {displayMessages.map((message) => (
@@ -234,6 +379,36 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
         
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Quick Actions */}
+      {selectedText && (
+        <div className="px-4 py-2 border-t border-white/10 flex space-x-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 border-white/10 hover:bg-white/10"
+            onClick={() => handleQuickAction("improve")}
+          >
+            <Wand2 className="h-3 w-3 mr-1" /> Improve
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 border-white/10 hover:bg-white/10"
+            onClick={() => handleQuickAction("tone")}
+          >
+            <PenTool className="h-3 w-3 mr-1" /> Tone
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 border-white/10 hover:bg-white/10"
+            onClick={() => handleQuickAction("rewrite")}
+          >
+            <MessageSquare className="h-3 w-3 mr-1" /> Rewrite
+          </Button>
+        </div>
+      )}
 
       <div className="p-4 border-t border-white/10">
         <Accordion type="single" collapsible defaultValue="suggestions">

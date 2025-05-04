@@ -7,9 +7,6 @@ import CanvasPreview from "./CanvasPreview";
 import ContentChatPanel from "./ContentChatPanel";
 import useContentFormatting from "./hooks/useContentFormatting";
 import ResizablePanelsWrapper from "./ResizablePanelsWrapper";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
 
 interface ContentCanvasProps {
   initialContent?: string;
@@ -29,6 +26,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
   const [showChatPanel, setShowChatPanel] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [selectedText, setSelectedText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { handleFormatting } = useContentFormatting();
 
@@ -42,6 +40,28 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     
     return () => clearTimeout(saveTimer);
   }, [content, initialContent]);
+
+  // Update selected text for AI context
+  useEffect(() => {
+    const updateSelection = () => {
+      if (textareaRef.current) {
+        const start = textareaRef.current.selectionStart;
+        const end = textareaRef.current.selectionEnd;
+        if (start !== end) {
+          setSelectedText(content.substring(start, end));
+        } else {
+          setSelectedText("");
+        }
+      }
+    };
+
+    // Add selection event listener
+    document.addEventListener("selectionchange", updateSelection);
+    
+    return () => {
+      document.removeEventListener("selectionchange", updateSelection);
+    };
+  }, [content]);
 
   const handleAutoSave = () => {
     setIsSaving(true);
@@ -87,12 +107,13 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     handleFormatting(format, content, setContent, textareaRef);
   };
 
-  const handleSendToAI = async (message: string, selectedText?: string) => {
+  const handleSendToAI = async (message: string, selection?: string) => {
     console.log("Sending content to AI:", message);
     
     // Prepare the full prompt with selected content if available
-    const fullPrompt = selectedText 
-      ? `${message}\n\nSelected content:\n${selectedText}`
+    const textToAnalyze = selection || selectedText || "";
+    const fullPrompt = textToAnalyze 
+      ? `${message}\n\nSelected content:\n${textToAnalyze}`
       : message;
     
     toast.info(`AI processing request: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`);
@@ -105,21 +126,29 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Handle text transformation based on the message
-      if (selectedText && textareaRef.current) {
+      if (textToAnalyze && textareaRef.current) {
         const start = textareaRef.current.selectionStart;
         const end = textareaRef.current.selectionEnd;
-        let transformedText = selectedText;
+        let transformedText = textToAnalyze;
         
         if (message.toLowerCase().includes("rewrite")) {
-          transformedText = `${selectedText} (rewritten with more engaging language)`;
+          transformedText = `${textToAnalyze} (rewritten with more engaging language)`;
         } else if (message.toLowerCase().includes("shorter")) {
-          transformedText = selectedText.split(" ")
-            .slice(0, Math.ceil(selectedText.split(" ").length / 2))
+          transformedText = textToAnalyze.split(" ")
+            .slice(0, Math.ceil(textToAnalyze.split(" ").length / 2))
             .join(" ");
         } else if (message.toLowerCase().includes("longer")) {
-          transformedText = `${selectedText} with additional context and supporting details to expand on the key points`;
+          transformedText = `${textToAnalyze} with additional context and supporting details to expand on the key points`;
         } else if (message.toLowerCase().includes("grammar") || message.toLowerCase().includes("fix")) {
-          transformedText = selectedText.replace(/\b(i)\b/g, "I").replace(/\s+([.,;:!?])/g, "$1");
+          transformedText = textToAnalyze.replace(/\b(i)\b/g, "I").replace(/\s+([.,;:!?])/g, "$1");
+        } else if (message.toLowerCase().includes("tone") || message.toLowerCase().includes("professional")) {
+          transformedText = textToAnalyze.replace(/(\bI think\b|\bmaybe\b|\bperhaps\b)/g, "")
+            .replace(/\b(great|awesome|cool)\b/g, "excellent")
+            .replace(/\b(thing|stuff)\b/g, "element");
+        } else if (message.toLowerCase().includes("improve")) {
+          transformedText = textToAnalyze.replace(/\b(very|really)\b/g, "")
+            .replace(/\b(good)\b/g, "excellent")
+            .replace(/\b(bad)\b/g, "problematic");
         }
         
         const newContent = 
@@ -200,17 +229,9 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     <ResizablePanelsWrapper
       leftPanel={
         <ContentChatPanel 
-          onSendMessage={(message) => {
-            // Determine if this is a selection-based message or direct message
-            if (message.startsWith("Improve") || message.startsWith("Edit") || message.startsWith("Fix")) {
-              const selectedContent = getSelectedContentForAI();
-              if (selectedContent) {
-                handleSendToAI(message, selectedContent);
-                return;
-              }
-            }
-            handleSendToAI(message);
-          }}
+          onSendMessage={handleSendToAI}
+          selectedText={selectedText}
+          content={content}
         />
       }
       rightPanel={canvasContent}
