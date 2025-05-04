@@ -16,7 +16,7 @@ const CanvasStep: React.FC<CanvasStepProps> = ({
   onSchedule,
 }) => {
   return (
-    <div className="h-[calc(100vh-64px)] bg-black border border-white/10 rounded-xl shadow-lg overflow-hidden">
+    <div className="h-[calc(100vh-140px)] bg-black border border-white/10 rounded-xl shadow-lg overflow-hidden">
       <ContentCanvas
         initialContent={initialContent}
         onPublish={onPublish}

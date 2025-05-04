@@ -6,6 +6,10 @@ import CanvasEditor from "./CanvasEditor";
 import CanvasPreview from "./CanvasPreview";
 import ContentChatPanel from "./ContentChatPanel";
 import useContentFormatting from "./hooks/useContentFormatting";
+import ResizablePanelsWrapper from "./ResizablePanelsWrapper";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
 
 interface ContentCanvasProps {
   initialContent?: string;
@@ -119,7 +123,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     return "";
   };
 
-  return (
+  const canvasContent = (
     <div className="flex flex-col h-full">
       <CanvasToolbar
         onToggleMobileView={() => setMobileView(!mobileView)}
@@ -133,38 +137,44 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
         content={content}
       />
 
-      <div className="flex flex-1 overflow-hidden">
-        {showChatPanel && (
-          <ContentChatPanel 
-            onSendMessage={(message) => {
-              // Determine if this is a selection-based message or direct message
-              if (message.startsWith("Improve") || message.startsWith("Edit") || message.startsWith("Fix")) {
-                const selectedContent = getSelectedContentForAI();
-                if (selectedContent) {
-                  handleSendToAI(`${message}\n\nSelected content:\n${selectedContent}`);
-                  return;
-                }
-              }
-              handleSendToAI(message);
-            }}
-          />
-        )}
-        
-        <div className="flex-1 p-6 bg-[#0F1117] overflow-y-auto">
-          <div className="max-w-2xl mx-auto">
-            {!mobileView ? (
-              <CanvasEditor 
-                content={content}
-                setContent={setContent}
-                onKeyDown={handleKeyDown}
-              />
-            ) : (
-              <CanvasPreview content={content} />
-            )}
-          </div>
+      <div className="flex-1 p-6 bg-[#0F1117] overflow-y-auto">
+        <div className="max-w-2xl mx-auto">
+          {!mobileView ? (
+            <CanvasEditor 
+              content={content}
+              setContent={setContent}
+              onKeyDown={handleKeyDown}
+            />
+          ) : (
+            <CanvasPreview content={content} />
+          )}
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <ResizablePanelsWrapper
+      leftPanel={
+        <ContentChatPanel 
+          onSendMessage={(message) => {
+            // Determine if this is a selection-based message or direct message
+            if (message.startsWith("Improve") || message.startsWith("Edit") || message.startsWith("Fix")) {
+              const selectedContent = getSelectedContentForAI();
+              if (selectedContent) {
+                handleSendToAI(`${message}\n\nSelected content:\n${selectedContent}`);
+                return;
+              }
+            }
+            handleSendToAI(message);
+          }}
+        />
+      }
+      rightPanel={canvasContent}
+      initialLeftSize={25}
+      initialRightSize={75}
+      collapsible={true}
+    />
   );
 };
 

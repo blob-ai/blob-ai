@@ -1,9 +1,12 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowUp, Sparkles } from "lucide-react";
+import { ArrowUp, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { useChat } from "@/contexts/ChatContext";
 import { toast } from "sonner";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface Message {
   id: string;
@@ -40,6 +43,8 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
     "Check my grammar and style",
     "Suggest a catchy headline"
   ]);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(true);
+  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(true);
 
   // Initialize a thread on component mount
   useEffect(() => {
@@ -182,7 +187,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
     localMessages;
 
   return (
-    <div className="w-96 bg-black border-r border-white/10 flex flex-col">
+    <div className="h-full flex flex-col bg-black border-r border-white/10">
       <div className="p-4 border-b border-white/10">
         <h2 className="text-lg font-medium flex items-center">
           <Sparkles className="h-4 w-4 text-blue-400 mr-2" />
@@ -199,7 +204,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
             }`}
           >
             <div
-              className={`max-w-[80%] rounded-lg p-3 ${
+              className={`max-w-[90%] rounded-lg p-3 ${
                 message.sender === "user"
                   ? "bg-blue-600 text-white"
                   : "bg-white/5 border border-white/10"
@@ -217,7 +222,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
         
         {isTyping && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] rounded-lg p-3 bg-white/5 border border-white/10">
+            <div className="max-w-[90%] rounded-lg p-3 bg-white/5 border border-white/10">
               <div className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0s" }}></div>
                 <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
@@ -231,22 +236,28 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
       </div>
 
       <div className="p-4 border-t border-white/10">
-        <div className="mb-3 space-y-2">
-          <p className="text-xs text-white/50 mb-2">Suggestions</p>
-          <div className="flex flex-wrap gap-2">
-            {suggestedPrompts.map((prompt, index) => (
-              <button
-                key={index}
-                className="px-3 py-1.5 text-sm rounded-full bg-white/5 border border-white/10 text-white/80 hover:bg-white/10"
-                onClick={() => handlePromptClick(prompt)}
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Accordion type="single" collapsible defaultValue="suggestions">
+          <AccordionItem value="suggestions" className="border-none">
+            <AccordionTrigger className="py-2 text-sm text-white/70 hover:no-underline">
+              Suggestions
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {suggestedPrompts.map((prompt, index) => (
+                  <button
+                    key={index}
+                    className="px-3 py-1.5 text-sm rounded-full bg-white/5 border border-white/10 text-white/80 hover:bg-white/10"
+                    onClick={() => handlePromptClick(prompt)}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-2">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
