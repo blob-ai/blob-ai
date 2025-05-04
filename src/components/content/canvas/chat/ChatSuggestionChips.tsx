@@ -10,6 +10,8 @@ const ChatSuggestionChips: React.FC<ChatSuggestionChipsProps> = ({
   suggestedPrompts, 
   onPromptClick 
 }) => {
+  if (suggestedPrompts.length === 0) return null;
+  
   return (
     <div className="mb-3 space-y-2">
       <p className="text-xs text-white/50 mb-2">Suggestions</p>

@@ -1,13 +1,14 @@
 
-import React from "react";
+import React, { useContext } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { ArrowUp, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useChatMessages } from "./hooks/useChatMessages";
 import ChatMessage from "./chat/ChatMessage";
 import ChatSuggestionChips from "./chat/ChatSuggestionChips";
 import ChatInput from "./chat/ChatInput";
 import TypingIndicator from "./chat/TypingIndicator";
+import { useChat } from "@/contexts/ChatContext";
+import { toast } from "@/hooks/use-toast";
 
 interface ContentChatPanelProps {
   onSendMessage: (message: string) => void;
@@ -54,6 +55,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
           input={input}
           setInput={setInput}
           handleSend={handleSend}
+          isLoading={isTyping}
         />
       </div>
     </div>

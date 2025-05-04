@@ -1,10 +1,13 @@
 
 import { useState, useRef, useEffect } from "react";
+import { useChat } from "@/contexts/ChatContext";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "@/hooks/use-toast";
 
 export interface Message {
   id: string;
   text: string;
-  sender: "user" | "ai"; // Fixed type to be a union of specific string literals
+  sender: "user" | "ai";
 }
 
 export const useChatMessages = (onSendMessage: (message: string) => void) => {
@@ -25,33 +28,79 @@ export const useChatMessages = (onSendMessage: (message: string) => void) => {
     "Check my grammar and style",
     "Suggest a catchy headline"
   ]);
+  
+  // Optional: Connect to ChatContext if you want to use Supabase backend
+  const { currentThread, createThread, sendMessage } = useChat();
+  const threadRef = useRef<string | null>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = () => {
+  // Initialize a thread if needed
+  useEffect(() => {
+    const initThread = async () => {
+      if (!threadRef.current && !currentThread) {
+        try {
+          const newThreadId = await createThread("Content Editor Chat");
+          threadRef.current = newThreadId;
+        } catch (error) {
+          console.error("Error creating thread:", error);
+          // Fallback to local-only mode
+        }
+      } else if (currentThread) {
+        threadRef.current = currentThread.id;
+      }
+    };
+
+    initThread();
+  }, [currentThread, createThread]);
+
+  const handleSend = async () => {
     if (!input.trim()) return;
 
     // Add user message
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: uuidv4(),
       text: input,
       sender: "user",
     };
     setMessages((prev) => [...prev, userMessage]);
     onSendMessage(input);
+    const userInput = input;
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI response (in a real app, this would come from an API)
-    setTimeout(() => {
-      generateAIResponse(input);
-      setIsTyping(false);
-    }, 1000);
+    try {
+      // Try to use Supabase backend if available
+      if (threadRef.current) {
+        await sendMessage(userInput, threadRef.current);
+        // The ChatContext handles adding the assistant's response
+        // We'll get it from there in a real implementation
+      } else {
+        // Fallback to local simulation
+        setTimeout(() => {
+          generateLocalAIResponse(userInput);
+          setIsTyping(false);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast({
+        title: "Error",
+        description: "Failed to get a response. Using fallback mode.",
+        variant: "destructive"
+      });
+      
+      // Fallback to local simulation
+      setTimeout(() => {
+        generateLocalAIResponse(userInput);
+        setIsTyping(false);
+      }, 1000);
+    }
   };
 
-  const generateAIResponse = (userInput: string) => {
+  const generateLocalAIResponse = (userInput: string) => {
     let response = "";
     
     if (userInput.toLowerCase().includes("improve") || userInput.toLowerCase().includes("better")) {
@@ -67,7 +116,7 @@ export const useChatMessages = (onSendMessage: (message: string) => void) => {
     }
 
     const aiMessage: Message = {
-      id: (Date.now() + 1).toString(),
+      id: uuidv4(),
       text: response,
       sender: "ai",
     };

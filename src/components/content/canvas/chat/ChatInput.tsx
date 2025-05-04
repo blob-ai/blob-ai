@@ -8,9 +8,15 @@ interface ChatInputProps {
   input: string;
   setInput: (input: string) => void;
   handleSend: () => void;
+  isLoading?: boolean;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ input, setInput, handleSend }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ 
+  input, 
+  setInput, 
+  handleSend,
+  isLoading = false
+}) => {
   return (
     <div className="flex items-center gap-2">
       <Textarea
@@ -24,13 +30,14 @@ const ChatInput: React.FC<ChatInputProps> = ({ input, setInput, handleSend }) =>
             handleSend();
           }
         }}
+        disabled={isLoading}
       />
       <Button
         variant="default"
         size="icon"
         className="bg-blue-600 hover:bg-blue-500 rounded-full h-10 w-10"
         onClick={handleSend}
-        disabled={!input.trim()}
+        disabled={!input.trim() || isLoading}
       >
         <ArrowUp className="h-5 w-5" />
       </Button>
