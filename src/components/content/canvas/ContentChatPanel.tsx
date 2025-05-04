@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,7 +8,7 @@ import { toast } from "sonner";
 interface Message {
   id: string;
   text: string;
-  sender: "user" | "ai";
+  sender: "user" | "ai";  // Strict union type for sender
 }
 
 interface ContentChatPanelProps {
@@ -71,7 +70,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
       const mappedMessages = chatMessages.map(msg => ({
         id: msg.id,
         text: msg.text,
-        sender: msg.sender === "assistant" ? "ai" : "user"
+        sender: msg.sender === "assistant" ? "ai" : "user" as "ai" | "user"  // Explicit type casting
       }));
       
       if (mappedMessages.length > 0) {
@@ -178,7 +177,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ onSendMessage }) =>
     chatMessages.map(msg => ({
       id: msg.id,
       text: msg.text,
-      sender: msg.sender === "assistant" ? "ai" : "user"
+      sender: msg.sender === "assistant" ? "ai" : "user" as "ai" | "user"  // Explicit type casting
     })) : 
     localMessages;
 
