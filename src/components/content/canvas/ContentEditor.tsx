@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, FormEvent } from "react";
 import ContentEditingToolbar from "./ContentEditingToolbar";
 
 interface ContentEditorProps {
@@ -89,10 +89,10 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ content, onChange }) => {
           suppressContentEditableWarning
           onMouseUp={handleTextSelection}
           onKeyUp={handleTextSelection}
-          onInput={(e) => onChange(e.currentTarget.innerHTML)}
+          onInput={(e: FormEvent<HTMLDivElement>) => onChange(e.currentTarget.innerHTML)}
           dangerouslySetInnerHTML={{ __html: content }}
-          placeholder="Start writing your content here..."
           style={{ minHeight: '300px' }}
+          data-placeholder="Start writing your content here..."
         />
       </div>
     </div>

@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Clock, Save, Send, Bold, Italic, Underline, Image, ListOrdered, ListBullet, Eye } from "lucide-react";
+import { Clock, Save, Send, Bold, Italic, Underline, Image, ListOrdered, List, Eye } from "lucide-react";
 
 interface ContentEditorToolbarProps {
   onPublish: () => void;
@@ -48,7 +48,7 @@ const ContentEditorToolbar: React.FC<ContentEditorToolbarProps> = ({
           size="icon" 
           className="hover:bg-white/10 rounded-md h-9 w-9"
         >
-          <ListBullet className="h-4 w-4" />
+          <List className="h-4 w-4" />
         </Button>
         <Button 
           variant="ghost" 
