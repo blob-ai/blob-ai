@@ -8,11 +8,10 @@ import IdeasGallery, { ContentIdea } from "@/components/content/idea-generation/
 import ContentCanvas from "@/components/content/canvas/ContentCanvas";
 import PublishModal from "@/components/content/publish/PublishModal";
 import { toast } from "sonner";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 enum CreationStep {
   START,
-  CREATION_OPTIONS,
   THEME_SELECTION,
   IDEAS_GALLERY,
   CONTENT_CANVAS,
@@ -20,6 +19,7 @@ enum CreationStep {
 }
 
 const ContentCreationPage = () => {
+  // State variables
   const [currentStep, setCurrentStep] = useState<CreationStep>(CreationStep.START);
   const [showCreationModal, setShowCreationModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -33,15 +33,22 @@ const ContentCreationPage = () => {
   const [usageCount, setUsageCount] = useState(2);
   const [maxUsage] = useState(5);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  // Show the creation modal automatically when the page loads
+  // Parse URL params to determine initial step
   useEffect(() => {
-    // Short delay to ensure the page is loaded
-    const timer = setTimeout(() => {
+    const params = new URLSearchParams(location.search);
+    const step = params.get('step');
+
+    if (step === 'theme') {
+      setCurrentStep(CreationStep.THEME_SELECTION);
+    } else if (step === 'canvas') {
+      setCurrentStep(CreationStep.CONTENT_CANVAS);
+    } else {
+      // Show the creation modal automatically when no specific step is provided
       setShowCreationModal(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+    }
+  }, [location]);
 
   // Function to generate mock ideas
   const generateIdeas = (theme: string, categories: string[]) => {
@@ -240,9 +247,11 @@ const ContentCreationPage = () => {
     
     if (option === "idea-generation") {
       setCurrentStep(CreationStep.THEME_SELECTION);
+      navigate('/dashboard/content?step=theme', { replace: true });
     } else if (option === "blank-canvas") {
       setContent("");
       setCurrentStep(CreationStep.CONTENT_CANVAS);
+      navigate('/dashboard/content?step=canvas', { replace: true });
     } else {
       // Handle other options by showing a notification for demo
       toast.info(`${option} option selected. This feature is coming soon!`);
@@ -337,7 +346,19 @@ const ContentCreationPage = () => {
         <div className="flex justify-between items-center mb-6">
           <Button
             variant="ghost"
-            onClick={() => setCurrentStep(prev => Math.max(CreationStep.START, prev - 1))}
+            onClick={() => {
+              if (currentStep > CreationStep.START) {
+                const prevStep = Math.max(CreationStep.START, currentStep - 1);
+                setCurrentStep(prevStep);
+                
+                // Update URL to reflect the step change
+                if (prevStep === CreationStep.THEME_SELECTION) {
+                  navigate('/dashboard/content?step=theme', { replace: true });
+                } else {
+                  navigate('/dashboard/content', { replace: true });
+                }
+              }
+            }}
             className="text-white/70 hover:text-white"
           >
             ← Back
@@ -368,6 +389,7 @@ const ContentCreationPage = () => {
           toast.success("Post published successfully!");
           setShowPublishModal(false);
           setCurrentStep(CreationStep.START);
+          navigate('/dashboard/content', { replace: true });
         }}
         onConnectPlatform={(platform) => {
           toast.success(`Connected to ${platform}`);
@@ -375,6 +397,7 @@ const ContentCreationPage = () => {
             toast.success("Post published successfully!");
             setShowPublishModal(false);
             setCurrentStep(CreationStep.START);
+            navigate('/dashboard/content', { replace: true });
           }, 1000);
         }}
       />
