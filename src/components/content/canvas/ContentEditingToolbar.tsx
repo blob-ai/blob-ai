@@ -5,9 +5,6 @@ import {
   Italic, 
   List, 
   Underline,
-  AlignLeft,
-  Image,
-  Save,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
