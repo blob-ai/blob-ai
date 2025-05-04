@@ -1,9 +1,17 @@
+
 import React from 'react';
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { PenLine } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from 'react-router-dom';
 
 const SidebarHeader: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleCreatePostsClick = () => {
+    navigate('/dashboard/content');
+  };
+
   return (
     <div className="flex flex-col px-4 pt-5 pb-1">
       <h2 className="text-lg font-bold px-1 mb-7">
@@ -24,6 +32,7 @@ const SidebarHeader: React.FC = () => {
           "transition-all duration-150",
           "focus:outline-none focus:ring-1 focus:ring-blue-300"
         )}
+        onClick={handleCreatePostsClick}
         aria-label="Create new post"
       >
         <span className="inline-flex items-center justify-center text-white">

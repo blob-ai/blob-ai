@@ -19,7 +19,7 @@ import SidebarFooter from "./sidebar/SidebarFooter";
 const Sidebar = () => {
   const { isSidebarOpen } = useSidebar();
 
-  // Main navigation items
+  // Main navigation items - removed the Content Creation item as it was redundant
   const navItems = [
     {
       name: "AI Chat",
@@ -28,13 +28,6 @@ const Sidebar = () => {
       exact: false,
       hasAction: true,
       action: () => window.location.href = '/dashboard/chat/new'
-    },
-    {
-      name: "Content Creation",
-      path: "/dashboard/content",
-      icon: <Edit className="h-6 w-6" />,
-      exact: true,
-      hasAction: false
     },
     {
       name: "Dashboard",
