@@ -60,8 +60,14 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ content, onChange }) => {
     setShowToolbar(false);
   };
 
+  const handleTextFormat = (command: string) => {
+    document.execCommand(command, false);
+    const newContent = editorRef.current?.innerHTML || '';
+    onChange(newContent);
+  };
+
   return (
-    <div className="relative h-full">
+    <div className="h-full flex flex-col">
       {showToolbar && selectionPosition && (
         <ContentEditingToolbar
           onSelect={handleToolbarSelect}
@@ -72,18 +78,21 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ content, onChange }) => {
           }}
         />
       )}
+      
       <div 
-        className="h-full overflow-y-auto p-6 prose prose-invert max-w-none"
+        className="flex-grow overflow-y-auto p-6"
         ref={editorRef}
       >
         <div
-          className="min-h-[calc(100%-2rem)] outline-none"
+          className="min-h-[calc(100%-2rem)] outline-none prose prose-invert max-w-none"
           contentEditable
           suppressContentEditableWarning
           onMouseUp={handleTextSelection}
           onKeyUp={handleTextSelection}
           onInput={(e) => onChange(e.currentTarget.innerHTML)}
           dangerouslySetInnerHTML={{ __html: content }}
+          placeholder="Start writing your content here..."
+          style={{ minHeight: '300px' }}
         />
       </div>
     </div>

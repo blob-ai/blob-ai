@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Undo, Wand2 } from "lucide-react";
+import { Send, Wand2 } from "lucide-react";
 
 interface ChatAIPanelProps {
   onApplySuggestion: (suggestion: string) => void;
@@ -11,7 +11,10 @@ interface ChatAIPanelProps {
 const ChatAIPanel: React.FC<ChatAIPanelProps> = ({ onApplySuggestion }) => {
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "ai"; content: string }>>([
-    { role: "ai", content: "I'm your AI assistant. How can I help improve your content?" }
+    { 
+      role: "ai", 
+      content: "Hi! I'm your AI content assistant. I can help you create, edit, and improve your content. What would you like to work on today?" 
+    }
   ]);
 
   const handleSendMessage = () => {
@@ -41,18 +44,17 @@ const ChatAIPanel: React.FC<ChatAIPanelProps> = ({ onApplySuggestion }) => {
     }
   };
 
-  // Quick suggestions that can be applied to the content
-  const quickSuggestions = [
-    "Make it more engaging",
-    "Add a strong call to action",
-    "Make it more professional",
-    "Add data points",
+  // Quick actions that can be applied
+  const quickActions = [
+    "Edit specific sentence",
+    "Rewrite the whole post",
+    "Ask anything"
   ];
 
   return (
-    <div className="flex flex-col h-full border-l border-white/10">
+    <div className="flex flex-col h-full">
       <div className="p-4 border-b border-white/10">
-        <h2 className="text-xl font-semibold">AI Assistant</h2>
+        <h2 className="text-xl font-semibold">Chat</h2>
       </div>
       
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -60,7 +62,7 @@ const ChatAIPanel: React.FC<ChatAIPanelProps> = ({ onApplySuggestion }) => {
           <div 
             key={index}
             className={`${
-              msg.role === "user" ? "bg-white/5 ml-4" : "bg-blue-600/20 mr-4"
+              msg.role === "user" ? "bg-white/5 ml-4" : "bg-black/40 mr-4"
             } p-3 rounded-lg`}
           >
             <div className="text-sm">
@@ -84,37 +86,37 @@ const ChatAIPanel: React.FC<ChatAIPanelProps> = ({ onApplySuggestion }) => {
         ))}
       </div>
       
-      <div className="p-4 border-t border-white/10">
-        <div className="flex flex-wrap gap-2 mb-3">
-          {quickSuggestions.map((suggestion, index) => (
+      <div className="p-4 space-y-4">
+        <div className="text-sm text-white/70">Quick Actions</div>
+        <div className="flex flex-wrap gap-2">
+          {quickActions.map((action, index) => (
             <Button
               key={index}
               variant="outline"
               size="sm"
-              className="text-xs bg-white/5 border-white/10 hover:bg-white/10"
+              className="text-xs bg-black/30 border-white/10 hover:bg-white/10"
               onClick={() => {
-                setMessage(suggestion);
+                setMessage(action);
                 handleSendMessage();
               }}
             >
-              <Wand2 className="h-3 w-3 mr-1" />
-              {suggestion}
+              {action}
             </Button>
           ))}
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex items-center relative">
           <Input
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask AI for suggestions..."
-            className="bg-white/5 border-white/10 text-white"
+            placeholder="Ask anything or select..."
+            className="bg-black/30 border-white/10 text-white pr-10 rounded-2xl"
           />
           <Button 
             onClick={handleSendMessage}
             disabled={!message.trim()}
-            className="bg-blue-600 hover:bg-blue-500"
+            className="absolute right-0 top-0 bottom-0 rounded-r-2xl bg-blue-600 hover:bg-blue-500 px-3"
           >
             <Send className="h-4 w-4" />
           </Button>

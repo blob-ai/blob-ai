@@ -33,80 +33,75 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     setContent(content + "\n\n" + suggestion);
   };
 
+  // Desktop layout similar to Image #2
+  const desktopLayout = (
+    <div className="flex h-full">
+      {/* Left panel for chat */}
+      <div className="w-1/3 border-r border-white/10 flex flex-col">
+        <ChatAIPanel onApplySuggestion={handleApplySuggestion} />
+      </div>
+      
+      {/* Right panel for editor */}
+      <div className="w-2/3 flex flex-col h-full">
+        <ContentEditor
+          content={content}
+          onChange={handleContentChange}
+        />
+      </div>
+    </div>
+  );
+
+  // Mobile layout with tabs
+  const mobileLayout = (
+    <div className="flex flex-col w-full h-full">
+      <div className="flex border-b border-white/10">
+        <button
+          className={`flex-1 p-3 text-center ${!showPreview ? "text-primary-400 border-b-2 border-primary-400" : "text-white/70"}`}
+          onClick={() => setShowPreview(false)}
+        >
+          Editor
+        </button>
+        <button
+          className={`flex-1 p-3 text-center ${showPreview ? "text-primary-400 border-b-2 border-primary-400" : "text-white/70"}`}
+          onClick={() => setShowPreview(true)}
+        >
+          Preview
+        </button>
+      </div>
+      
+      <div className="flex-1 overflow-hidden">
+        {showPreview ? (
+          <ContentPreview
+            content={content}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        ) : (
+          <div className="flex flex-col h-full">
+            <ContentEditor
+              content={content}
+              onChange={handleContentChange}
+            />
+            <div className="h-80 border-t border-white/10">
+              <ChatAIPanel onApplySuggestion={handleApplySuggestion} />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex flex-col h-full">
       <ContentEditorToolbar
         onPublish={() => onPublish(content)}
         onSaveDraft={() => onSaveDraft(content)}
         onSchedule={() => onSchedule(content)}
+        showPreview={() => setShowPreview(true)}
       />
       
-      <div className="flex flex-1 overflow-hidden">
-        {/* Main content area - split into editor and assistant */}
-        {isMobile ? (
-          // Mobile layout: Tabbed interface
-          <div className="flex flex-col w-full h-full">
-            <div className="flex border-b border-white/10">
-              <button
-                className={`flex-1 p-3 text-center ${!showPreview ? "text-primary-400 border-b-2 border-primary-400" : "text-white/70"}`}
-                onClick={() => setShowPreview(false)}
-              >
-                Editor
-              </button>
-              <button
-                className={`flex-1 p-3 text-center ${showPreview ? "text-primary-400 border-b-2 border-primary-400" : "text-white/70"}`}
-                onClick={() => setShowPreview(true)}
-              >
-                Preview
-              </button>
-            </div>
-            
-            <div className="flex-1 overflow-hidden">
-              {showPreview ? (
-                <ContentPreview
-                  content={content}
-                  viewMode={viewMode}
-                  onViewModeChange={setViewMode}
-                />
-              ) : (
-                <div className="flex flex-col h-full">
-                  <div className="flex-1 overflow-hidden">
-                    <ContentEditor
-                      content={content}
-                      onChange={handleContentChange}
-                    />
-                  </div>
-                  <div className="h-80 border-t border-white/10">
-                    <ChatAIPanel onApplySuggestion={handleApplySuggestion} />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          // Desktop layout: Side-by-side panels
-          <>
-            <div className="flex flex-col w-1/2 border-r border-white/10">
-              <ContentEditor
-                content={content}
-                onChange={handleContentChange}
-              />
-            </div>
-            
-            <div className="flex flex-col w-1/2">
-              <div className="flex-1 border-b border-white/10">
-                <ContentPreview
-                  content={content}
-                  viewMode={viewMode}
-                  onViewModeChange={setViewMode}
-                />
-              </div>
-              <div className="h-1/2">
-                <ChatAIPanel onApplySuggestion={handleApplySuggestion} />
-              </div>
-            </div>
-          </>
-        )}
+      <div className="flex-1 overflow-hidden">
+        {isMobile ? mobileLayout : desktopLayout}
       </div>
     </div>
   );

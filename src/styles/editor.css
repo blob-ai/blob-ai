@@ -1,0 +1,34 @@
+
+@layer components {
+  [contenteditable="true"]:empty:before {
+    content: attr(placeholder);
+    color: theme('colors.white.DEFAULT');
+    opacity: 0.3;
+    cursor: text;
+  }
+  
+  .editor-toolbar {
+    @apply flex items-center gap-1 p-2 border-b border-white/10;
+  }
+  
+  .editor-toolbar-button {
+    @apply p-1 rounded hover:bg-white/10 transition-colors;
+  }
+  
+  .editor-content {
+    @apply p-4 min-h-[300px] outline-none;
+  }
+  
+  .editor-content:focus {
+    @apply outline-none;
+  }
+  
+  .format-button {
+    @apply p-2 rounded hover:bg-white/10 transition-colors;
+  }
+  
+  .format-button.active {
+    @apply bg-white/10;
+  }
+}
+
