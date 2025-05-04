@@ -1,12 +1,18 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
 import CanvasToolbar from "./CanvasToolbar";
 import CanvasEditor from "./CanvasEditor";
 import CanvasPreview from "./CanvasPreview";
 import ContentChatPanel from "./ContentChatPanel";
+import ScheduleModal from "./ScheduleModal";
+import ContentVersionHistory from "./ContentVersionHistory";
+import KeyboardShortcutsGuide from "./KeyboardShortcutsGuide";
 import useContentFormatting from "./hooks/useContentFormatting";
 import ResizablePanelsWrapper from "./ResizablePanelsWrapper";
+import { ContentVersion } from "./ContentVersionHistory";
+import { History, Keyboard } from "lucide-react";
 
 interface ContentCanvasProps {
   initialContent?: string;
@@ -27,13 +33,35 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [selectedText, setSelectedText] = useState("");
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showShortcutsGuide, setShowShortcutsGuide] = useState(false);
+  const [platformView, setPlatformView] = useState<"default" | "twitter" | "linkedin" | "facebook">("default");
+  
+  // Version history state
+  const [versions, setVersions] = useState<ContentVersion[]>([]);
+  const [currentVersionId, setCurrentVersionId] = useState<string>(uuidv4());
+  
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { handleFormatting } = useContentFormatting();
+  
+  // Initialize first version on component mount
+  useEffect(() => {
+    if (initialContent) {
+      const initialVersion: ContentVersion = {
+        id: currentVersionId,
+        content: initialContent,
+        timestamp: new Date(),
+        change: "Initial content"
+      };
+      setVersions([initialVersion]);
+    }
+  }, []);
 
-  // Auto-save functionality
+  // Auto-save functionality with version tracking
   useEffect(() => {
     const saveTimer = setTimeout(() => {
-      if (content !== initialContent) {
+      if (content !== initialContent && content.trim() !== '') {
         handleAutoSave();
       }
     }, 30000); // Auto-save every 30 seconds if there are changes
@@ -62,14 +90,116 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
       document.removeEventListener("selectionchange", updateSelection);
     };
   }, [content]);
+  
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyboardShortcuts = (e: KeyboardEvent) => {
+      // Show keyboard shortcuts guide when ? is pressed
+      if (e.key === "?" || (e.key === "/" && e.shiftKey)) {
+        e.preventDefault();
+        setShowShortcutsGuide(true);
+        return;
+      }
+      
+      if (e.key === "Escape") {
+        // Close any open modals/panels
+        if (showScheduleModal) setShowScheduleModal(false);
+        if (showVersionHistory) setShowVersionHistory(false);
+        if (showShortcutsGuide) setShowShortcutsGuide(false);
+        return;
+      }
+      
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 'h':
+            e.preventDefault();
+            setShowVersionHistory(true);
+            break;
+          case 'p':
+            e.preventDefault();
+            setMobileView(!mobileView);
+            break;
+          case '\\':
+            e.preventDefault();
+            setShowChatPanel(!showChatPanel);
+            break;
+          case '1':
+            e.preventDefault();
+            setPlatformView("twitter");
+            break;
+          case '2':
+            e.preventDefault();
+            setPlatformView("linkedin");
+            break;
+          case '3':
+            e.preventDefault();
+            setPlatformView("facebook");
+            break;
+          case 'z':
+            if (e.shiftKey) {
+              // Handle redo
+              e.preventDefault();
+              toast.info("Redo functionality will be implemented");
+            }
+            break;
+        }
+      }
+    };
+    
+    window.addEventListener("keydown", handleKeyboardShortcuts);
+    
+    return () => {
+      window.removeEventListener("keydown", handleKeyboardShortcuts);
+    };
+  }, [showChatPanel, mobileView, showScheduleModal, showVersionHistory, showShortcutsGuide]);
 
   const handleAutoSave = () => {
     setIsSaving(true);
+    
+    // Create a new version
+    const newVersionId = uuidv4();
+    const newVersion: ContentVersion = {
+      id: newVersionId,
+      content: content,
+      timestamp: new Date(),
+      change: "Auto-saved draft"
+    };
+    
+    // Add to version history (at beginning of array - newest first)
+    setVersions(prevVersions => [newVersion, ...prevVersions]);
+    setCurrentVersionId(newVersionId);
+    
     // Simulate saving to backend
     setTimeout(() => {
       onSaveDraft(content);
       setIsSaving(false);
       setLastSaved(new Date());
+      toast.success("Draft saved");
+    }, 500);
+  };
+  
+  const handleManualSave = () => {
+    setIsSaving(true);
+    
+    // Create a new version
+    const newVersionId = uuidv4();
+    const newVersion: ContentVersion = {
+      id: newVersionId,
+      content: content,
+      timestamp: new Date(),
+      change: "Manually saved draft"
+    };
+    
+    // Add to version history
+    setVersions(prevVersions => [newVersion, ...prevVersions]);
+    setCurrentVersionId(newVersionId);
+    
+    // Save to backend
+    setTimeout(() => {
+      onSaveDraft(content);
+      setIsSaving(false);
+      setLastSaved(new Date());
+      toast.success("Draft saved");
     }, 500);
   };
 
@@ -77,7 +207,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     setShowChatPanel(!showChatPanel);
   };
 
-  // Handle keyboard shortcuts
+  // Handle keyboard shortcuts in the textarea
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.ctrlKey || e.metaKey) {
       switch (e.key) {
@@ -95,7 +225,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
           break;
         case 's':
           e.preventDefault();
-          handleAutoSave();
+          handleManualSave();
           break;
         default:
           break;
@@ -157,6 +287,18 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
           content.substring(end);
         
         setContent(newContent);
+        
+        // Add version for significant content change
+        const newVersionId = uuidv4();
+        const newVersion: ContentVersion = {
+          id: newVersionId,
+          content: newContent,
+          timestamp: new Date(),
+          change: `AI ${message.toLowerCase().includes("rewrite") ? "rewrote" : "modified"} content`,
+        };
+        setVersions(prevVersions => [newVersion, ...prevVersions]);
+        setCurrentVersionId(newVersionId);
+        
         toast.success("Text transformed successfully!", { id: "ai-processing" });
       } else {
         toast.success("AI processing complete!", { id: "ai-processing" });
@@ -191,6 +333,23 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     }
     return "";
   };
+  
+  // Handle reverting to a previous version
+  const handleRevertVersion = (version: ContentVersion) => {
+    setContent(version.content);
+    setCurrentVersionId(version.id);
+    
+    // Add a revert record to the version history
+    const newVersionId = uuidv4();
+    const newVersion: ContentVersion = {
+      id: newVersionId,
+      content: version.content,
+      timestamp: new Date(),
+      change: "Reverted to previous version"
+    };
+    
+    setVersions(prevVersions => [newVersion, ...prevVersions]);
+  };
 
   const canvasContent = (
     <div className="flex flex-col h-full">
@@ -198,13 +357,17 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
         onToggleMobileView={() => setMobileView(!mobileView)}
         onToggleChatPanel={toggleChatPanel}
         showChatPanel={showChatPanel}
-        handleAutoSave={handleAutoSave}
+        handleAutoSave={handleManualSave}
         isSaving={isSaving}
         lastSaved={lastSaved}
-        onSchedule={onSchedule}
+        onSchedule={() => setShowScheduleModal(true)}
         onPublish={onPublish}
         content={content}
         onFormat={onFormatting}
+        onToggleHistory={() => setShowVersionHistory(true)}
+        onShowKeyboardShortcuts={() => setShowShortcutsGuide(true)}
+        onChangePlatformView={(platform) => setPlatformView(platform)}
+        currentPlatformView={platformView}
       />
 
       <div className="flex-1 p-6 bg-[#0F1117] overflow-y-auto">
@@ -218,10 +381,36 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
               onTextTransform={handleSendToAI}
             />
           ) : (
-            <CanvasPreview content={content} />
+            <CanvasPreview 
+              content={content} 
+              platform={platformView}
+            />
           )}
         </div>
       </div>
+      
+      {/* Schedule Modal */}
+      <ScheduleModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        onSchedule={onSchedule}
+        content={content}
+      />
+      
+      {/* Version History Panel */}
+      <ContentVersionHistory
+        isOpen={showVersionHistory}
+        onClose={() => setShowVersionHistory(false)}
+        versions={versions}
+        currentVersion={currentVersionId}
+        onRevert={handleRevertVersion}
+      />
+      
+      {/* Keyboard Shortcuts Guide */}
+      <KeyboardShortcutsGuide
+        isOpen={showShortcutsGuide}
+        onClose={() => setShowShortcutsGuide(false)}
+      />
     </div>
   );
 

@@ -1,9 +1,27 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Image, Eye, Save, Calendar } from "lucide-react";
+import { 
+  Image, 
+  Eye, 
+  Save, 
+  Calendar, 
+  History, 
+  Keyboard,
+  Twitter,
+  Linkedin,
+  Facebook
+} from "lucide-react";
 import ContentEditingToolbar from "./ContentEditingToolbar";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface CanvasToolbarProps {
   onToggleMobileView: () => void;
@@ -16,6 +34,10 @@ interface CanvasToolbarProps {
   onPublish: (content: string) => void;
   content: string;
   onFormat: (format: string) => void;
+  onToggleHistory: () => void;
+  onShowKeyboardShortcuts: () => void;
+  onChangePlatformView: (platform: "default" | "twitter" | "linkedin" | "facebook") => void;
+  currentPlatformView: "default" | "twitter" | "linkedin" | "facebook";
 }
 
 const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
@@ -29,7 +51,25 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
   onPublish,
   content,
   onFormat,
+  onToggleHistory,
+  onShowKeyboardShortcuts,
+  onChangePlatformView,
+  currentPlatformView
 }) => {
+  const platformIcons = {
+    default: <Eye className="h-4 w-4" />,
+    twitter: <Twitter className="h-4 w-4" />,
+    linkedin: <Linkedin className="h-4 w-4" />,
+    facebook: <Facebook className="h-4 w-4" />
+  };
+  
+  const platformLabels = {
+    default: "Preview",
+    twitter: "Twitter",
+    linkedin: "LinkedIn",
+    facebook: "Facebook"
+  };
+
   return (
     <div className="flex items-center justify-between p-4 border-b border-white/10">
       <div className="flex items-center gap-4">
@@ -53,15 +93,59 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           <span className="text-sm">Add Image</span>
         </Button>
         
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="text-white/70 hover:text-white hover:bg-white/5"
-          onClick={onToggleMobileView}
-        >
-          <Eye className="h-4 w-4 mr-1" />
-          <span className="text-sm">Preview</span>
-        </Button>
+        {/* Platform View Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-white/70 hover:text-white hover:bg-white/5"
+            >
+              {platformIcons[currentPlatformView]}
+              <span className="text-sm ml-1">{platformLabels[currentPlatformView]}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="bg-[#16181c] border border-white/10 text-white">
+            <DropdownMenuLabel>Select Platform View</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/10" />
+            <DropdownMenuItem 
+              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
+              onClick={() => {
+                onChangePlatformView("default");
+                onToggleMobileView();
+              }}
+            >
+              <Eye className="h-4 w-4" /> Standard Preview
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
+              onClick={() => {
+                onChangePlatformView("twitter");
+                onToggleMobileView();
+              }}
+            >
+              <Twitter className="h-4 w-4" /> Twitter
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
+              onClick={() => {
+                onChangePlatformView("linkedin");
+                onToggleMobileView();
+              }}
+            >
+              <Linkedin className="h-4 w-4" /> LinkedIn
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
+              onClick={() => {
+                onChangePlatformView("facebook");
+                onToggleMobileView();
+              }}
+            >
+              <Facebook className="h-4 w-4" /> Facebook
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         
         <Button
           variant="ghost"
@@ -74,6 +158,26 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           ) : (
             <span className="text-sm">Show AI</span>
           )}
+        </Button>
+        
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-white/70 hover:text-white hover:bg-white/5"
+          onClick={onToggleHistory}
+        >
+          <History className="h-4 w-4 mr-1" />
+          <span className="text-sm">History</span>
+        </Button>
+        
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-white/70 hover:text-white hover:bg-white/5"
+          onClick={onShowKeyboardShortcuts}
+        >
+          <Keyboard className="h-4 w-4 mr-1" />
+          <span className="text-sm">Shortcuts</span>
         </Button>
       </div>
       
@@ -100,11 +204,7 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           variant="outline" 
           size="sm" 
           className="border-white/10 hover:bg-white/5"
-          onClick={() => {
-            const date = new Date();
-            date.setDate(date.getDate() + 1);
-            onSchedule(content, date);
-          }}
+          onClick={() => onSchedule(content, new Date())}
         >
           <Calendar className="h-4 w-4 mr-1" />
           <span className="text-sm">Schedule</span>
