@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ActionButton } from "@/components/ui/action-button";
@@ -11,7 +10,7 @@ import {
   Plus,
   FileText,
   ChevronLeft,
-  ChevronRight,
+  ChevronRight
 } from "lucide-react";
 import { DraggableKanbanBoard } from "@/components/dashboard/DraggableKanbanBoard";
 import { useRef, useState } from "react";
@@ -24,7 +23,7 @@ const Dashboard = () => {
   const isMobile = useIsMobile();
   const [sortBy, setSortBy] = useState<string>("dueDate");
   const boardRef = useRef<any>(null);
-  
+
   // Function to scroll the taskboard
   const scrollTaskboard = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -75,10 +74,10 @@ const Dashboard = () => {
           <Button
             variant="outline"
             className="bg-white/5 border-white/10 hover:bg-white/10 hover:text-primary-400 transition-all justify-start h-12 text-sm w-full"
-            onClick={() => navigate('/dashboard/content')}
+            onClick={() => navigate('/dashboard/chat')}
           >
-            <FileText className="w-4 h-4 text-primary-400 mr-2 flex-shrink-0" />
-            <span className="truncate">Find Templates</span>
+            <MessageSquare className="w-4 h-4 text-primary-400 mr-2 flex-shrink-0" />
+            <span className="truncate">Create Content</span>
           </Button>
           
           <Button
@@ -170,7 +169,7 @@ const Dashboard = () => {
 
       {/* Chat Button - Fixed positioning */}
       <Button 
-        className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-primary-600 shadow-lg flex items-center justify-center p-0 z-20 hover:bg-primary-700"
+        className="fixed bottom-6 left-6 w-12 h-12 rounded-full bg-primary-600 shadow-lg flex items-center justify-center p-0 z-20 hover:bg-primary-700"
         onClick={() => navigate('/dashboard/chat')}
       >
         <MessageSquare className="h-6 w-6" />

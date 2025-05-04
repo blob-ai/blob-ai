@@ -16,7 +16,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import UpgradePlan from "@/pages/UpgradePlan";
-import { useNavigate } from "react-router-dom";
 
 interface AppHeaderProps {
   className?: string;
@@ -26,7 +25,6 @@ export function AppHeader({ className }: AppHeaderProps) {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const { user, profile, signOut } = useAuth();
   const [showUpgradePlan, setShowUpgradePlan] = useState(false);
-  const navigate = useNavigate();
   
   const getInitials = () => {
     if (profile?.full_name) {
