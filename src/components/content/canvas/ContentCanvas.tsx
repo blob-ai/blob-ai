@@ -87,14 +87,54 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     handleFormatting(format, content, setContent, textareaRef);
   };
 
-  const handleSendToAI = (message: string) => {
+  const handleSendToAI = async (message: string, selectedText?: string) => {
     console.log("Sending content to AI:", message);
     
-    // Send content to AI service
+    // Prepare the full prompt with selected content if available
+    const fullPrompt = selectedText 
+      ? `${message}\n\nSelected content:\n${selectedText}`
+      : message;
+    
     toast.info(`AI processing request: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`);
     
-    // Here we'd typically call an AI service directly or through ChatContext
-    // For now we're using the toast notification to show the request
+    // Simulate AI processing with a timeout
+    toast.loading("AI is processing your content...", { id: "ai-processing" });
+    
+    try {
+      // Simulate an AI response
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Handle text transformation based on the message
+      if (selectedText && textareaRef.current) {
+        const start = textareaRef.current.selectionStart;
+        const end = textareaRef.current.selectionEnd;
+        let transformedText = selectedText;
+        
+        if (message.toLowerCase().includes("rewrite")) {
+          transformedText = `${selectedText} (rewritten with more engaging language)`;
+        } else if (message.toLowerCase().includes("shorter")) {
+          transformedText = selectedText.split(" ")
+            .slice(0, Math.ceil(selectedText.split(" ").length / 2))
+            .join(" ");
+        } else if (message.toLowerCase().includes("longer")) {
+          transformedText = `${selectedText} with additional context and supporting details to expand on the key points`;
+        } else if (message.toLowerCase().includes("grammar") || message.toLowerCase().includes("fix")) {
+          transformedText = selectedText.replace(/\b(i)\b/g, "I").replace(/\s+([.,;:!?])/g, "$1");
+        }
+        
+        const newContent = 
+          content.substring(0, start) + 
+          transformedText + 
+          content.substring(end);
+        
+        setContent(newContent);
+        toast.success("Text transformed successfully!", { id: "ai-processing" });
+      } else {
+        toast.success("AI processing complete!", { id: "ai-processing" });
+      }
+    } catch (error) {
+      toast.error("Failed to process your request. Please try again.", { id: "ai-processing" });
+    }
   };
 
   // Helper function to get selected text or paragraph
@@ -135,6 +175,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
         onSchedule={onSchedule}
         onPublish={onPublish}
         content={content}
+        onFormat={onFormatting}
       />
 
       <div className="flex-1 p-6 bg-[#0F1117] overflow-y-auto">
@@ -144,6 +185,8 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
               content={content}
               setContent={setContent}
               onKeyDown={handleKeyDown}
+              textareaRef={textareaRef}
+              onTextTransform={handleSendToAI}
             />
           ) : (
             <CanvasPreview content={content} />
@@ -162,7 +205,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
             if (message.startsWith("Improve") || message.startsWith("Edit") || message.startsWith("Fix")) {
               const selectedContent = getSelectedContentForAI();
               if (selectedContent) {
-                handleSendToAI(`${message}\n\nSelected content:\n${selectedContent}`);
+                handleSendToAI(message, selectedContent);
                 return;
               }
             }

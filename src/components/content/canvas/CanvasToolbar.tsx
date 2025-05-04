@@ -15,6 +15,7 @@ interface CanvasToolbarProps {
   onSchedule: (content: string, date: Date) => void;
   onPublish: (content: string) => void;
   content: string;
+  onFormat: (format: string) => void;
 }
 
 const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
@@ -27,13 +28,14 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
   onSchedule,
   onPublish,
   content,
+  onFormat,
 }) => {
   return (
     <div className="flex items-center justify-between p-4 border-b border-white/10">
       <div className="flex items-center gap-4">
         <ContentEditingToolbar
           onSelect={() => {}}
-          onFormat={() => {}}
+          onFormat={onFormat}
           isFloating={false}
         />
         

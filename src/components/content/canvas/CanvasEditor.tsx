@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import ContentEditingToolbar from "./ContentEditingToolbar";
 
@@ -7,14 +7,17 @@ interface CanvasEditorProps {
   content: string;
   setContent: (content: string) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  onTextTransform: (operation: string, selectedText: string) => void;
 }
 
 const CanvasEditor: React.FC<CanvasEditorProps> = ({
   content,
   setContent,
   onKeyDown,
+  textareaRef,
+  onTextTransform
 }) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [selection, setSelection] = useState<{ start: number; end: number; text: string } | null>(null);
   const [showToolbar, setShowToolbar] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
@@ -70,35 +73,13 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   const handleTextOperation = (operation: string) => {
     if (!selection) return;
     
-    const selectedText = content.substring(selection.start, selection.end);
-    let newText = "";
-    
-    switch (operation) {
-      case "rewrite":
-        // In a real implementation, this would call an AI service
-        newText = `${selectedText} (rewritten)`;
-        break;
-      case "shorter":
-        newText = `${selectedText.split(" ").slice(0, Math.max(1, Math.floor(selectedText.split(" ").length / 2))).join(" ")}`;
-        break;
-      case "longer":
-        newText = `${selectedText} with additional expanded details`;
-        break;
-      case "fix":
-        // In a real implementation, this would call a grammar checking service
-        newText = selectedText;
-        break;
-      default:
-        newText = selectedText;
-    }
-    
-    const newContent = 
-      content.substring(0, selection.start) + 
-      newText + 
-      content.substring(selection.end);
-    
-    setContent(newContent);
+    onTextTransform(operation, selection.text);
     setShowToolbar(false);
+  };
+
+  const handleFormat = (format: string) => {
+    // This is empty as the formatting is handled at the ContentCanvas level
+    // but we need this to satisfy the ContentEditingToolbar props
   };
 
   return (
@@ -116,7 +97,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       {showToolbar && selection && (
         <ContentEditingToolbar
           onSelect={handleTextOperation}
-          onFormat={() => {}}
+          onFormat={handleFormat}
           style={{
             position: 'absolute',
             top: toolbarPosition.top,
