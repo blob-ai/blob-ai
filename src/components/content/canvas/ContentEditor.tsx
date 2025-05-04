@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect, FormEvent } from "react";
+import React, { useState, useRef, FormEvent } from "react";
 import ContentEditingToolbar from "./ContentEditingToolbar";
 
 interface ContentEditorProps {
@@ -60,6 +60,11 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ content, onChange }) => {
     setShowToolbar(false);
   };
 
+  const handleInput = (e: FormEvent<HTMLDivElement>) => {
+    const newContent = e.currentTarget.innerHTML;
+    onChange(newContent);
+  };
+
   const handleTextFormat = (command: string) => {
     document.execCommand(command, false);
     const newContent = editorRef.current?.innerHTML || '';
@@ -84,14 +89,13 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ content, onChange }) => {
         ref={editorRef}
       >
         <div
-          className="min-h-[calc(100%-2rem)] outline-none prose prose-invert max-w-none"
+          className="min-h-[calc(100%-2rem)] outline-none prose prose-invert max-w-none editor-content"
           contentEditable
           suppressContentEditableWarning
           onMouseUp={handleTextSelection}
           onKeyUp={handleTextSelection}
-          onInput={(e: FormEvent<HTMLDivElement>) => onChange(e.currentTarget.innerHTML)}
+          onInput={handleInput}
           dangerouslySetInnerHTML={{ __html: content }}
-          style={{ minHeight: '300px' }}
           data-placeholder="Start writing your content here..."
         />
       </div>
