@@ -83,6 +83,42 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     handleFormatting(format, content, setContent, textareaRef);
   };
 
+  const handleSendToAI = (message: string) => {
+    console.log("Sending content to AI:", message);
+    
+    // Send content to AI service
+    toast.info(`AI processing request: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`);
+    
+    // Here we'd typically call an AI service directly or through ChatContext
+    // For now we're using the toast notification to show the request
+  };
+
+  // Helper function to get selected text or paragraph
+  const getSelectedContentForAI = () => {
+    if (textareaRef.current) {
+      const start = textareaRef.current.selectionStart;
+      const end = textareaRef.current.selectionEnd;
+      
+      if (start === end) {
+        // No selection, get paragraph
+        const textBefore = content.substring(0, start);
+        const textAfter = content.substring(start);
+        
+        const paragraphStart = textBefore.lastIndexOf('\n\n') + 2;
+        const paragraphEnd = textAfter.indexOf('\n\n');
+        
+        return content.substring(
+          paragraphStart, 
+          paragraphEnd > -1 ? start + paragraphEnd : content.length
+        );
+      } else {
+        // Return selected text
+        return content.substring(start, end);
+      }
+    }
+    return "";
+  };
+
   return (
     <div className="flex flex-col h-full">
       <CanvasToolbar
@@ -101,8 +137,15 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
         {showChatPanel && (
           <ContentChatPanel 
             onSendMessage={(message) => {
-              console.log("Message sent:", message);
-              toast.info(`AI request: "${message}". This would call an AI service in production.`);
+              // Determine if this is a selection-based message or direct message
+              if (message.startsWith("Improve") || message.startsWith("Edit") || message.startsWith("Fix")) {
+                const selectedContent = getSelectedContentForAI();
+                if (selectedContent) {
+                  handleSendToAI(`${message}\n\nSelected content:\n${selectedContent}`);
+                  return;
+                }
+              }
+              handleSendToAI(message);
             }}
           />
         )}
