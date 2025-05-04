@@ -1,20 +1,22 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Heart } from "lucide-react";
+import { RefreshCw, Heart, ChevronDown, ChevronUp, X } from "lucide-react";
+import { HookOption } from "../hooks/HookSelector";
 
 export interface ContentIdea {
   id: string;
   title: string;
   category: string;
   categoryColor: string;
+  hooks?: HookOption[];
 }
 
 interface IdeasGalleryProps {
   theme: string;
   ideas: ContentIdea[];
   onRefresh: () => void;
-  onUseIdea: (idea: ContentIdea) => void;
+  onCombinationSelect: (idea: ContentIdea, hookId: string) => void;
   onToggleFavorite: (id: string) => void;
   favorites: string[];
   usageCount: number;
@@ -25,28 +27,39 @@ const IdeasGallery: React.FC<IdeasGalleryProps> = ({
   theme,
   ideas,
   onRefresh,
-  onUseIdea,
+  onCombinationSelect,
   onToggleFavorite,
   favorites,
   usageCount,
   maxUsage,
 }) => {
-  // Function to get category-based color
-  const getCategoryColor = (category: string): string => {
-    const colors: Record<string, string> = {
-      "Best practices": "bg-orange-100 text-orange-800",
-      "Explanation / Analysis": "bg-green-100 text-green-800",
-      "List of advice/rules/etc": "bg-purple-100 text-purple-800",
-      "Striking advice": "bg-blue-100 text-blue-800",
-      "Useful resources": "bg-sky-100 text-sky-800",
-      "Personal reflection": "bg-pink-100 text-pink-800",
-      "Thought-provoking": "bg-indigo-100 text-indigo-800",
-      "Company sagas": "bg-gray-100 text-gray-800",
-      "Tip": "bg-amber-100 text-amber-800",
-      "Rant": "bg-red-100 text-red-800",
-    };
-    
-    return colors[category] || "bg-gray-100 text-gray-800";
+  const [expandedIdea, setExpandedIdea] = useState<string | null>(null);
+  const [previewContent, setPreviewContent] = useState<{ideaId: string, hookId: string} | null>(null);
+
+  const toggleExpand = (ideaId: string) => {
+    setExpandedIdea(expandedIdea === ideaId ? null : ideaId);
+    setPreviewContent(null);
+  };
+
+  const handlePreview = (ideaId: string, hookId: string) => {
+    setPreviewContent({ideaId, hookId});
+  };
+
+  const handleClosePreview = () => {
+    setPreviewContent(null);
+  };
+
+  const getIdeaById = (ideaId: string) => {
+    return ideas.find(idea => idea.id === ideaId);
+  };
+
+  const getHookById = (idea: ContentIdea | undefined, hookId: string) => {
+    return idea?.hooks?.find(hook => hook.id === hookId);
+  };
+
+  const generatePreviewContent = (idea: ContentIdea | undefined, hook: HookOption | undefined) => {
+    if (!idea || !hook) return "";
+    return `${hook.text}\n\nHere's my perspective on ${idea.title}:\n\n[Your content will be generated here based on the selected idea and hook]`;
   };
 
   return (
@@ -77,37 +90,186 @@ const IdeasGallery: React.FC<IdeasGalleryProps> = ({
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {ideas.map((idea) => (
-          <div key={idea.id} className="border border-white/10 rounded-xl overflow-hidden bg-black">
-            <div className={`p-4 min-h-[120px] flex flex-col ${idea.categoryColor}`}>
-              <h3 className="font-medium text-base mb-auto">{idea.title}</h3>
-              <div className="flex items-center justify-between mt-2">
-                <span className="text-sm opacity-80">{idea.category}</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onToggleFavorite(idea.id)}
-                  className="h-8 w-8 rounded-full hover:bg-black/10"
-                >
-                  <Heart
-                    className={`h-5 w-5 ${
-                      favorites.includes(idea.id) ? "fill-current text-red-500" : ""
-                    }`}
-                  />
-                </Button>
-              </div>
-            </div>
-            <div className="p-3 border-t border-white/10 bg-black">
-              <Button
-                variant="outline"
-                onClick={() => onUseIdea(idea)}
-                className="w-full bg-transparent border border-white/20 hover:bg-white/5"
-                size="sm"
+      {/* Preview Modal */}
+      {previewContent && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-black border border-white/10 rounded-xl max-w-2xl w-full max-h-[80vh] overflow-auto">
+            <div className="border-b border-white/10 p-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Content Preview</h3>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={handleClosePreview}
+                className="text-white/70 hover:text-white rounded-full"
               >
-                Use
+                <X className="h-5 w-5" />
               </Button>
             </div>
+            <div className="p-6">
+              {(() => {
+                const idea = getIdeaById(previewContent.ideaId);
+                const hook = getHookById(idea, previewContent.hookId);
+                return (
+                  <div className="space-y-4">
+                    {hook && (
+                      <div className="border border-white/10 rounded-lg p-4 bg-white/5">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="h-8 w-8 rounded-full overflow-hidden bg-gray-700">
+                            <img 
+                              src={hook.author.avatar} 
+                              alt={hook.author.name} 
+                              className="h-full w-full object-cover" 
+                            />
+                          </div>
+                          <div>
+                            <div className="font-medium text-sm">{hook.author.name}</div>
+                            <div className="text-xs text-white/60">{hook.author.credential}</div>
+                          </div>
+                        </div>
+                        <p className="text-sm text-white/90">{hook.text}</p>
+                      </div>
+                    )}
+                    {idea && (
+                      <div className="space-y-3">
+                        <h4 className="font-medium">Content outline</h4>
+                        <div className="border border-white/10 rounded-lg p-4">
+                          <p className="text-sm text-white/80">
+                            Here's my perspective on {idea.title}
+                            <br /><br />
+                            [Your content will be generated here based on the selected idea and hook]
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    <Button 
+                      className="w-full bg-blue-600 hover:bg-blue-500 mt-4"
+                      onClick={() => {
+                        onCombinationSelect(
+                          getIdeaById(previewContent.ideaId)!, 
+                          previewContent.hookId
+                        );
+                        handleClosePreview();
+                      }}
+                    >
+                      Use this combination
+                    </Button>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="space-y-4">
+        {ideas.map((idea) => (
+          <div 
+            key={idea.id} 
+            className={`border border-white/10 rounded-xl overflow-hidden transition-all duration-300 ${
+              expandedIdea === idea.id ? 'bg-white/5' : 'bg-black'
+            }`}
+          >
+            <div className={`p-4 min-h-[120px] relative ${idea.categoryColor}`}>
+              <h3 className="font-medium text-base">{idea.title}</h3>
+              <div className="flex items-center justify-between mt-4">
+                <span className="text-sm opacity-80">{idea.category}</span>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onToggleFavorite(idea.id)}
+                    className="h-8 w-8 rounded-full hover:bg-black/10"
+                  >
+                    <Heart
+                      className={`h-5 w-5 ${
+                        favorites.includes(idea.id) ? "fill-current text-red-500" : ""
+                      }`}
+                    />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => toggleExpand(idea.id)}
+                    className="h-8 w-8 rounded-full hover:bg-black/10"
+                  >
+                    {expandedIdea === idea.id ? (
+                      <ChevronUp className="h-5 w-5" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            {expandedIdea === idea.id && idea.hooks && (
+              <div className="p-4 border-t border-white/10 bg-black/20">
+                <h4 className="text-sm font-medium text-white/70 mb-3">Choose a hook or use the idea directly</h4>
+                <div className="space-y-3">
+                  {idea.hooks.map((hook) => (
+                    <div 
+                      key={hook.id} 
+                      className="border border-white/10 rounded-lg p-3 hover:bg-white/5 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="h-8 w-8 rounded-full overflow-hidden bg-gray-700">
+                          <img 
+                            src={hook.author.avatar} 
+                            alt={hook.author.name} 
+                            className="h-full w-full object-cover" 
+                          />
+                        </div>
+                        <div>
+                          <div className="font-medium text-sm">{hook.author.name}</div>
+                          <div className="text-xs text-white/60">{hook.author.credential}</div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-white/80 mb-3">{hook.text}</p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs border-white/10 hover:bg-white/5"
+                          onClick={() => handlePreview(idea.id, hook.id)}
+                        >
+                          Preview
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="text-xs bg-blue-600 hover:bg-blue-500"
+                          onClick={() => onCombinationSelect(idea, hook.id)}
+                        >
+                          Use this hook
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="border-t border-white/10 pt-3 mt-4">
+                    <Button
+                      variant="outline"
+                      className="w-full border-white/10 hover:bg-white/5"
+                      onClick={() => onCombinationSelect(idea, "")}
+                    >
+                      Use idea without a hook
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {expandedIdea !== idea.id && (
+              <div className="p-3 border-t border-white/10 bg-black">
+                <Button
+                  variant="outline"
+                  onClick={() => toggleExpand(idea.id)}
+                  className="w-full bg-transparent border border-white/20 hover:bg-white/5"
+                  size="sm"
+                >
+                  View hooks & use
+                </Button>
+              </div>
+            )}
           </div>
         ))}
       </div>

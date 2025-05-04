@@ -4,12 +4,24 @@ import { TextShimmer } from "@/components/ui/text-shimmer";
 import { PenLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from 'react-router-dom';
+import ContentCreationModal from '@/components/content/ContentCreationModal';
+import { toast } from 'sonner';
 
 const SidebarHeader: React.FC = () => {
   const navigate = useNavigate();
+  const [showCreationModal, setShowCreationModal] = React.useState(false);
 
-  const handleCreatePostsClick = () => {
-    navigate('/dashboard/content');
+  const handleOptionSelect = (option: string) => {
+    setShowCreationModal(false);
+    
+    if (option === "idea-generation") {
+      navigate('/dashboard/content?step=theme');
+    } else if (option === "blank-canvas") {
+      navigate('/dashboard/content?step=canvas');
+    } else {
+      // Handle other options by showing a notification for demo
+      toast.info(`${option} option selected. This feature is coming soon!`);
+    }
   };
 
   return (
@@ -32,7 +44,7 @@ const SidebarHeader: React.FC = () => {
           "transition-all duration-150",
           "focus:outline-none focus:ring-1 focus:ring-blue-300"
         )}
-        onClick={handleCreatePostsClick}
+        onClick={() => setShowCreationModal(true)}
         aria-label="Create new post"
       >
         <span className="inline-flex items-center justify-center text-white">
@@ -40,6 +52,12 @@ const SidebarHeader: React.FC = () => {
         </span>
         <span>Create posts</span>
       </button>
+
+      <ContentCreationModal
+        isOpen={showCreationModal}
+        onClose={() => setShowCreationModal(false)}
+        onOptionSelect={handleOptionSelect}
+      />
     </div>
   );
 };

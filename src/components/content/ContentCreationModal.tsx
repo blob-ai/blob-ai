@@ -98,7 +98,7 @@ const ContentCreationModal: React.FC<ContentCreationModalProps> = ({
           <h2 className="text-xl font-semibold">Choose how you want to create posts</h2>
           <button 
             onClick={onClose}
-            className="text-white/70 hover:text-white rounded-full p-1"
+            className="text-white/70 hover:text-white rounded-full p-1 hover:bg-white/10 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
