@@ -3,7 +3,7 @@ import React from "react";
 import ThemeSelectionForm from "@/components/content/idea-generation/ThemeSelectionForm";
 
 interface ThemeSelectionStepProps {
-  onSubmit: (theme: string, categories: string[]) => void;
+  onSubmit: (theme: string, categories: string[], goal: string) => void;
 }
 
 const ThemeSelectionStep: React.FC<ThemeSelectionStepProps> = ({ onSubmit }) => {

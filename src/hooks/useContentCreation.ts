@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -19,6 +18,7 @@ export const useContentCreation = () => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [theme, setTheme] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
+  const [contentGoal, setContentGoal] = useState("knowledge");
   const [generatedIdeas, setGeneratedIdeas] = useState<ContentIdea[]>([]);
   const [selectedIdea, setSelectedIdea] = useState<ContentIdea | null>(null);
   const [content, setContent] = useState("");
@@ -45,14 +45,16 @@ export const useContentCreation = () => {
     }
   }, [location]);
 
-  // Function to generate mock ideas
-  const generateIdeas = (theme: string, categories: string[]) => {
+  // Function to generate mock ideas based on theme, categories, and goal
+  const generateIdeas = (theme: string, categories: string[], goal: string) => {
     // This would be an API call in a real application
+    const goalPrefix = getGoalPrefix(goal);
+    
     const mockIdeas: ContentIdea[] = [
       {
         id: "1",
-        title: `How to integrate AI effectively in ${theme} teaching for more engaging learning experiences.`,
-        category: "Best practices",
+        title: `${goalPrefix}: How to integrate AI effectively in ${theme} teaching for more engaging learning experiences.`,
+        category: categories[0] || "Best practices",
         categoryColor: "bg-orange-100 text-orange-800",
         hooks: [
           {
@@ -77,8 +79,8 @@ export const useContentCreation = () => {
       },
       {
         id: "2",
-        title: `Why blended learning is becoming the new normal in ${theme} schools and universities.`,
-        category: "Explanation / Analysis",
+        title: `${goalPrefix}: Why blended learning is becoming the new normal in ${theme} schools and universities.`,
+        category: categories[0] || "Explanation / Analysis",
         categoryColor: "bg-green-100 text-green-800",
         hooks: [
           {
@@ -103,8 +105,8 @@ export const useContentCreation = () => {
       },
       {
         id: "3",
-        title: `10 crucial skills every ${theme} educator should develop for modern classrooms.`,
-        category: "List of advice/rules/etc",
+        title: `${goalPrefix}: 10 crucial skills every ${theme} educator should develop for modern classrooms.`,
+        category: categories[0] || "List of advice/rules/etc",
         categoryColor: "bg-purple-100 text-purple-800",
         hooks: [
           {
@@ -129,8 +131,8 @@ export const useContentCreation = () => {
       },
       {
         id: "4",
-        title: `Top 5 online platforms offering free courses in ${theme.toLowerCase()} and entrepreneurship for students.`,
-        category: "Useful resources",
+        title: `${goalPrefix}: Top 5 online platforms offering free courses in ${theme.toLowerCase()} and entrepreneurship for students.`,
+        category: categories[0] || "Useful resources",
         categoryColor: "bg-sky-100 text-sky-800",
         hooks: [
           {
@@ -155,8 +157,8 @@ export const useContentCreation = () => {
       },
       {
         id: "5",
-        title: `Reflecting on my journey from a traditional ${theme.toLowerCase()} teacher to embracing digital tools - here's what I learned about adaptability and change.`,
-        category: "Personal reflection",
+        title: `${goalPrefix}: Reflecting on my journey from a traditional ${theme.toLowerCase()} teacher to embracing digital tools - here's what I learned about adaptability and change.`,
+        category: categories[0] || "Personal reflection",
         categoryColor: "bg-pink-100 text-pink-800",
         hooks: [
           {
@@ -181,8 +183,8 @@ export const useContentCreation = () => {
       },
       {
         id: "6",
-        title: `Is our current ${theme.toLowerCase()} system preparing students adequately for jobs that do not exist yet?`,
-        category: "Thought-provoking",
+        title: `${goalPrefix}: Is our current ${theme.toLowerCase()} system preparing students adequately for jobs that do not exist yet?`,
+        category: categories[0] || "Thought-provoking",
         categoryColor: "bg-indigo-100 text-indigo-800",
         hooks: [
           {
@@ -210,13 +212,34 @@ export const useContentCreation = () => {
     setGeneratedIdeas(mockIdeas);
     setCurrentStep(CreationStep.IDEAS_GALLERY);
     setUsageCount(prev => Math.min(prev + 1, maxUsage));
-    toast.success(`Generated ideas for "${theme}"`);
+    toast.success(`Generated ideas for "${theme}" with ${goal} goal`);
   };
 
-  const handleThemeSubmit = (theme: string, categories: string[]) => {
+  // Helper function to get a prefix based on the content goal
+  const getGoalPrefix = (goal: string): string => {
+    switch (goal) {
+      case "knowledge":
+        return "Learn";
+      case "community":
+        return "Discuss";
+      case "growth":
+        return "Grow";
+      case "brand":
+        return "Brand";
+      case "leads":
+        return "Discover";
+      case "thought":
+        return "Insight";
+      default:
+        return "";
+    }
+  };
+
+  const handleThemeSubmit = (theme: string, categories: string[], goal: string = "knowledge") => {
     setTheme(theme);
     setCategories(categories);
-    generateIdeas(theme, categories);
+    setContentGoal(goal);
+    generateIdeas(theme, categories, goal);
   };
 
   const handleCombinationSelect = (idea: ContentIdea, hookId: string) => {
@@ -287,6 +310,7 @@ export const useContentCreation = () => {
     selectedOption,
     theme,
     categories,
+    contentGoal,
     generatedIdeas,
     selectedIdea,
     content,
