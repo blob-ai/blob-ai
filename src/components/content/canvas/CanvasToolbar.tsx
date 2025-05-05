@@ -1,16 +1,23 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ActionButton } from "@/components/ui/action-button";
 import { 
   Image, 
-  Eye, 
+  Eye,
+  EyeOff, 
   Save, 
   Calendar, 
   History, 
   Keyboard,
   Twitter,
   Linkedin,
-  Facebook
+  Facebook,
+  Bold,
+  Italic,
+  Underline,
+  List
 } from "lucide-react";
 import ContentEditingToolbar from "./ContentEditingToolbar";
 import { toast } from "sonner";
@@ -71,118 +78,170 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-between p-4 border-b border-white/10">
-      <div className="flex items-center gap-4">
-        <ContentEditingToolbar
-          onSelect={() => {}}
-          onFormat={onFormat}
-          isFloating={false}
-        />
+    <div className="flex items-center justify-between p-4 border-b border-white/10 bg-[#16181c]">
+      {/* Left side: Formatting and Content Tools */}
+      <div className="flex items-center gap-2">
+        {/* Group 1: Basic Formatting */}
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-white/70 hover:text-white hover:bg-white/5 px-2"
+            onClick={() => onFormat('bold')}
+          >
+            <Bold className="h-4 w-4" />
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-white/70 hover:text-white hover:bg-white/5 px-2"
+            onClick={() => onFormat('italic')}
+          >
+            <Italic className="h-4 w-4" />
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-white/70 hover:text-white hover:bg-white/5 px-2"
+            onClick={() => onFormat('underline')}
+          >
+            <Underline className="h-4 w-4" />
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-white/70 hover:text-white hover:bg-white/5 px-2"
+            onClick={() => onFormat('list')}
+          >
+            <List className="h-4 w-4" />
+          </Button>
+        </div>
         
-        <div className="h-5 border-r border-white/10"></div>
+        <Separator orientation="vertical" className="h-6 bg-white/10 mx-2" />
         
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="text-white/70 hover:text-white hover:bg-white/5"
-          onClick={() => {
-            toast.info("Image upload feature coming soon");
-          }}
-        >
-          <Image className="h-4 w-4 mr-1" />
-          <span className="text-sm">Add Image</span>
-        </Button>
+        {/* Group 2: Content Operations */}
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-white/70 hover:text-white hover:bg-white/5"
+            onClick={() => {
+              toast.info("Image upload feature coming soon");
+            }}
+          >
+            <Image className="h-4 w-4 mr-1" />
+            <span className="text-sm">Add Image</span>
+          </Button>
+          
+          {/* Platform View Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-white/70 hover:text-white hover:bg-white/5"
+              >
+                {platformIcons[currentPlatformView]}
+                <span className="text-sm ml-1">{platformLabels[currentPlatformView]}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="bg-[#16181c] border border-white/10 text-white">
+              <DropdownMenuLabel>Select Platform View</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuItem 
+                className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
+                onClick={() => {
+                  onChangePlatformView("default");
+                  onToggleMobileView();
+                }}
+              >
+                <Eye className="h-4 w-4" /> Standard Preview
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
+                onClick={() => {
+                  onChangePlatformView("twitter");
+                  onToggleMobileView();
+                }}
+              >
+                <Twitter className="h-4 w-4" /> Twitter
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
+                onClick={() => {
+                  onChangePlatformView("linkedin");
+                  onToggleMobileView();
+                }}
+              >
+                <Linkedin className="h-4 w-4" /> LinkedIn
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
+                onClick={() => {
+                  onChangePlatformView("facebook");
+                  onToggleMobileView();
+                }}
+              >
+                <Facebook className="h-4 w-4" /> Facebook
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         
-        {/* Platform View Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-white/70 hover:text-white hover:bg-white/5"
-            >
-              {platformIcons[currentPlatformView]}
-              <span className="text-sm ml-1">{platformLabels[currentPlatformView]}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="bg-[#16181c] border border-white/10 text-white">
-            <DropdownMenuLabel>Select Platform View</DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/10" />
-            <DropdownMenuItem 
-              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
-              onClick={() => {
-                onChangePlatformView("default");
-                onToggleMobileView();
-              }}
-            >
-              <Eye className="h-4 w-4" /> Standard Preview
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
-              onClick={() => {
-                onChangePlatformView("twitter");
-                onToggleMobileView();
-              }}
-            >
-              <Twitter className="h-4 w-4" /> Twitter
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
-              onClick={() => {
-                onChangePlatformView("linkedin");
-                onToggleMobileView();
-              }}
-            >
-              <Linkedin className="h-4 w-4" /> LinkedIn
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
-              onClick={() => {
-                onChangePlatformView("facebook");
-                onToggleMobileView();
-              }}
-            >
-              <Facebook className="h-4 w-4" /> Facebook
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Separator orientation="vertical" className="h-6 bg-white/10 mx-2" />
         
+        {/* Group 3: AI Toggle */}
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="text-white/70 hover:text-white hover:bg-white/5"
+          className="border-white/10 hover:bg-white/5 flex items-center gap-1.5"
           onClick={onToggleChatPanel}
         >
           {showChatPanel ? (
-            <span className="text-sm">Hide AI</span>
+            <>
+              <EyeOff className="h-4 w-4" />
+              <span className="text-sm">Hide AI</span>
+            </>
           ) : (
-            <span className="text-sm">Show AI</span>
+            <>
+              <Eye className="h-4 w-4" />
+              <span className="text-sm">Show AI</span>
+            </>
           )}
         </Button>
         
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-white/70 hover:text-white hover:bg-white/5"
-          onClick={onToggleHistory}
-        >
-          <History className="h-4 w-4 mr-1" />
-          <span className="text-sm">History</span>
-        </Button>
+        <Separator orientation="vertical" className="h-6 bg-white/10 mx-2" />
         
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-white/70 hover:text-white hover:bg-white/5"
-          onClick={onShowKeyboardShortcuts}
-        >
-          <Keyboard className="h-4 w-4 mr-1" />
-          <span className="text-sm">Shortcuts</span>
-        </Button>
+        {/* Group 4: Tools */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-white/70 hover:text-white hover:bg-white/5"
+            onClick={onToggleHistory}
+          >
+            <History className="h-4 w-4 mr-1" />
+            <span className="text-sm">History</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-white/70 hover:text-white hover:bg-white/5"
+            onClick={onShowKeyboardShortcuts}
+          >
+            <Keyboard className="h-4 w-4 mr-1" />
+            <span className="text-sm">Shortcuts</span>
+          </Button>
+        </div>
       </div>
       
-      <div className="flex items-center gap-2">
-        <div className="text-xs text-white/50 mr-2">
+      {/* Right side: Saving and Publishing */}
+      <div className="flex items-center gap-3">
+        <div className="text-xs text-white/50 mr-1">
           {isSaving ? (
             <span>Saving...</span>
           ) : lastSaved ? (
@@ -190,29 +249,27 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           ) : null}
         </div>
 
-        <Button 
-          variant="outline" 
+        <ActionButton 
+          variant="outline"
           size="sm" 
+          icon={<Save className="h-4 w-4" />}
+          label="Save Draft"
           className="border-white/10 hover:bg-white/5"
           onClick={handleAutoSave}
-        >
-          <Save className="h-4 w-4 mr-1" />
-          <span className="text-sm">Save Draft</span>
-        </Button>
+        />
         
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <ActionButton 
+          variant="outline"
+          size="sm"
+          icon={<Calendar className="h-4 w-4" />}
+          label="Schedule"
           className="border-white/10 hover:bg-white/5"
           onClick={() => onSchedule(content, new Date())}
-        >
-          <Calendar className="h-4 w-4 mr-1" />
-          <span className="text-sm">Schedule</span>
-        </Button>
+        />
         
         <Button 
           size="sm" 
-          className="bg-blue-600 hover:bg-blue-500"
+          className="bg-blue-600 hover:bg-blue-500 px-4"
           onClick={() => onPublish(content)}
         >
           Publish

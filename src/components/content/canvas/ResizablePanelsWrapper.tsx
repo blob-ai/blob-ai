@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -11,6 +11,7 @@ interface ResizablePanelsWrapperProps {
   initialLeftSize?: number;
   initialRightSize?: number;
   collapsible?: boolean;
+  isLeftPanelCollapsed?: boolean;
 }
 
 const ResizablePanelsWrapper: React.FC<ResizablePanelsWrapperProps> = ({
@@ -19,16 +20,24 @@ const ResizablePanelsWrapper: React.FC<ResizablePanelsWrapperProps> = ({
   initialLeftSize = 25,
   initialRightSize = 75,
   collapsible = true,
+  isLeftPanelCollapsed = false,
 }) => {
-  const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(isLeftPanelCollapsed);
   const [leftPanelSize, setLeftPanelSize] = useState(initialLeftSize);
   
+  // Update collapsed state when prop changes
+  useEffect(() => {
+    setIsCollapsed(isLeftPanelCollapsed);
+  }, [isLeftPanelCollapsed]);
+
   const toggleLeftPanel = () => {
-    setIsLeftPanelCollapsed(!isLeftPanelCollapsed);
+    setIsCollapsed(!isCollapsed);
   };
 
   const handleResizeEnd = (sizes: number[]) => {
-    setLeftPanelSize(sizes[0]);
+    if (!isCollapsed) {
+      setLeftPanelSize(sizes[0]);
+    }
   };
 
   return (
@@ -44,15 +53,18 @@ const ResizablePanelsWrapper: React.FC<ResizablePanelsWrapperProps> = ({
           maxSize={50}
           className={cn(
             "transition-all duration-300 ease-in-out",
-            isLeftPanelCollapsed ? "w-0 p-0 m-0 overflow-hidden" : ""
+            isCollapsed ? "w-0 p-0 m-0 overflow-hidden" : ""
           )}
         >
           {leftPanel}
         </ResizablePanel>
         
-        <ResizableHandle withHandle />
+        <ResizableHandle withHandle className={isCollapsed ? "hidden" : ""} />
         
-        <ResizablePanel defaultSize={initialRightSize}>
+        <ResizablePanel 
+          defaultSize={initialRightSize}
+          className={cn(isCollapsed ? "w-full" : "")}
+        >
           {rightPanel}
         </ResizablePanel>
       </ResizablePanelGroup>
@@ -64,7 +76,7 @@ const ResizablePanelsWrapper: React.FC<ResizablePanelsWrapperProps> = ({
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full border border-white/10 bg-black shadow-md hover:bg-black/80"
           onClick={toggleLeftPanel}
         >
-          {isLeftPanelCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
       )}
     </div>
