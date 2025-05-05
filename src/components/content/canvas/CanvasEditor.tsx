@@ -1,7 +1,8 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import ContentEditingToolbar from "./ContentEditingToolbar";
+import useContentFormatting from "./hooks/useContentFormatting";
 
 interface CanvasEditorProps {
   content: string;
@@ -19,8 +20,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   onTextTransform
 }) => {
   const [selection, setSelection] = useState<{ start: number; end: number; text: string } | null>(null);
-  const [showToolbar, setShowToolbar] = useState(false);
-  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+  const { handleFormatting, renderFloatingToolbar } = useContentFormatting();
 
   const handleTextSelect = () => {
     if (textareaRef.current) {
@@ -30,57 +30,32 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       if (start !== end) {
         const selectedText = content.substring(start, end);
         setSelection({ start, end, text: selectedText });
-        setShowToolbar(true);
-        
-        // Calculate toolbar position based on selection
-        const textarea = textareaRef.current;
-        const selectionRect = getSelectionCoordinates(textarea, start, end);
-        
-        setToolbarPosition({
-          top: selectionRect.top - 50,
-          left: selectionRect.left + (selectionRect.width / 2) - 100, // Center toolbar
-        });
       } else {
-        setShowToolbar(false);
         setSelection(null);
       }
     }
   };
 
-  // Improved function to get coordinates of selection
-  const getSelectionCoordinates = (
-    textarea: HTMLTextAreaElement,
-    start: number,
-    end: number
-  ) => {
-    // For accurate positioning, we would use Range and getBoundingClientRect in a real implementation
-    // This is a simplified version for demonstration
-    const textareaRect = textarea.getBoundingClientRect();
-    
-    // Approximate the position based on line height and character position
-    const textBeforeSelection = content.substring(0, start);
-    const lineBreaks = textBeforeSelection.split('\n').length - 1;
-    const lineHeight = 24; // Approximate line height in pixels
-    
-    return {
-      top: textareaRect.top + lineBreaks * lineHeight,
-      left: textareaRect.left + 10, // Approximate horizontal position
-      width: textareaRect.width - 20,
-      height: lineHeight,
-    };
-  };
-
   const handleTextOperation = (operation: string) => {
     if (!selection) return;
-    
     onTextTransform(operation, selection.text);
-    setShowToolbar(false);
   };
 
-  const handleFormat = (format: string) => {
-    // This is empty as the formatting is handled at the ContentCanvas level
-    // but we need this to satisfy the ContentEditingToolbar props
-  };
+  // Listen for custom formatting event from the floating toolbar
+  useEffect(() => {
+    const handleCustomFormatEvent = (e: CustomEvent) => {
+      const { format } = e.detail;
+      if (format && textareaRef.current) {
+        handleFormatting(format, content, setContent, textareaRef);
+      }
+    };
+    
+    document.addEventListener('applyFormatting', handleCustomFormatEvent as EventListener);
+    
+    return () => {
+      document.removeEventListener('applyFormatting', handleCustomFormatEvent as EventListener);
+    };
+  }, [content, handleFormatting, setContent, textareaRef]);
 
   return (
     <div className="relative">
@@ -94,14 +69,17 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         placeholder="Start writing your content here..."
       />
       
-      {showToolbar && selection && (
+      {/* Modern floating toolbar that appears near text selection */}
+      {renderFloatingToolbar()}
+      
+      {/* Legacy toolbar - can be removed once floating toolbar is fully functional */}
+      {selection && (
         <ContentEditingToolbar
           onSelect={handleTextOperation}
-          onFormat={handleFormat}
+          onFormat={() => {}}
           style={{
             position: 'absolute',
-            top: toolbarPosition.top,
-            left: toolbarPosition.left,
+            display: 'none', // Hide the legacy toolbar
           }}
           isFloating={true}
         />

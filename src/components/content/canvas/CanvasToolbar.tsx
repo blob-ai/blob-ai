@@ -10,9 +10,13 @@ import {
   Keyboard,
   Twitter,
   Linkedin,
-  Facebook
+  Facebook,
+  Bold,
+  Italic,
+  Underline,
+  List,
+  EyeOff
 } from "lucide-react";
-import ContentEditingToolbar from "./ContentEditingToolbar";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -22,6 +26,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+import { ActionButton } from "@/components/ui/action-button";
+import { Separator } from "@/components/ui/separator";
 
 interface CanvasToolbarProps {
   onToggleMobileView: () => void;
@@ -70,27 +77,46 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
     facebook: "Facebook"
   };
 
+  // Format options for the toolbar
+  const formatOptions = [
+    { id: "bold", icon: <Bold className="h-4 w-4" /> },
+    { id: "italic", icon: <Italic className="h-4 w-4" /> },
+    { id: "underline", icon: <Underline className="h-4 w-4" /> },
+    { id: "list", icon: <List className="h-4 w-4" /> },
+  ];
+
   return (
-    <div className="flex items-center justify-between p-4 border-b border-white/10">
-      <div className="flex items-center gap-4">
-        <ContentEditingToolbar
-          onSelect={() => {}}
-          onFormat={onFormat}
-          isFloating={false}
-        />
+    <div className="flex items-center justify-between p-3 border-b border-white/10 bg-[#0a0b0e]">
+      <div className="flex items-center space-x-2">
+        {/* Group 1: Text Formatting Options */}
+        <div className="flex items-center">
+          {formatOptions.map((option) => (
+            <Button
+              key={option.id}
+              variant="ghost"
+              size="sm"
+              className="text-white/70 hover:text-white hover:bg-white/5 h-8 px-2.5"
+              onClick={() => onFormat(option.id)}
+              title={option.id.charAt(0).toUpperCase() + option.id.slice(1)}
+            >
+              {option.icon}
+            </Button>
+          ))}
+        </div>
+
+        <Separator orientation="vertical" className="h-6 mx-2 bg-white/10" />
         
-        <div className="h-5 border-r border-white/10"></div>
-        
+        {/* Group 2: Content Operations */}
         <Button 
           variant="ghost" 
           size="sm" 
-          className="text-white/70 hover:text-white hover:bg-white/5"
+          className="text-white/70 hover:text-white hover:bg-white/5 h-8"
           onClick={() => {
             toast.info("Image upload feature coming soon");
           }}
         >
           <Image className="h-4 w-4 mr-1" />
-          <span className="text-sm">Add Image</span>
+          <span className="text-sm">Image</span>
         </Button>
         
         {/* Platform View Dropdown */}
@@ -99,7 +125,7 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-white/70 hover:text-white hover:bg-white/5"
+              className="text-white/70 hover:text-white hover:bg-white/5 h-8"
             >
               {platformIcons[currentPlatformView]}
               <span className="text-sm ml-1">{platformLabels[currentPlatformView]}</span>
@@ -147,23 +173,40 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
         
+        <Separator orientation="vertical" className="h-6 mx-2 bg-white/10" />
+        
+        {/* Group 3: AI Assistant Toggle - More prominent */}
         <Button
-          variant="ghost"
+          variant={showChatPanel ? "default" : "outline"}
           size="sm"
-          className="text-white/70 hover:text-white hover:bg-white/5"
+          className={cn(
+            "h-8",
+            showChatPanel 
+              ? "bg-blue-600 hover:bg-blue-500 text-white" 
+              : "border-white/10 text-white/70 hover:bg-white/5 hover:text-white"
+          )}
           onClick={onToggleChatPanel}
         >
           {showChatPanel ? (
-            <span className="text-sm">Hide AI</span>
+            <>
+              <EyeOff className="h-4 w-4 mr-1" />
+              <span className="text-sm">Hide AI</span>
+            </>
           ) : (
-            <span className="text-sm">Show AI</span>
+            <>
+              <Eye className="h-4 w-4 mr-1" />
+              <span className="text-sm">Show AI</span>
+            </>
           )}
         </Button>
         
+        <Separator orientation="vertical" className="h-6 mx-2 bg-white/10" />
+        
+        {/* Group 4: Tools */}
         <Button
           variant="ghost"
           size="sm"
-          className="text-white/70 hover:text-white hover:bg-white/5"
+          className="text-white/70 hover:text-white hover:bg-white/5 h-8"
           onClick={onToggleHistory}
         >
           <History className="h-4 w-4 mr-1" />
@@ -173,7 +216,7 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
         <Button
           variant="ghost"
           size="sm"
-          className="text-white/70 hover:text-white hover:bg-white/5"
+          className="text-white/70 hover:text-white hover:bg-white/5 h-8"
           onClick={onShowKeyboardShortcuts}
         >
           <Keyboard className="h-4 w-4 mr-1" />
@@ -181,8 +224,9 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
         </Button>
       </div>
       
-      <div className="flex items-center gap-2">
-        <div className="text-xs text-white/50 mr-2">
+      {/* Group 5: Save, Schedule, Publish - Right Side */}
+      <div className="flex items-center gap-3">
+        <div className="text-xs text-white/50 mr-1">
           {isSaving ? (
             <span>Saving...</span>
           ) : lastSaved ? (
@@ -190,33 +234,30 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           ) : null}
         </div>
 
-        <Button 
+        <ActionButton 
           variant="outline" 
           size="sm" 
-          className="border-white/10 hover:bg-white/5"
+          className="border-white/10 hover:bg-white/5 h-8"
+          icon={<Save className="h-4 w-4" />}
+          label="Save Draft"
           onClick={handleAutoSave}
-        >
-          <Save className="h-4 w-4 mr-1" />
-          <span className="text-sm">Save Draft</span>
-        </Button>
+        />
         
-        <Button 
+        <ActionButton 
           variant="outline" 
           size="sm" 
-          className="border-white/10 hover:bg-white/5"
+          className="border-white/10 hover:bg-white/5 h-8"
+          icon={<Calendar className="h-4 w-4" />}
+          label="Schedule"
           onClick={() => onSchedule(content, new Date())}
-        >
-          <Calendar className="h-4 w-4 mr-1" />
-          <span className="text-sm">Schedule</span>
-        </Button>
+        />
         
-        <Button 
+        <ActionButton 
           size="sm" 
-          className="bg-blue-600 hover:bg-blue-500"
+          className="bg-blue-600 hover:bg-blue-500 text-white h-8 px-5"
+          label="Publish"
           onClick={() => onPublish(content)}
-        >
-          Publish
-        </Button>
+        />
       </div>
     </div>
   );

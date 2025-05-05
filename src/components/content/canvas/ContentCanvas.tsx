@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
@@ -12,7 +11,6 @@ import KeyboardShortcutsGuide from "./KeyboardShortcutsGuide";
 import useContentFormatting from "./hooks/useContentFormatting";
 import ResizablePanelsWrapper from "./ResizablePanelsWrapper";
 import { ContentVersion } from "./ContentVersionHistory";
-import { History, Keyboard } from "lucide-react";
 
 interface ContentCanvasProps {
   initialContent?: string;
@@ -203,6 +201,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     }, 500);
   };
 
+  // Updated toggle function - now used by both button and keyboard shortcut
   const toggleChatPanel = () => {
     setShowChatPanel(!showChatPanel);
   };
@@ -427,6 +426,8 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
       initialLeftSize={25}
       initialRightSize={75}
       collapsible={true}
+      isLeftPanelCollapsed={!showChatPanel}
+      onCollapseChange={(collapsed) => setShowChatPanel(!collapsed)}
     />
   );
 };
