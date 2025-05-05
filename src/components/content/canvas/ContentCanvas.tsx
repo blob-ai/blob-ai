@@ -427,7 +427,6 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
       initialLeftSize={25}
       initialRightSize={75}
       collapsible={true}
-      isLeftPanelCollapsed={!showChatPanel}
     />
   );
 };
