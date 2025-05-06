@@ -17,7 +17,7 @@ interface ContentCanvasProps {
   onContentChange?: (content: string) => void;
   onPublish: (content: string) => void;
   onSaveDraft: (content: string) => void;
-  onSchedule: (date: Date) => void;
+  onSchedule: (content: string, date: Date) => void;
   buttonColor?: string;
 }
 
@@ -372,7 +372,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
         isSaving={isSaving}
         lastSaved={lastSaved}
         onSchedule={() => setShowScheduleModal(true)}
-        onPublish={onPublish}
+        onPublish={() => onPublish(content)}
         content={content}
         onFormat={onFormatting}
         onToggleHistory={() => setShowVersionHistory(true)}
@@ -404,7 +404,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
       <ScheduleModal
         isOpen={showScheduleModal}
         onClose={() => setShowScheduleModal(false)}
-        onSchedule={onSchedule}
+        onSchedule={(date) => onSchedule(content, date)}
         content={content}
       />
       
