@@ -61,7 +61,7 @@ const Sidebar = () => {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 h-full bg-black border-r border-white/10 z-30 transition-all duration-300 ease-in-out overflow-hidden",
+        "fixed left-0 top-0 h-full bg-black border-r border-white/10 z-30 transition-all duration-300 ease-in-out",
         isSidebarOpen ? "w-72" : "w-0"
       )}
     >

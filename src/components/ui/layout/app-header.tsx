@@ -39,7 +39,7 @@ export function AppHeader({ className }: AppHeaderProps) {
   return (
     <>
       <header className={cn(
-        "bg-black z-50 w-full sticky top-0", // Removed border-b
+        "bg-black z-20 w-full sticky top-0 border-b border-white/10", 
         className
       )}>
         <div className="flex items-center justify-between h-16 px-4 w-full max-w-[1200px] mx-auto">
