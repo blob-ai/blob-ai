@@ -50,7 +50,7 @@ const SidebarHeader: React.FC = () => {
         <span className="inline-flex items-center justify-center text-white">
           <PenLine className="h-[18px] w-[18px]" />
         </span>
-        <span>Create</span>
+        <span>Create posts</span>
       </button>
 
       <ContentCreationModal
