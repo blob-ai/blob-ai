@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import ContentCanvas from "@/components/content/canvas/ContentCanvas";
 
 interface CanvasStepProps {
@@ -15,13 +15,17 @@ const CanvasStep: React.FC<CanvasStepProps> = ({
   onSaveDraft,
   onSchedule,
 }) => {
+  const [content, setContent] = useState(initialContent);
+
   return (
-    <div className="h-[calc(100vh-140px)] bg-black border border-white/10 rounded-xl shadow-lg overflow-hidden">
+    <div className="w-full bg-black border border-white/10 rounded-xl shadow-lg overflow-hidden">
       <ContentCanvas
         initialContent={initialContent}
-        onPublish={onPublish}
-        onSaveDraft={onSaveDraft}
-        onSchedule={onSchedule}
+        onContentChange={setContent}
+        onPublish={() => onPublish(content)}
+        onSaveDraft={() => onSaveDraft(content)}
+        onSchedule={(date) => onSchedule(content, date)}
+        buttonColor="#3260ea" // Updated to match sidebar button blue
       />
     </div>
   );
