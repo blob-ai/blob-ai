@@ -7,7 +7,7 @@ import {
   MessageSquare, 
   FileText, 
   Users,
-  Edit
+  Book
 } from "lucide-react";
 
 // Import refactored sidebar components
@@ -19,7 +19,7 @@ import SidebarFooter from "./sidebar/SidebarFooter";
 const Sidebar = () => {
   const { isSidebarOpen } = useSidebar();
 
-  // Main navigation items - removed the Content Creation item as it was redundant
+  // Main navigation items - added Library item
   const navItems = [
     {
       name: "AI Chat",
@@ -28,6 +28,13 @@ const Sidebar = () => {
       exact: false,
       hasAction: true,
       action: () => window.location.href = '/dashboard/chat/new'
+    },
+    {
+      name: "Library",
+      path: "/dashboard/library",
+      icon: <Book className="h-6 w-6" />,
+      exact: true,
+      hasAction: false
     },
     {
       name: "Dashboard",
