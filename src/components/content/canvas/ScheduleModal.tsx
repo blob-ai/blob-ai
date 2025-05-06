@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Clock } from "lucide-react";
@@ -18,7 +17,7 @@ import { toast } from "sonner";
 interface ScheduleModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSchedule: (content: string, date: Date) => void;
+  onSchedule: (date: Date) => void;
   content: string;
 }
 
@@ -60,7 +59,7 @@ const ScheduleModal: React.FC<ScheduleModalProps> = ({
       return;
     }
     
-    onSchedule(content, scheduledDateTime);
+    onSchedule(scheduledDateTime);
     onClose();
     toast.success(`Content scheduled for ${format(scheduledDateTime, "PPP 'at' h:mm a")}`);
   };
