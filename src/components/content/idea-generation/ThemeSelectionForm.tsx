@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Info, Users, MessageSquare, Award, DollarSign, Share, Book } from "lucide-react";
+import { Book, Users, MessageSquare, Award, DollarSign, Share, Info } from "lucide-react";
 import ContentGoalSelector from "./ContentGoalSelector";
 
 interface ThemeSelectionFormProps {
@@ -26,20 +26,22 @@ const categoriesByGoal: Record<string, string[]> = {
 const ThemeSelectionForm: React.FC<ThemeSelectionFormProps> = ({ onSubmit }) => {
   const [step, setStep] = useState(1);
   const [theme, setTheme] = useState("");
-  const [selectedGoal, setSelectedGoal] = useState("knowledge");
+  const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   // Update available categories when goal changes
   useEffect(() => {
-    // Pre-select the first two categories when goal changes
-    const availableCategories = categoriesByGoal[selectedGoal] || [];
-    if (availableCategories.length > 0) {
-      setSelectedCategories([availableCategories[0]]);
-      if (availableCategories.length > 1) {
-        setSelectedCategories([availableCategories[0], availableCategories[1]]);
+    if (selectedGoal) {
+      // Pre-select the first two categories when goal changes
+      const availableCategories = categoriesByGoal[selectedGoal] || [];
+      if (availableCategories.length > 0) {
+        setSelectedCategories([availableCategories[0]]);
+        if (availableCategories.length > 1) {
+          setSelectedCategories([availableCategories[0], availableCategories[1]]);
+        }
+      } else {
+        setSelectedCategories([]);
       }
-    } else {
-      setSelectedCategories([]);
     }
   }, [selectedGoal]);
 
@@ -53,7 +55,7 @@ const ThemeSelectionForm: React.FC<ThemeSelectionFormProps> = ({ onSubmit }) => 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (theme.trim() && selectedCategories.length > 0) {
+    if (selectedGoal && selectedCategories.length > 0) {
       onSubmit(theme, selectedCategories, selectedGoal);
     }
   };
@@ -77,27 +79,13 @@ const ThemeSelectionForm: React.FC<ThemeSelectionFormProps> = ({ onSubmit }) => 
             <span className="text-sm text-blue-100">{getGoalTitle(selectedGoal)}</span>
           </div>
           
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="theme" className="text-lg font-medium">What topic are you focusing on?</Label>
-              <Info className="h-4 w-4 text-white/50" />
-            </div>
-            <Input
-              id="theme"
-              placeholder="Enter your niche, industry, or specific subject"
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              className="bg-white/5 border-white/10 text-white"
-            />
-          </div>
-
           <div className="space-y-3">
             <div className="flex flex-col">
               <Label className="text-lg font-medium">Post categories</Label>
               <span className="text-sm text-white/70">Popular in {getGoalTitle(selectedGoal)}</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/5 border border-white/10 rounded-lg p-3">
-              {(categoriesByGoal[selectedGoal] || []).map((category) => (
+            <div className="flex flex-col gap-3 bg-white/5 border border-white/10 rounded-lg p-3">
+              {(categoriesByGoal[selectedGoal || ""] || []).map((category) => (
                 <div key={category} className="flex items-center space-x-2">
                   <Checkbox 
                     id={`category-${category}`}
@@ -116,10 +104,24 @@ const ThemeSelectionForm: React.FC<ThemeSelectionFormProps> = ({ onSubmit }) => 
             </div>
           </div>
 
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="theme" className="text-lg font-medium">What topic are you focusing on? (optional)</Label>
+              <Info className="h-4 w-4 text-white/50" />
+            </div>
+            <Input
+              id="theme"
+              placeholder="Enter your niche, industry, or specific subject"
+              value={theme}
+              onChange={(e) => setTheme(e.target.value)}
+              className="bg-white/5 border-white/10 text-white"
+            />
+          </div>
+
           <Button 
             type="submit" 
             className="w-full py-6 bg-[#3260ea] hover:bg-[#5078F3] text-lg rounded-xl"
-            disabled={theme.trim() === "" || selectedCategories.length === 0}
+            disabled={!selectedGoal || selectedCategories.length === 0}
           >
             Generate Content Ideas
           </Button>
@@ -130,7 +132,9 @@ const ThemeSelectionForm: React.FC<ThemeSelectionFormProps> = ({ onSubmit }) => 
 };
 
 // Helper functions
-function getGoalTitle(goalId: string): string {
+function getGoalTitle(goalId: string | null): string {
+  if (!goalId) return "";
+  
   const goalMap: Record<string, string> = {
     knowledge: "Educate Your Audience",
     community: "Boost Engagement",
@@ -142,7 +146,9 @@ function getGoalTitle(goalId: string): string {
   return goalMap[goalId] || goalId;
 }
 
-function renderGoalIcon(goalId: string): React.ReactNode {
+function renderGoalIcon(goalId: string | null): React.ReactNode {
+  if (!goalId) return null;
+  
   switch (goalId) {
     case "growth":
       return <Users className="h-4 w-4 text-blue-300" />;
@@ -153,7 +159,7 @@ function renderGoalIcon(goalId: string): React.ReactNode {
     case "brand":
       return <DollarSign className="h-4 w-4 text-blue-300" />;
     case "personal":
-      return <Share className="h-4 w-4 text-blue-300" />;
+      return <Users className="h-4 w-4 text-blue-300" />;
     case "knowledge":
       return <Book className="h-4 w-4 text-blue-300" />;
     default:

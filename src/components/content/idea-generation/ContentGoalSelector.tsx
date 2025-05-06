@@ -11,7 +11,7 @@ interface ContentGoalOption {
 }
 
 interface ContentGoalSelectorProps {
-  selectedGoal: string;
+  selectedGoal: string | null;
   onSelectGoal: (goalId: string) => void;
 }
 
@@ -48,7 +48,7 @@ const ContentGoalSelector: React.FC<ContentGoalSelectorProps> = ({
       id: "personal",
       title: "Share Personal Journey",
       description: "Authentic content about your experiences",
-      icon: <Share className="h-5 w-5 text-blue-400" />,
+      icon: <Users className="h-5 w-5 text-blue-400" />,
     },
     {
       id: "knowledge",
