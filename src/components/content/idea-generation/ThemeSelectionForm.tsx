@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Book, User, MessageSquare, Award, DollarSign, Share } from "lucide-react";
+import { Book, User, MessageSquare, Award, DollarSign, Share, Info, Users } from "lucide-react";
 import ContentGoalSelector from "./ContentGoalSelector";
 
 interface ThemeSelectionFormProps {
