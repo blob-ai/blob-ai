@@ -21,9 +21,11 @@ const CanvasStep: React.FC<CanvasStepProps> = ({
     <div className="w-full bg-black border border-white/10 rounded-xl shadow-lg overflow-hidden">
       <ContentCanvas
         initialContent={initialContent}
+        onContentChange={setContent}
         onPublish={() => onPublish(content)}
         onSaveDraft={() => onSaveDraft(content)}
         onSchedule={(date) => onSchedule(content, date)}
+        buttonColor="#3260ea" // Updated to match sidebar button blue
       />
     </div>
   );
