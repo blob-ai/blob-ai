@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,7 +19,7 @@ export const useContentCreation = () => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [theme, setTheme] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
-  const [contentGoal, setContentGoal] = useState("knowledge");
+  const [contentGoal, setContentGoal] = useState("");
   const [generatedIdeas, setGeneratedIdeas] = useState<ContentIdea[]>([]);
   const [selectedIdea, setSelectedIdea] = useState<ContentIdea | null>(null);
   const [content, setContent] = useState("");
@@ -45,17 +46,41 @@ export const useContentCreation = () => {
     }
   }, [location]);
 
+  // Helper function to get a consistent category color based on category name
+  const getCategoryColor = (category: string): string => {
+    const categoryColorMap: Record<string, string> = {
+      "Personal reflection": "bg-amber-100/90 text-amber-800",
+      "Milestones": "bg-emerald-100/90 text-emerald-800",
+      "Lessons learned": "bg-sky-100/90 text-sky-800",
+      "Before/after": "bg-indigo-100/90 text-indigo-800",
+      "Challenges overcome": "bg-rose-100/90 text-rose-800",
+      "Best practices": "bg-orange-100/90 text-orange-800",
+      "Explanation / Analysis": "bg-green-100/90 text-green-800",
+      "List of advice/rules/etc": "bg-purple-100/90 text-purple-800",
+      "Useful resources": "bg-blue-100/90 text-blue-800",
+      "Thought-provoking": "bg-violet-100/90 text-violet-800",
+      "Striking advice": "bg-red-100/90 text-red-800",
+      "Tip": "bg-teal-100/90 text-teal-800",
+      "Company sagas": "bg-pink-100/90 text-pink-800",
+      "Rant": "bg-gray-100/90 text-gray-800",
+    };
+
+    return categoryColorMap[category] || "bg-gray-100/90 text-gray-800";
+  };
+
   // Function to generate mock ideas based on theme, categories, and goal
   const generateIdeas = (theme: string, categories: string[], goal: string) => {
     // This would be an API call in a real application
     const goalPrefix = getGoalPrefix(goal);
+    const themeText = theme ? theme : "your field";
     
+    // Ensure we use the selected categories by shuffling them through the ideas
     const mockIdeas: ContentIdea[] = [
       {
         id: "1",
-        title: `${goalPrefix}: How to integrate AI effectively in ${theme} teaching for more engaging learning experiences.`,
-        category: categories[0] || "Best practices",
-        categoryColor: "bg-orange-100 text-orange-800",
+        title: `${goalPrefix}: How to integrate AI effectively in ${themeText} teaching for more engaging learning experiences.`,
+        category: categories[0] || "Personal reflection",
+        categoryColor: getCategoryColor(categories[0] || "Personal reflection"),
         hooks: [
           {
             id: "h1",
@@ -68,7 +93,7 @@ export const useContentCreation = () => {
           },
           {
             id: "h2",
-            text: `10X or nothing. Why aim for just 10% better in ${theme.toLowerCase()} when you can change the game?`,
+            text: `10X or nothing. Why aim for just 10% better in ${themeText.toLowerCase()} when you can change the game?`,
             author: {
               name: "Sarah Williams",
               avatar: "/placeholder.svg",
@@ -79,13 +104,13 @@ export const useContentCreation = () => {
       },
       {
         id: "2",
-        title: `${goalPrefix}: Why blended learning is becoming the new normal in ${theme} schools and universities.`,
-        category: categories[0] || "Explanation / Analysis",
-        categoryColor: "bg-green-100 text-green-800",
+        title: `${goalPrefix}: Why blended learning is becoming the new normal in ${themeText} schools and universities.`,
+        category: categories.length > 1 ? categories[1] : categories[0] || "Lessons learned",
+        categoryColor: getCategoryColor(categories.length > 1 ? categories[1] : categories[0] || "Lessons learned"),
         hooks: [
           {
             id: "h3",
-            text: `Your destiny in ${theme.toLowerCase()} is determined by the choices you make today. Choose wisely.`,
+            text: `Your destiny in ${themeText.toLowerCase()} is determined by the choices you make today. Choose wisely.`,
             author: {
               name: "Michael Chen",
               avatar: "/placeholder.svg",
@@ -94,7 +119,7 @@ export const useContentCreation = () => {
           },
           {
             id: "h4",
-            text: `The future of ${theme.toLowerCase()} isn't about technology — it's about how we use it.`,
+            text: `The future of ${themeText.toLowerCase()} isn't about technology — it's about how we use it.`,
             author: {
               name: "Emma Rodriguez",
               avatar: "/placeholder.svg",
@@ -105,9 +130,9 @@ export const useContentCreation = () => {
       },
       {
         id: "3",
-        title: `${goalPrefix}: 10 crucial skills every ${theme} educator should develop for modern classrooms.`,
-        category: categories[0] || "List of advice/rules/etc",
-        categoryColor: "bg-purple-100 text-purple-800",
+        title: `${goalPrefix}: 10 crucial skills every ${themeText} educator should develop for modern classrooms.`,
+        category: categories.length > 2 ? categories[2] : categories[0] || "List of advice/rules/etc",
+        categoryColor: getCategoryColor(categories.length > 2 ? categories[2] : categories[0] || "List of advice/rules/etc"),
         hooks: [
           {
             id: "h5",
@@ -120,7 +145,7 @@ export const useContentCreation = () => {
           },
           {
             id: "h6",
-            text: `Knowledge isn't power until it's applied. Here's how ${theme.toLowerCase()} is evolving.`,
+            text: `Knowledge isn't power until it's applied. Here's how ${themeText.toLowerCase()} is evolving.`,
             author: {
               name: "Lisa Wang",
               avatar: "/placeholder.svg",
@@ -131,9 +156,9 @@ export const useContentCreation = () => {
       },
       {
         id: "4",
-        title: `${goalPrefix}: Top 5 online platforms offering free courses in ${theme.toLowerCase()} and entrepreneurship for students.`,
-        category: categories[0] || "Useful resources",
-        categoryColor: "bg-sky-100 text-sky-800",
+        title: `${goalPrefix}: Top 5 online platforms offering free courses in ${themeText.toLowerCase()} and entrepreneurship for students.`,
+        category: categories.length > 1 ? categories[0] : categories[0] || "Useful resources",
+        categoryColor: getCategoryColor(categories.length > 1 ? categories[0] : categories[0] || "Useful resources"),
         hooks: [
           {
             id: "h7",
@@ -146,7 +171,7 @@ export const useContentCreation = () => {
           },
           {
             id: "h8",
-            text: `The best ${theme.toLowerCase()} happens outside the classroom. Here's where to find it.`,
+            text: `The best ${themeText.toLowerCase()} happens outside the classroom. Here's where to find it.`,
             author: {
               name: "Rachel Greene",
               avatar: "/placeholder.svg",
@@ -157,9 +182,9 @@ export const useContentCreation = () => {
       },
       {
         id: "5",
-        title: `${goalPrefix}: Reflecting on my journey from a traditional ${theme.toLowerCase()} teacher to embracing digital tools - here's what I learned about adaptability and change.`,
-        category: categories[0] || "Personal reflection",
-        categoryColor: "bg-pink-100 text-pink-800",
+        title: `${goalPrefix}: Reflecting on my journey from a traditional ${themeText.toLowerCase()} teacher to embracing digital tools - here's what I learned about adaptability and change.`,
+        category: categories.length > 1 ? categories[1] : categories[0] || "Personal reflection",
+        categoryColor: getCategoryColor(categories.length > 1 ? categories[1] : categories[0] || "Personal reflection"),
         hooks: [
           {
             id: "h9",
@@ -172,7 +197,7 @@ export const useContentCreation = () => {
           },
           {
             id: "h10",
-            text: `The tools change, but the principles of good ${theme.toLowerCase()} remain timeless.`,
+            text: `The tools change, but the principles of good ${themeText.toLowerCase()} remain timeless.`,
             author: {
               name: "Sophia Miller",
               avatar: "/placeholder.svg",
@@ -183,9 +208,9 @@ export const useContentCreation = () => {
       },
       {
         id: "6",
-        title: `${goalPrefix}: Is our current ${theme.toLowerCase()} system preparing students adequately for jobs that do not exist yet?`,
-        category: categories[0] || "Thought-provoking",
-        categoryColor: "bg-indigo-100 text-indigo-800",
+        title: `${goalPrefix}: Is our current ${themeText.toLowerCase()} system preparing students adequately for jobs that do not exist yet?`,
+        category: categories.length > 2 ? categories[0] : categories[0] || "Thought-provoking",
+        categoryColor: getCategoryColor(categories.length > 2 ? categories[0] : categories[0] || "Thought-provoking"),
         hooks: [
           {
             id: "h11",
@@ -198,7 +223,7 @@ export const useContentCreation = () => {
           },
           {
             id: "h12",
-            text: `The skills gap in ${theme.toLowerCase()} isn't about technology — it's about adaptability.`,
+            text: `The skills gap in ${themeText.toLowerCase()} isn't about technology — it's about adaptability.`,
             author: {
               name: "Olivia Chen",
               avatar: "/placeholder.svg",
@@ -212,7 +237,7 @@ export const useContentCreation = () => {
     setGeneratedIdeas(mockIdeas);
     setCurrentStep(CreationStep.IDEAS_GALLERY);
     setUsageCount(prev => Math.min(prev + 1, maxUsage));
-    toast.success(`Generated ideas for "${theme}" with ${goal} goal`);
+    toast.success(`Generated ideas for "${theme || 'your selected categories'}" with ${goal} goal`);
   };
 
   // Helper function to get a prefix based on the content goal
@@ -226,8 +251,8 @@ export const useContentCreation = () => {
         return "Grow";
       case "brand":
         return "Brand";
-      case "leads":
-        return "Discover";
+      case "personal":
+        return "Share";
       case "thought":
         return "Insight";
       default:

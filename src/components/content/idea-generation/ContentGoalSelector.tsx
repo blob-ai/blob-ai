@@ -1,13 +1,13 @@
 
 import React from "react";
-import { Award, Book, DollarSign, MessageSquare, Share, Users } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Book, MessageSquare, Users, Award, DollarSign, User } from "lucide-react";
 
 interface ContentGoalOption {
   id: string;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: JSX.Element;
 }
 
 interface ContentGoalSelectorProps {
@@ -19,7 +19,7 @@ const ContentGoalSelector: React.FC<ContentGoalSelectorProps> = ({
   selectedGoal,
   onSelectGoal,
 }) => {
-  const goalOptions: ContentGoalOption[] = [
+  const goals: ContentGoalOption[] = [
     {
       id: "growth",
       title: "Grow My Audience",
@@ -48,7 +48,7 @@ const ContentGoalSelector: React.FC<ContentGoalSelectorProps> = ({
       id: "personal",
       title: "Share Personal Journey",
       description: "Authentic content about your experiences",
-      icon: <Share className="h-5 w-5 text-blue-400" />,
+      icon: <User className="h-5 w-5 text-blue-400" />,
     },
     {
       id: "knowledge",
@@ -59,28 +59,28 @@ const ContentGoalSelector: React.FC<ContentGoalSelectorProps> = ({
   ];
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-semibold text-white">What's your content goal today?</h2>
-      <p className="text-white/70">Select the primary purpose of your content</p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
-        {goalOptions.map((goal) => (
-          <button
+    <div>
+      <h2 className="text-xl font-semibold mb-2">What's your content goal today?</h2>
+      <p className="text-white/70 mb-6">Select the primary purpose of your content</p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {goals.map((goal) => (
+          <Button
             key={goal.id}
-            className={cn(
-              "flex items-start gap-3 p-4 rounded-xl border text-left transition-all",
-              selectedGoal === goal.id
-                ? "bg-blue-600/20 border-blue-500"
-                : "bg-white/5 border-white/10 hover:bg-white/10"
-            )}
+            variant="outline"
+            className={`
+              h-auto flex items-start p-4 gap-3 border-white/10 
+              ${selectedGoal === goal.id ? 'bg-blue-950/40 border-blue-500/50' : 'bg-white/5 hover:bg-white/10'}
+              transition-colors text-left`
+            }
             onClick={() => onSelectGoal(goal.id)}
           >
             <div className="mt-0.5">{goal.icon}</div>
             <div>
-              <h3 className="font-medium text-white">{goal.title}</h3>
-              <p className="text-sm text-white/70 mt-1">{goal.description}</p>
+              <div className="font-medium">{goal.title}</div>
+              <div className="text-sm text-white/70 mt-0.5">{goal.description}</div>
             </div>
-          </button>
+          </Button>
         ))}
       </div>
     </div>
