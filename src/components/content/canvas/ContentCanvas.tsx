@@ -14,18 +14,30 @@ import { ContentVersion } from "./ContentVersionHistory";
 
 interface ContentCanvasProps {
   initialContent?: string;
+  onContentChange?: (content: string) => void;
   onPublish: (content: string) => void;
   onSaveDraft: (content: string) => void;
-  onSchedule: (content: string, date: Date) => void;
+  onSchedule: (date: Date) => void;
+  buttonColor?: string;
 }
 
 const ContentCanvas: React.FC<ContentCanvasProps> = ({
   initialContent = "",
+  onContentChange,
   onPublish,
   onSaveDraft,
   onSchedule,
+  buttonColor,
 }) => {
   const [content, setContent] = useState(initialContent);
+  
+  // Update parent component when content changes
+  useEffect(() => {
+    if (onContentChange) {
+      onContentChange(content);
+    }
+  }, [content, onContentChange]);
+
   const [mobileView, setMobileView] = useState(false);
   const [showChatPanel, setShowChatPanel] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
