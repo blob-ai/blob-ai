@@ -57,6 +57,11 @@ const IdeasGallery: React.FC<IdeasGalleryProps> = ({
     return idea?.hooks?.find(hook => hook.id === hookId);
   };
 
+  const generatePreviewContent = (idea: ContentIdea | undefined, hook: HookOption | undefined) => {
+    if (!idea || !hook) return "";
+    return `${hook.text}\n\nHere's my perspective on ${idea.title}:\n\n[Your content will be generated here based on the selected idea and hook]`;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -73,7 +78,7 @@ const IdeasGallery: React.FC<IdeasGalleryProps> = ({
         <div className="flex-1 flex flex-col sm:flex-row gap-2">
           <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg flex-1">
             <span className="text-white/50 text-sm">Theme</span>
-            <div className="font-semibold">{theme || "None specified"}</div>
+            <div className="font-semibold">{theme}</div>
           </div>
         </div>
         <Button 
@@ -164,12 +169,10 @@ const IdeasGallery: React.FC<IdeasGalleryProps> = ({
               expandedIdea === idea.id ? 'bg-white/5' : 'bg-black'
             }`}
           >
-            <div className="p-4 min-h-[120px] relative">
+            <div className={`p-4 min-h-[120px] relative ${idea.categoryColor}`}>
               <h3 className="font-medium text-base">{idea.title}</h3>
               <div className="flex items-center justify-between mt-4">
-                <span className={`text-xs px-2 py-0.5 rounded-full ${idea.categoryColor}`}>
-                  {idea.category}
-                </span>
+                <span className="text-sm opacity-80">{idea.category}</span>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
