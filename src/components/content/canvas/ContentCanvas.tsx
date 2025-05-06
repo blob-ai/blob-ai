@@ -181,7 +181,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     
     // Simulate saving to backend
     setTimeout(() => {
-      onSaveDraft(content);
+      onSaveDraft();
       setIsSaving(false);
       setLastSaved(new Date());
       toast.success("Draft saved");
@@ -206,7 +206,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
     
     // Save to backend
     setTimeout(() => {
-      onSaveDraft(content);
+      onSaveDraft();
       setIsSaving(false);
       setLastSaved(new Date());
       toast.success("Draft saved");
