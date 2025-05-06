@@ -30,16 +30,16 @@ const Sidebar = () => {
       action: () => window.location.href = '/dashboard/chat/new'
     },
     {
-      name: "Library",
-      path: "/dashboard/library",
-      icon: <Book className="h-6 w-6" />,
+      name: "Dashboard",
+      path: "/dashboard/dashboard",
+      icon: <LayoutDashboard className="h-6 w-6" />,
       exact: true,
       hasAction: false
     },
     {
-      name: "Dashboard",
-      path: "/dashboard/dashboard",
-      icon: <LayoutDashboard className="h-6 w-6" />,
+      name: "Library",
+      path: "/dashboard/library",
+      icon: <Book className="h-6 w-6" />,
       exact: true,
       hasAction: false
     }
