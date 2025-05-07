@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,19 +22,19 @@ interface ContentAnalysis {
 }
 
 interface ContentChatPanelProps {
-  onSendMessage: (message: string, selection?: string) => void;
-  selectedText?: string;
-  content?: string;
+  onSendMessage: (message: string, selectedText?: string) => void;
+  selectedText: string;
+  content: string;
   goalType?: string;
   contentStructure?: string;
 }
 
-const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ 
+const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
   onSendMessage,
-  selectedText = "",
-  content = "",
-  goalType = "",
-  contentStructure = ""
+  selectedText,
+  content,
+  goalType,
+  contentStructure,
 }) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
