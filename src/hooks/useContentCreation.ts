@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ContentIdea } from "@/components/content/idea-generation/IdeasGallery";
+import { getCategoryColors } from "@/utils/categoryColors";
 
 export enum CreationStep {
   START,
@@ -50,12 +52,21 @@ export const useContentCreation = () => {
     // This would be an API call in a real application
     const goalPrefix = getGoalPrefix(goal);
     
+    // Define common categories for our mock data
+    const ideaCategories = [
+      "Best practices",
+      "Explanation / Analysis",
+      "List of advice/rules/etc",
+      "Useful resources",
+      "Personal reflection", 
+      "Thought-provoking"
+    ];
+    
     const mockIdeas: ContentIdea[] = [
       {
         id: "1",
         title: `${goalPrefix}: How to integrate AI effectively in ${theme} teaching for more engaging learning experiences.`,
-        category: categories[0] || "Best practices",
-        categoryColor: "bg-orange-100 text-orange-800",
+        category: ideaCategories[0],
         hooks: [
           {
             id: "h1",
@@ -80,8 +91,7 @@ export const useContentCreation = () => {
       {
         id: "2",
         title: `${goalPrefix}: Why blended learning is becoming the new normal in ${theme} schools and universities.`,
-        category: categories[0] || "Explanation / Analysis",
-        categoryColor: "bg-green-100 text-green-800",
+        category: ideaCategories[1],
         hooks: [
           {
             id: "h3",
@@ -106,8 +116,7 @@ export const useContentCreation = () => {
       {
         id: "3",
         title: `${goalPrefix}: 10 crucial skills every ${theme} educator should develop for modern classrooms.`,
-        category: categories[0] || "List of advice/rules/etc",
-        categoryColor: "bg-purple-100 text-purple-800",
+        category: ideaCategories[2],
         hooks: [
           {
             id: "h5",
@@ -132,8 +141,7 @@ export const useContentCreation = () => {
       {
         id: "4",
         title: `${goalPrefix}: Top 5 online platforms offering free courses in ${theme.toLowerCase()} and entrepreneurship for students.`,
-        category: categories[0] || "Useful resources",
-        categoryColor: "bg-sky-100 text-sky-800",
+        category: ideaCategories[3],
         hooks: [
           {
             id: "h7",
@@ -158,8 +166,7 @@ export const useContentCreation = () => {
       {
         id: "5",
         title: `${goalPrefix}: Reflecting on my journey from a traditional ${theme.toLowerCase()} teacher to embracing digital tools - here's what I learned about adaptability and change.`,
-        category: categories[0] || "Personal reflection",
-        categoryColor: "bg-pink-100 text-pink-800",
+        category: ideaCategories[4],
         hooks: [
           {
             id: "h9",
@@ -184,8 +191,7 @@ export const useContentCreation = () => {
       {
         id: "6",
         title: `${goalPrefix}: Is our current ${theme.toLowerCase()} system preparing students adequately for jobs that do not exist yet?`,
-        category: categories[0] || "Thought-provoking",
-        categoryColor: "bg-indigo-100 text-indigo-800",
+        category: ideaCategories[5],
         hooks: [
           {
             id: "h11",
