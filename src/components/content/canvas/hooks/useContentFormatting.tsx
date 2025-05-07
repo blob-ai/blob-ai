@@ -1,6 +1,5 @@
-
 import { toast } from "sonner";
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState } from "react";
 import { 
   Bold, 
   Italic, 
@@ -14,26 +13,26 @@ const useContentFormatting = () => {
   const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
 
-  // Calculate proper toolbar position based on selection - memoized with useCallback
-  const calculateToolbarPosition = useCallback(
-    (selection: Selection | null, container: HTMLTextAreaElement) => {
-      if (!selection || selection.isCollapsed) return { top: 0, left: 0 };
-      
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      
-      // Position the toolbar above the selection
-      return {
-        top: rect.top - containerRect.top - (toolbarRef.current?.offsetHeight || 0) - 10,
-        left: rect.left + (rect.width / 2) - containerRect.left - (toolbarRef.current?.offsetWidth || 0) / 2
-      };
-    },
-    [toolbarRef]
-  );
+  // Calculate proper toolbar position based on selection
+  const calculateToolbarPosition = (
+    selection: Selection | null, 
+    container: HTMLTextAreaElement
+  ) => {
+    if (!selection || selection.isCollapsed) return { top: 0, left: 0 };
+    
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    
+    // Position the toolbar above the selection
+    return {
+      top: rect.top - containerRect.top - (toolbarRef.current?.offsetHeight || 0) - 10,
+      left: rect.left + (rect.width / 2) - containerRect.left - (toolbarRef.current?.offsetWidth || 0) / 2
+    };
+  };
 
-  // Ensure toolbar stays within viewport bounds - memoized with useCallback
-  const positionToolbar = useCallback(() => {
+  // Ensure toolbar stays within viewport bounds
+  const positionToolbar = () => {
     if (!toolbarRef.current) return {};
     
     const toolbar = toolbarRef.current;
@@ -49,9 +48,9 @@ const useContentFormatting = () => {
     if (top < 50) top = 50;
     
     return { top: `${top}px`, left: `${left}px` };
-  }, [toolbarPosition]);
+  };
 
-  // Monitor selection changes with proper dependency array
+  // Monitor selection changes
   useEffect(() => {
     const handleSelectionChange = () => {
       const selection = window.getSelection();
@@ -84,67 +83,64 @@ const useContentFormatting = () => {
     
     document.addEventListener("selectionchange", handleSelectionChange);
     return () => document.removeEventListener("selectionchange", handleSelectionChange);
-  }, [calculateToolbarPosition]);
+  }, []);
   
-  // Basic formatting operations - memoized with useCallback
-  const handleFormatting = useCallback(
-    (
-      format: string,
-      content: string,
-      setContent: (content: string) => void,
-      textareaRef: React.RefObject<HTMLTextAreaElement>
-    ) => {
-      if (!textareaRef.current) return;
-      
-      const textarea = textareaRef.current;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      
-      if (start === end) {
-        // If no text is selected, show toast message
-        toast.info(`Select text first to apply ${format} formatting`);
-        return;
-      }
-      
-      const selectedText = content.substring(start, end);
-      
-      let formattedText = "";
-      
-      switch(format) {
-        case "bold":
-          formattedText = `**${selectedText}**`;
-          break;
-        case "italic":
-          formattedText = `*${selectedText}*`;
-          break;
-        case "underline":
-          formattedText = `_${selectedText}_`;
-          break;
-        case "list":
-          formattedText = selectedText.split("\n").map(line => `• ${line}`).join("\n");
-          break;
-        default:
-          formattedText = selectedText;
-      }
-      
-      const newContent = 
-        content.substring(0, start) + 
-        formattedText + 
-        content.substring(end);
-      
-      setContent(newContent);
-      
-      // Restore focus to the textarea
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start, start + formattedText.length);
-      }, 0);
-    },
-    []
-  );
+  // Basic formatting operations
+  const handleFormatting = (
+    format: string,
+    content: string,
+    setContent: (content: string) => void,
+    textareaRef: React.RefObject<HTMLTextAreaElement>
+  ) => {
+    if (!textareaRef.current) return;
+    
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    
+    if (start === end) {
+      // If no text is selected, show toast message
+      toast.info(`Select text first to apply ${format} formatting`);
+      return;
+    }
+    
+    const selectedText = content.substring(start, end);
+    
+    let formattedText = "";
+    
+    switch(format) {
+      case "bold":
+        formattedText = `**${selectedText}**`;
+        break;
+      case "italic":
+        formattedText = `*${selectedText}*`;
+        break;
+      case "underline":
+        formattedText = `_${selectedText}_`;
+        break;
+      case "list":
+        formattedText = selectedText.split("\n").map(line => `• ${line}`).join("\n");
+        break;
+      default:
+        formattedText = selectedText;
+    }
+    
+    const newContent = 
+      content.substring(0, start) + 
+      formattedText + 
+      content.substring(end);
+    
+    setContent(newContent);
+    
+    // Restore focus to the textarea
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start, start + formattedText.length);
+    }, 0);
+  };
 
-  // Memoized rendering function to prevent unnecessary re-renders
-  const renderFloatingToolbar = useCallback(() => {
+  // Render the floating toolbar
+  const renderFloatingToolbar = () => {
     if (!toolbarVisible) return null;
     
     const formatOptions = [
@@ -181,7 +177,7 @@ const useContentFormatting = () => {
         ))}
       </div>
     );
-  }, [toolbarVisible, positionToolbar]);
+  };
 
   return { 
     handleFormatting,

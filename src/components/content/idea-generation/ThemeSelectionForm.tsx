@@ -6,7 +6,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Book, Users, MessageSquare, Award, DollarSign, Share, Info } from "lucide-react";
 import ContentGoalSelector from "./ContentGoalSelector";
-import { categoryColors } from "./IdeasGallery";
 
 interface ThemeSelectionFormProps {
   onSubmit: (theme: string, categories: string[], goal: string) => void;
@@ -66,21 +65,6 @@ const ThemeSelectionForm: React.FC<ThemeSelectionFormProps> = ({ onSubmit }) => 
     setStep(2);
   };
 
-  // Get the CSS class for category color
-  const getCategoryColorClass = (category: string, isSelected: boolean) => {
-    if (!isSelected) return 'border-white/30 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600';
-    
-    // Extract the background color class from the category color definition
-    const colorClass = categoryColors[category];
-    if (!colorClass) return 'border-white/30 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600';
-    
-    // Convert background to border and checked state
-    const bgClass = colorClass.split(' ')[0]; // Get the first class (bg-color-100)
-    const colorBase = bgClass.replace('bg-', '').replace('-100', '');
-    
-    return `border-${colorBase}-400 data-[state=checked]:bg-${colorBase}-600 data-[state=checked]:border-${colorBase}-600`;
-  };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {step === 1 ? (
@@ -100,36 +84,23 @@ const ThemeSelectionForm: React.FC<ThemeSelectionFormProps> = ({ onSubmit }) => 
               <Label className="text-lg font-medium">Post categories</Label>
               <span className="text-sm text-white/70">Popular in {getGoalTitle(selectedGoal)}</span>
             </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {(categoriesByGoal[selectedGoal || ""] || []).map((category) => {
-                const isChecked = selectedCategories.includes(category);
-                const colorClass = categoryColors[category] || "bg-gray-100 text-gray-800";
-                return (
-                  <div 
-                    key={category} 
-                    className={`flex items-center space-x-2 p-3 border rounded-lg cursor-pointer transition-all ${
-                      isChecked
-                        ? `border-white/30 ${colorClass.replace('bg-', 'bg-').replace('100', '50')}`
-                        : 'border-white/10 bg-white/5 hover:bg-white/10'
-                    }`}
-                    onClick={() => handleCategoryChange(category)}
+            <div className="flex flex-col gap-3 bg-white/5 border border-white/10 rounded-lg p-3">
+              {(categoriesByGoal[selectedGoal || ""] || []).map((category) => (
+                <div key={category} className="flex items-center space-x-2">
+                  <Checkbox 
+                    id={`category-${category}`}
+                    checked={selectedCategories.includes(category)}
+                    onCheckedChange={() => handleCategoryChange(category)}
+                    className="border-white/30 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                  />
+                  <Label 
+                    htmlFor={`category-${category}`}
+                    className="text-base font-normal cursor-pointer"
                   >
-                    <Checkbox 
-                      id={`category-${category}`}
-                      checked={isChecked}
-                      onCheckedChange={() => handleCategoryChange(category)}
-                      className={getCategoryColorClass(category, isChecked)}
-                    />
-                    <Label 
-                      htmlFor={`category-${category}`}
-                      className="text-base font-normal cursor-pointer flex-1"
-                    >
-                      {category}
-                    </Label>
-                  </div>
-                );
-              })}
+                    {category}
+                  </Label>
+                </div>
+              ))}
             </div>
           </div>
 

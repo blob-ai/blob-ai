@@ -14,8 +14,6 @@ import { ContentVersion } from "./ContentVersionHistory";
 
 interface ContentCanvasProps {
   initialContent?: string;
-  goalType?: string; // Add goalType prop
-  contentStructure?: string; // Add contentStructure prop
   onContentChange?: (content: string) => void;
   onPublish: () => void;
   onSaveDraft: () => void;
@@ -25,8 +23,6 @@ interface ContentCanvasProps {
 
 const ContentCanvas: React.FC<ContentCanvasProps> = ({
   initialContent = "",
-  goalType,
-  contentStructure,
   onContentChange,
   onPublish,
   onSaveDraft,
@@ -436,8 +432,6 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
           onSendMessage={handleSendToAI}
           selectedText={selectedText}
           content={content}
-          goalType={goalType} // Pass the goalType to ContentChatPanel
-          contentStructure={contentStructure} // Pass the contentStructure to ContentChatPanel
         />
       }
       rightPanel={canvasContent}

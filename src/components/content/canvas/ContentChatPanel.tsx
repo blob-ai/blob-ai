@@ -1,7 +1,8 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowUp, Sparkles, ChevronDown, ChevronUp, Wand2, MessageSquare, PenTool, Lightbulb, User } from "lucide-react";
+import { ArrowUp, Sparkles, ChevronDown, ChevronUp, Wand2, MessageSquare, PenTool, Lightbulb } from "lucide-react";
 import { useChat } from "@/contexts/ChatContext";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -22,19 +23,15 @@ interface ContentAnalysis {
 }
 
 interface ContentChatPanelProps {
-  onSendMessage: (message: string, selectedText?: string) => void;
-  selectedText: string;
-  content: string;
-  goalType?: string;
-  contentStructure?: string;
+  onSendMessage: (message: string, selection?: string) => void;
+  selectedText?: string;
+  content?: string;
 }
 
-const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
+const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ 
   onSendMessage,
-  selectedText,
-  content,
-  goalType,
-  contentStructure,
+  selectedText = "",
+  content = "" 
 }) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -45,24 +42,13 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
     currentThread, 
     createThread
   } = useChat();
-  
-  // Initial welcome message based on user's previous selections
-  const getInitialMessage = () => {
-    if (goalType && contentStructure) {
-      return {
-        id: "1",
-        text: `Hi! I'm your AI content assistant. I see you're creating ${goalType} content with a ${contentStructure} approach. What specific topic would you like to focus on today?`,
-        sender: "ai" as const,
-      };
-    }
-    return {
+  const [localMessages, setLocalMessages] = useState<Message[]>([
+    {
       id: "1",
       text: "Hi! I'm your AI content assistant. I can help you create, edit, and improve your content. What would you like to work on today?",
-      sender: "ai" as const,
-    };
-  };
-  
-  const [localMessages, setLocalMessages] = useState<Message[]>([getInitialMessage()]);
+      sender: "ai",
+    },
+  ]);
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
   const [suggestedPrompts, setSuggestedPrompts] = useState([
     "Improve my introduction",
@@ -120,52 +106,9 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
     }
   }, [chatMessages, activeThreadId]);
 
-  // Update suggested prompts based on selected text and goal type
+  // Update suggested prompts based on selected text
   useEffect(() => {
-    if (goalType) {
-      let goalSpecificPrompts: string[] = [];
-      
-      switch (goalType.toLowerCase()) {
-        case "growth":
-          goalSpecificPrompts = [
-            "How can I make this more shareable?",
-            "What headline would attract new followers?",
-            "Suggest ways to end with a call to follow"
-          ];
-          break;
-        case "knowledge":
-          goalSpecificPrompts = [
-            "Make this explanation clearer",
-            "Add helpful examples to this section",
-            "Simplify this complex concept"
-          ];
-          break;
-        case "brand":
-          goalSpecificPrompts = [
-            "Add a subtle product mention",
-            "Make this more aligned with my brand voice",
-            "End with a soft conversion prompt"
-          ];
-          break;
-        default:
-          goalSpecificPrompts = [
-            "Make this more engaging",
-            "Improve the flow of this section",
-            "Suggest a powerful conclusion"
-          ];
-      }
-      
-      if (selectedText) {
-        setSuggestedPrompts([
-          "Improve this selection",
-          "Make this more concise",
-          "Rewrite in a professional tone",
-          ...goalSpecificPrompts.slice(0, 2)
-        ]);
-      } else {
-        setSuggestedPrompts(goalSpecificPrompts);
-      }
-    } else if (selectedText) {
+    if (selectedText) {
       setSuggestedPrompts([
         "Improve this selection",
         "Make this more concise",
@@ -182,7 +125,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         "Check overall readability"
       ]);
     }
-  }, [selectedText, goalType]);
+  }, [selectedText]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
