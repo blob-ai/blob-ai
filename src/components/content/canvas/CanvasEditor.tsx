@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import ContentEditingToolbar from "./ContentEditingToolbar";
 import useContentFormatting from "./hooks/useContentFormatting";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserRound } from "lucide-react";
 
 interface CanvasEditorProps {
   content: string;
@@ -59,6 +61,16 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
   return (
     <div className="relative">
+      <div className="flex items-center mb-4">
+        <Avatar className="h-8 w-8 mr-2">
+          <AvatarImage src="/placeholder.svg" alt="Your content" />
+          <AvatarFallback className="bg-blue-600">
+            <UserRound className="h-4 w-4" />
+          </AvatarFallback>
+        </Avatar>
+        <div className="text-sm text-white/70">Your post</div>
+      </div>
+      
       <Textarea
         ref={textareaRef}
         value={content}

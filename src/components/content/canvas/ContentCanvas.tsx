@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
@@ -19,6 +20,11 @@ interface ContentCanvasProps {
   onSaveDraft: () => void;
   onSchedule: (date: Date) => void;
   buttonColor?: string;
+  contentGoal?: string;
+  selectedIdea?: {
+    title: string;
+    category: string;
+  } | null;
 }
 
 const ContentCanvas: React.FC<ContentCanvasProps> = ({
@@ -28,6 +34,8 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
   onSaveDraft,
   onSchedule,
   buttonColor,
+  contentGoal,
+  selectedIdea
 }) => {
   const [content, setContent] = useState(initialContent);
   
@@ -432,6 +440,8 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
           onSendMessage={handleSendToAI}
           selectedText={selectedText}
           content={content}
+          contentGoal={contentGoal}
+          selectedIdea={selectedIdea}
         />
       }
       rightPanel={canvasContent}

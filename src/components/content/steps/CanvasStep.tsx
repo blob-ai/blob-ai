@@ -7,6 +7,11 @@ interface CanvasStepProps {
   onPublish: (content: string) => void;
   onSaveDraft: (content: string) => void;
   onSchedule: (content: string, date: Date) => void;
+  contentGoal?: string;
+  selectedIdea?: {
+    title: string;
+    category: string;
+  } | null;
 }
 
 const CanvasStep: React.FC<CanvasStepProps> = ({
@@ -14,6 +19,8 @@ const CanvasStep: React.FC<CanvasStepProps> = ({
   onPublish,
   onSaveDraft,
   onSchedule,
+  contentGoal,
+  selectedIdea,
 }) => {
   const [content, setContent] = useState(initialContent);
 
@@ -26,6 +33,8 @@ const CanvasStep: React.FC<CanvasStepProps> = ({
         onSaveDraft={() => onSaveDraft(content)}
         onSchedule={(date) => onSchedule(content, date)}
         buttonColor="#3260ea" // Updated to match sidebar button blue
+        contentGoal={contentGoal}
+        selectedIdea={selectedIdea}
       />
     </div>
   );

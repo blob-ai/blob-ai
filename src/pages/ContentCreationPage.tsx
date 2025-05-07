@@ -18,12 +18,14 @@ const ContentCreationPage = () => {
     currentStep,
     showCreationModal,
     theme,
+    contentGoal,
     generatedIdeas,
     content,
     showPublishModal,
     favorites,
     usageCount,
     maxUsage,
+    selectedIdea,
     setShowCreationModal,
     setFavorites,
     handleThemeSubmit,
@@ -71,6 +73,8 @@ const ContentCreationPage = () => {
             onPublish={handlePublish}
             onSaveDraft={handleSaveDraft}
             onSchedule={handleSchedule}
+            contentGoal={contentGoal}
+            selectedIdea={selectedIdea}
           />
         );
         

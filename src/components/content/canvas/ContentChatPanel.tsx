@@ -26,12 +26,19 @@ interface ContentChatPanelProps {
   onSendMessage: (message: string, selection?: string) => void;
   selectedText?: string;
   content?: string;
+  contentGoal?: string;
+  selectedIdea?: {
+    title: string;
+    category: string;
+  } | null;
 }
 
 const ContentChatPanel: React.FC<ContentChatPanelProps> = ({ 
   onSendMessage,
   selectedText = "",
-  content = "" 
+  content = "",
+  contentGoal = "",
+  selectedIdea = null
 }) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -42,21 +49,74 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
     currentThread, 
     createThread
   } = useChat();
+  
+  // Generate a more relevant welcome message based on the content goal and selected idea
+  const getInitialMessage = () => {
+    if (selectedIdea) {
+      return `Hi! I'm your AI content assistant. I see you're working on a post about "${selectedIdea.title}" in the "${selectedIdea.category}" category. How can I help you develop this content?`;
+    } else if (contentGoal) {
+      return `Hi! I'm your AI content assistant. I see you're creating content with a focus on "${contentGoal}". What would you like to write about today?`;
+    } else {
+      return "Hi! I'm your AI content assistant. I can help you create, edit, and improve your content. What would you like to work on today?";
+    }
+  };
+  
   const [localMessages, setLocalMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Hi! I'm your AI content assistant. I can help you create, edit, and improve your content. What would you like to work on today?",
+      text: getInitialMessage(),
       sender: "ai",
     },
   ]);
+  
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
-  const [suggestedPrompts, setSuggestedPrompts] = useState([
-    "Improve my introduction",
-    "Make my content more engaging",
-    "Add a strong conclusion",
-    "Check my grammar and style",
-    "Suggest a catchy headline"
-  ]);
+  
+  // Generate more relevant suggested prompts based on the content goal and selected idea
+  const getContextualPrompts = () => {
+    if (selectedIdea) {
+      return [
+        `Help me develop an outline for "${selectedIdea.title}"`,
+        `What key points should I include in this ${selectedIdea.category} post?`,
+        `Suggest a strong introduction for this content`,
+        `What data or statistics would support this topic?`,
+        `How should I conclude this piece?`
+      ];
+    } else if (contentGoal === "knowledge") {
+      return [
+        "Help me explain this concept clearly",
+        "What examples would make this more educational?",
+        "How can I make this content more informative?",
+        "What research should I cite to support this?",
+        "How can I simplify complex ideas in this post?"
+      ];
+    } else if (contentGoal === "community") {
+      return [
+        "How can I make this post more engaging for my community?",
+        "What questions should I ask to encourage discussion?",
+        "How can I make this content more relatable?",
+        "What stories would connect with my audience?",
+        "How can I invite more participation with this content?"
+      ];
+    } else if (contentGoal === "growth") {
+      return [
+        "What actionable steps should I include?",
+        "How can I make this content more valuable for skill development?",
+        "What challenges should I address in this post?",
+        "How can I structure this for maximum learning impact?",
+        "What exercises or practices should I recommend?"
+      ];
+    } else {
+      return [
+        "Help me develop my main points",
+        "How can I make my content more engaging?",
+        "Suggest a powerful conclusion",
+        "What examples would strengthen my message?",
+        "How can I improve the overall flow?"
+      ];
+    }
+  };
+  
+  const [suggestedPrompts, setSuggestedPrompts] = useState(getContextualPrompts());
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(true);
   const [contentAnalysis, setContentAnalysis] = useState<ContentAnalysis | null>(null);
@@ -117,15 +177,27 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         "Make this more engaging"
       ]);
     } else {
-      setSuggestedPrompts([
-        "Analyze my content tone",
-        "Suggest improvements",
-        "Help me with my conclusion",
-        "Make my content more engaging",
-        "Check overall readability"
-      ]);
+      setSuggestedPrompts(getContextualPrompts());
     }
-  }, [selectedText]);
+  }, [selectedText, contentGoal, selectedIdea]);
+
+  // Update the initial message when props change
+  useEffect(() => {
+    setLocalMessages(prevMessages => {
+      // Only update the first message if it's from the AI
+      if (prevMessages.length > 0 && prevMessages[0].sender === "ai") {
+        return [
+          {
+            id: prevMessages[0].id,
+            text: getInitialMessage(),
+            sender: "ai"
+          },
+          ...prevMessages.slice(1)
+        ];
+      }
+      return prevMessages;
+    });
+  }, [contentGoal, selectedIdea]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -199,8 +271,13 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
   const generateLocalAIResponse = (userInput: string) => {
     let response = "";
     
+    // Customize response based on content goal if available
+    if (contentGoal && selectedIdea) {
+      response = `I'll help you with "${userInput}" for your ${selectedIdea.category} post about "${selectedIdea.title}". Let's make sure it aligns with your ${contentGoal} goal.\n\n`;
+    }
+    
     if (userInput.toLowerCase().includes("improve") || userInput.toLowerCase().includes("better")) {
-      response = "I've analyzed your content and here are some improvements:\n\n1. Your introduction could be more attention-grabbing\n2. Consider using more active voice\n3. The middle section needs more supporting evidence\n4. Your conclusion could be stronger";
+      response += "I've analyzed your content and here are some improvements:\n\n1. Your introduction could be more attention-grabbing\n2. Consider using more active voice\n3. The middle section needs more supporting evidence\n4. Your conclusion could be stronger";
       setSuggestedPrompts([
         "Show me how to improve my introduction",
         "Examples of active voice for my content",
@@ -208,7 +285,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         "Write a stronger conclusion"
       ]);
     } else if (userInput.toLowerCase().includes("headline") || userInput.toLowerCase().includes("title")) {
-      response = "Here are some headline suggestions based on your content:\n\n1. \"10 Surprising Ways to Boost Your Content Strategy\"\n2. \"The Ultimate Guide to Content That Converts\"\n3. \"How I Doubled My Engagement in Just 30 Days\"";
+      response += "Here are some headline suggestions based on your content:\n\n1. \"10 Surprising Ways to Boost Your Content Strategy\"\n2. \"The Ultimate Guide to Content That Converts\"\n3. \"How I Doubled My Engagement in Just 30 Days\"";
       setSuggestedPrompts([
         "Which headline is most clickable?",
         "Generate more headline options",
@@ -216,7 +293,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         "Add a subtitle suggestion"
       ]);
     } else if (userInput.toLowerCase().includes("grammar") || userInput.toLowerCase().includes("fix")) {
-      response = "I've checked your content for grammar issues. Here are my suggestions:\n\n1. Replace 'their' with 'there' in paragraph 2\n2. The sentence in paragraph 3 is a run-on sentence\n3. Consider breaking up some of your longer paragraphs";
+      response += "I've checked your content for grammar issues. Here are my suggestions:\n\n1. Replace 'their' with 'there' in paragraph 2\n2. The sentence in paragraph 3 is a run-on sentence\n3. Consider breaking up some of your longer paragraphs";
       setSuggestedPrompts([
         "Fix all grammar errors automatically",
         "Simplify my complex sentences",
@@ -224,7 +301,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         "Check for consistency in tense"
       ]);
     } else if (userInput.toLowerCase().includes("tone")) {
-      response = `I've analyzed your content's tone. It appears to be ${contentAnalysis?.tone || "neutral"}. To make it more persuasive, consider:\n\n1. Using more emotional language\n2. Adding rhetorical questions\n3. Incorporating personal anecdotes\n4. Addressing the reader directly with "you"`;
+      response += `I've analyzed your content's tone. It appears to be ${contentAnalysis?.tone || "neutral"}. To make it more persuasive, consider:\n\n1. Using more emotional language\n2. Adding rhetorical questions\n3. Incorporating personal anecdotes\n4. Addressing the reader directly with "you"`;
       setSuggestedPrompts([
         "Make the tone more professional",
         "Make the tone more conversational",
@@ -232,7 +309,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         "Add more emotional language"
       ]);
     } else if (userInput.toLowerCase().includes("conclusion")) {
-      response = "Here's a stronger conclusion for your piece:\n\n\"With these strategies in place, you're now equipped to create content that not only resonates with your audience but drives meaningful engagement. The key is consistency and authentic value—delivering insights your readers can't find elsewhere.\"";
+      response += "Here's a stronger conclusion for your piece:\n\n\"With these strategies in place, you're now equipped to create content that not only resonates with your audience but drives meaningful engagement. The key is consistency and authentic value—delivering insights your readers can't find elsewhere.\"";
       setSuggestedPrompts([
         "Make the conclusion more actionable",
         "Add a call to action",
@@ -240,7 +317,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         "Make the conclusion more memorable"
       ]);
     } else {
-      response = `I'll help you with "${userInput}". Based on your content, I recommend focusing on making your key points more concise and adding more specific examples to illustrate your ideas.`;
+      response += `I'll help you with "${userInput}". Based on your content, I recommend focusing on making your key points more concise and adding more specific examples to illustrate your ideas.`;
       setSuggestedPrompts([
         "Show me how to make this more concise",
         "Generate specific examples",
@@ -297,6 +374,20 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
           <Sparkles className="h-4 w-4 text-blue-400 mr-2" />
           AI Assistant
         </h2>
+        
+        {selectedIdea && (
+          <div className="mt-2 text-sm text-white/70">
+            <div className="flex items-center gap-2 mt-1">
+              <Badge variant="outline" className="bg-blue-500/20 text-blue-300">
+                {contentGoal || "Content"}
+              </Badge>
+              <span>•</span>
+              <Badge variant="outline" className="bg-white/10">
+                {selectedIdea.category}
+              </Badge>
+            </div>
+          </div>
+        )}
       </div>
 
       {contentAnalysis && (
