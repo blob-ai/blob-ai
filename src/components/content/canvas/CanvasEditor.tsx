@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import ContentEditingToolbar from "./ContentEditingToolbar";
 import useContentFormatting from "./hooks/useContentFormatting";
+import { User } from "lucide-react";
 
 interface CanvasEditorProps {
   content: string;
@@ -59,13 +60,19 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
   return (
     <div className="relative">
+      {/* User indicator at the top of the editor */}
+      <div className="flex items-center gap-2 mb-4 px-2 py-1 bg-white/5 rounded-lg w-fit">
+        <User className="h-4 w-4 text-white/70" />
+        <span className="text-sm font-medium text-white/80">Your content</span>
+      </div>
+      
       <Textarea
         ref={textareaRef}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onSelect={handleTextSelect}
         onKeyDown={onKeyDown}
-        className="min-h-[calc(100vh-200px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none"
+        className="min-h-[calc(100vh-240px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none"
         placeholder="Start writing your content here..."
       />
       

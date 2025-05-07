@@ -8,6 +8,7 @@ interface ContentGoalOption {
   title: string;
   description: string;
   icon: React.ReactNode;
+  color: string; // Added color property for consistent theming
 }
 
 interface ContentGoalSelectorProps {
@@ -25,36 +26,42 @@ const ContentGoalSelector: React.FC<ContentGoalSelectorProps> = ({
       title: "Grow My Audience",
       description: "Content that attracts new followers and expands your reach",
       icon: <Users className="h-5 w-5 text-blue-400" />,
+      color: "bg-blue-600/20 border-blue-500", // Added consistent color
     },
     {
       id: "community",
       title: "Boost Engagement",
       description: "Drive more comments, shares, and interactions",
-      icon: <MessageSquare className="h-5 w-5 text-blue-400" />,
+      icon: <MessageSquare className="h-5 w-5 text-green-400" />,
+      color: "bg-green-600/20 border-green-500",
     },
     {
       id: "thought",
       title: "Build Authority",
       description: "Position yourself as a thought leader in your space",
-      icon: <Award className="h-5 w-5 text-blue-400" />,
+      icon: <Award className="h-5 w-5 text-purple-400" />,
+      color: "bg-purple-600/20 border-purple-500",
     },
     {
       id: "brand",
       title: "Promote Product/Service",
       description: "Content that drives conversions and sales",
-      icon: <DollarSign className="h-5 w-5 text-blue-400" />,
+      icon: <DollarSign className="h-5 w-5 text-orange-400" />,
+      color: "bg-orange-600/20 border-orange-500",
     },
     {
       id: "personal",
       title: "Share Personal Journey",
       description: "Authentic content about your experiences",
-      icon: <Users className="h-5 w-5 text-blue-400" />,
+      icon: <Users className="h-5 w-5 text-pink-400" />,
+      color: "bg-pink-600/20 border-pink-500",
     },
     {
       id: "knowledge",
       title: "Educate Your Audience",
       description: "Teach valuable skills and share knowledge",
-      icon: <Book className="h-5 w-5 text-blue-400" />,
+      icon: <Book className="h-5 w-5 text-indigo-400" />,
+      color: "bg-indigo-600/20 border-indigo-500",
     },
   ];
 
@@ -70,7 +77,7 @@ const ContentGoalSelector: React.FC<ContentGoalSelectorProps> = ({
             className={cn(
               "flex items-start gap-3 p-4 rounded-xl border text-left transition-all",
               selectedGoal === goal.id
-                ? "bg-blue-600/20 border-blue-500"
+                ? goal.color
                 : "bg-white/5 border-white/10 hover:bg-white/10"
             )}
             onClick={() => onSelectGoal(goal.id)}
