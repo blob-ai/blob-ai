@@ -1,41 +1,15 @@
 
 // Type definitions for styles and folders
-import { Database } from "@/integrations/supabase/types";
+import type { Database as SupabaseDatabase } from "@/integrations/supabase/types";
 
-// Define the database schema tables we're working with
-export type Tables = Database['public']['Tables'];
+// Use the existing Database type from Supabase
+export type Tables = SupabaseDatabase['public']['Tables'];
 
 // Define the StyleFolder type based on the database schema
-export type StyleFolder = {
-  id: string;
-  name: string;
-  position: number | null;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-  count?: number; // For UI purposes, not in DB
-};
+export type StyleFolder = Tables['style_folders']['Row'];
 
 // Define the Style type based on the database schema
-export type Style = {
-  id: string;
-  name: string;
-  description: string | null;
-  tone: string[];
-  format: string[];
-  example: string | null;
-  creator_name: string | null;
-  creator_handle: string | null;
-  creator_avatar: string | null;
-  is_favorite: boolean;
-  is_pinned: boolean;
-  is_template: boolean;
-  folder_id: string | null;
-  source: string;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-};
+export type Style = Tables['styles']['Row'];
 
 // Type for the style object used in the UI components
 export type StyleUIObject = {
@@ -56,30 +30,8 @@ export type StyleUIObject = {
   isSavedInspiration?: boolean;
 };
 
-// Use referenced module augmentation instead of redeclaring
-declare module "@/integrations/supabase/types" {
-  interface Database {
-    public: {
-      Tables: {
-        style_folders: {
-          Row: StyleFolder;
-          Insert: Omit<StyleFolder, "id" | "created_at" | "updated_at"> & { 
-            id?: string;
-            created_at?: string;
-            updated_at?: string;
-          };
-          Update: Partial<Omit<StyleFolder, "id">>;
-        };
-        styles: {
-          Row: Style;
-          Insert: Omit<Style, "id" | "created_at" | "updated_at"> & {
-            id?: string;
-            created_at?: string;
-            updated_at?: string;
-          };
-          Update: Partial<Omit<Style, "id">>;
-        };
-      };
-    };
-  }
-}
+// Export types for inserting and updating
+export type StyleFolderInsert = Tables['style_folders']['Insert'];
+export type StyleFolderUpdate = Tables['style_folders']['Update'];
+export type StyleInsert = Tables['styles']['Insert'];
+export type StyleUpdate = Tables['styles']['Update'];
