@@ -33,7 +33,7 @@ const Library = () => {
       </div>
 
       <PageContainer className="flex flex-col flex-grow overflow-hidden pt-4">
-        <Tabs defaultValue="myStyles" value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
+        <Tabs defaultValue={activeTab} value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
           <div className="flex justify-center mb-6">
             <TabsList className="bg-[#1E2431]/70 border border-white/10 p-1 shadow-md">
               <TabsTrigger 
