@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Folder, Star, Clock, Heart, Pin, Save } from "lucide-react";
+import { Plus, Search, Folder, Star, Clock, Heart, Pin, Save, Sparkles } from "lucide-react";
 import { CardContainer } from "@/components/ui/card-container";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import StyleCard from "./StyleCard";
@@ -11,8 +11,27 @@ import { useNavigate } from "react-router-dom";
 import QuickSaveModal from "./QuickSaveModal";
 import { toast } from "sonner";
 
+// Define the Style type to fix TypeScript errors
+type Style = {
+  id: string;
+  name: string;
+  creatorName: string;
+  creatorHandle: string;
+  creatorAvatar: string;
+  description: string;
+  tone: string[];
+  example: string;
+  date: string;
+  isFavorite: boolean;
+  isPinned: boolean;
+  folder: string;
+  isTemplate: boolean;
+  source: "user" | "creator";
+  isSavedInspiration?: boolean;
+};
+
 // Sample saved styles - in a real app this would come from an API
-const SAMPLE_SAVED_STYLES = [
+const SAMPLE_SAVED_STYLES: Style[] = [
   {
     id: "p1",
     name: "Naval's Wisdom",
@@ -27,7 +46,7 @@ const SAMPLE_SAVED_STYLES = [
     isPinned: true,
     folder: "Inspiration",
     isTemplate: false,
-    source: "creator" as const
+    source: "creator"
   },
   {
     id: "p2",
@@ -43,7 +62,7 @@ const SAMPLE_SAVED_STYLES = [
     isPinned: false,
     folder: "Business",
     isTemplate: true,
-    source: "creator" as const
+    source: "creator"
   },
   {
     id: "p3",
@@ -59,7 +78,7 @@ const SAMPLE_SAVED_STYLES = [
     isPinned: true,
     folder: "Inspiration",
     isTemplate: false,
-    source: "creator" as const
+    source: "creator"
   },
   {
     id: "p4",
@@ -75,7 +94,7 @@ const SAMPLE_SAVED_STYLES = [
     isPinned: false,
     folder: "Personal",
     isTemplate: false,
-    source: "user" as const
+    source: "user"
   }
 ];
 
@@ -85,7 +104,8 @@ const FOLDERS = [
   { id: "f2", name: "Inspiration", count: 5 },
   { id: "f3", name: "Business", count: 3 },
   { id: "f4", name: "Personal", count: 4 },
-  { id: "f5", name: "Inspirations", count: 0 }
+  { id: "f5", name: "Quick Inspirations", count: 0 },
+  { id: "f6", name: "Templates", count: 2 }
 ];
 
 const LibraryMyStyles: React.FC = () => {
@@ -93,7 +113,7 @@ const LibraryMyStyles: React.FC = () => {
   const [activeView, setActiveView] = useState("all");
   const [selectedFolder, setSelectedFolder] = useState("All");
   const [showQuickSaveModal, setShowQuickSaveModal] = useState(false);
-  const [savedStyles, setSavedStyles] = useState(SAMPLE_SAVED_STYLES);
+  const [savedStyles, setSavedStyles] = useState<Style[]>(SAMPLE_SAVED_STYLES);
   const [folders, setFolders] = useState(FOLDERS);
   const navigate = useNavigate();
 
@@ -134,7 +154,7 @@ const LibraryMyStyles: React.FC = () => {
     setShowQuickSaveModal(true);
   };
   
-  const handleSaveInspiration = (newStyle: any) => {
+  const handleSaveInspiration = (newStyle: Style) => {
     // Add the new style to the savedStyles array
     setSavedStyles(prevStyles => [newStyle, ...prevStyles]);
     
@@ -204,6 +224,30 @@ const LibraryMyStyles: React.FC = () => {
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Hero card for Quick Save */}
+        <CardContainer className="mb-4 p-4 bg-gradient-to-r from-[#1e1e2d]/80 to-[#1a1f2c]/80">
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:block bg-primary-500/20 p-3 rounded-full">
+              <Sparkles className="h-6 w-6 text-primary-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-base font-medium">Have a bookmarked post that inspired you?</h3>
+              <p className="text-sm text-white/70">
+                <strong>Quick Save</strong> it and reuse it later.
+              </p>
+            </div>
+            <Button 
+              onClick={handleQuickSave} 
+              className="bg-primary-500 hover:bg-primary-600 whitespace-nowrap"
+              size="sm"
+            >
+              <Save className="h-4 w-4 mr-1" />
+              <span className="sm:inline hidden">Save a Post</span>
+              <span className="sm:hidden inline">Save</span>
+            </Button>
+          </div>
+        </CardContainer>
+
         {/* Search bar */}
         <div className="mb-4 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 h-4 w-4" />
@@ -284,14 +328,24 @@ const LibraryMyStyles: React.FC = () => {
               <Star className="h-16 w-16 text-white/20 mb-4" />
               <h3 className="text-lg font-medium text-white mb-2">No saved styles found</h3>
               <p className="text-white/60 mb-4">
-                {searchTerm ? 'Try adjusting your search' : 'Start saving styles from the Explore tab'}
+                {searchTerm ? 'Try adjusting your search' : 'Start saving styles from the Explore tab or Quick Save your inspiration'}
               </p>
-              <Button 
-                variant="outline"
-                onClick={() => setSearchParams({ tab: "explore" })}
-              >
-                Browse Explore
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline"
+                  onClick={() => setSearchParams({ tab: "explore" })}
+                  className="bg-transparent border-white/20"
+                >
+                  Browse Explore
+                </Button>
+                <Button
+                  onClick={handleQuickSave}
+                  className="bg-primary-500 hover:bg-primary-600"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Quick Save
+                </Button>
+              </div>
             </div>
           )}
         </ScrollArea>

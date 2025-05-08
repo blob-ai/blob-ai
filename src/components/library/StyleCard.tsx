@@ -13,6 +13,9 @@ import {
   Edit,
   Share,
   MoreHorizontal,
+  Layout,
+  BookmarkCheck,
+  Type,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -94,13 +97,47 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
     toast.success(`Converting ${style.name} to style`);
   };
 
+  // Determine card accent color and icon based on type
+  const getCardTypeDetails = () => {
+    if (style.isSavedInspiration) {
+      return {
+        icon: <BookmarkCheck className="h-4 w-4 text-amber-400" />,
+        label: "Saved Inspiration",
+        description: "Content you've saved for reference"
+      };
+    } else if (style.isTemplate) {
+      return {
+        icon: <Layout className="h-4 w-4 text-emerald-400" />,
+        label: "Template",
+        description: "Structure-focused format for reuse"
+      };
+    } else {
+      return {
+        icon: <Type className="h-4 w-4 text-primary-400" />,
+        label: "Style",
+        description: "Tone & voice pattern for your content"
+      };
+    }
+  };
+
+  const cardTypeDetails = getCardTypeDetails();
+
   return (
-    <CardContainer className="bg-black/20 border-white/10 p-0 overflow-hidden">
+    <CardContainer className={`bg-black/20 border-white/10 p-0 overflow-hidden ${
+      style.isSavedInspiration 
+        ? "border-l-4 border-l-amber-500/50" 
+        : style.isTemplate 
+          ? "border-l-4 border-l-emerald-500/50" 
+          : "border-l-4 border-l-primary-500/50"
+    }`}>
       {/* Card Header */}
       <div className="p-4 border-b border-white/10 flex justify-between items-center">
         <div>
-          <h3 className="font-medium text-white">{style.name}</h3>
-          <div className="flex items-center text-sm text-white/60 mt-1">
+          <div className="flex items-center gap-2 mb-1">
+            {cardTypeDetails.icon}
+            <h3 className="font-medium text-white">{style.name}</h3>
+          </div>
+          <div className="flex items-center text-sm text-white/60">
             {style.source === "creator" ? (
               <>
                 <img
@@ -161,7 +198,7 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
               <DropdownMenuGroup>
                 <DropdownMenuItem onClick={handleUseStyle}>
                   <Copy className="mr-2 h-4 w-4" />
-                  <span>Use this style</span>
+                  <span>Use this {style.isSavedInspiration ? "inspiration" : style.isTemplate ? "template" : "style"}</span>
                 </DropdownMenuItem>
                 
                 {style.isSavedInspiration && (
@@ -212,7 +249,13 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
           {style.tone.map((tag) => (
             <Badge
               key={tag}
-              className="bg-primary-500/20 text-primary-400 border-none"
+              className={`${
+                style.isSavedInspiration
+                  ? "bg-amber-500/20 text-amber-400"
+                  : style.isTemplate
+                    ? "bg-emerald-500/20 text-emerald-400"
+                    : "bg-primary-500/20 text-primary-400"
+              } border-none`}
             >
               {tag}
             </Badge>
@@ -222,8 +265,9 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
 
       {/* Card Footer */}
       <div className="border-t border-white/10 p-3 bg-black/20 flex items-center justify-between">
-        <div className="text-xs text-white/50">
-          {style.isTemplate ? "Template" : "Style"} • {style.folder}
+        <div className="text-xs text-white/50 flex items-center gap-1">
+          {cardTypeDetails.icon}
+          <span>{cardTypeDetails.label} • {style.folder}</span>
         </div>
 
         {style.isSavedInspiration ? (
@@ -251,7 +295,7 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
             className="h-8 bg-primary-500 hover:bg-primary-600"
             onClick={handleUseStyle}
           >
-            Use This Style
+            Use This {style.isTemplate ? "Template" : "Style"}
           </Button>
         )}
       </div>
