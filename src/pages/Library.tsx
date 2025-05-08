@@ -6,6 +6,7 @@ import LibraryExploreStyles from "@/components/library/LibraryExploreStyles";
 import LibraryMyStyles from "@/components/library/LibraryMyStyles";
 import LibraryCreateStyle from "@/components/library/LibraryCreateStyle";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 
 const Library = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,28 +21,39 @@ const Library = () => {
   };
   
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full h-full bg-[#0F1218]">
       {/* Header */}
-      <div className="border-b border-white/10 bg-background sticky top-0 z-10">
+      <div className="border-b border-white/10 bg-[#141921] sticky top-0 z-10 shadow-md">
         <div className="px-4 py-6 max-w-[1200px] mx-auto">
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl sm:text-3xl font-bold text-white">Styles</h1>
-            <p className="text-white/70 text-sm sm:text-base">
+            <p className="text-white/80 text-sm sm:text-base">
               Discover, save, and apply content styles to create your unique voice
             </p>
           </div>
         </div>
       </div>
 
-      <PageContainer className="flex flex-col flex-grow overflow-hidden">
+      <PageContainer className="flex flex-col flex-grow overflow-hidden pt-4">
         <Tabs defaultValue="myStyles" value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
           <div className="flex justify-center mb-6">
-            <TabsList className="bg-black/20 border border-white/10 p-1">
-              <TabsTrigger value="myStyles" className="px-8">My Styles</TabsTrigger>
-              <TabsTrigger value="explore" className="px-8">
+            <TabsList className="bg-[#1E2431]/70 border border-white/10 p-1 shadow-md">
+              <TabsTrigger 
+                value="myStyles" 
+                className="px-8 data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
+              >
+                My Styles
+              </TabsTrigger>
+              <TabsTrigger 
+                value="explore" 
+                className="px-8 data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
+              >
                 Explore
               </TabsTrigger>
-              <TabsTrigger value="create" className="px-8">
+              <TabsTrigger 
+                value="create" 
+                className="px-8 data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
+              >
                 Create Style
               </TabsTrigger>
             </TabsList>

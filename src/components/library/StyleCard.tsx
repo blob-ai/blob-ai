@@ -113,7 +113,7 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
       };
     } else {
       return {
-        icon: <Type className="h-4 w-4 text-primary-400" />,
+        icon: <Type className="h-4 w-4 text-blue-400" />,
         label: "Style",
         description: "Tone & voice pattern for your content"
       };
@@ -123,21 +123,21 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
   const cardTypeDetails = getCardTypeDetails();
 
   return (
-    <CardContainer className={`bg-black/20 border-white/10 p-0 overflow-hidden ${
+    <CardContainer className={`bg-[#1A202C] border-white/10 p-0 overflow-hidden ${
       style.isSavedInspiration 
         ? "border-l-4 border-l-amber-500/50" 
         : style.isTemplate 
           ? "border-l-4 border-l-emerald-500/50" 
-          : "border-l-4 border-l-primary-500/50"
-    }`}>
+          : "border-l-4 border-l-[#3260ea]/50"
+    } shadow-md hover:shadow-lg transition-all`}>
       {/* Card Header */}
-      <div className="p-4 border-b border-white/10 flex justify-between items-center">
+      <div className="p-4 border-b border-white/10 flex justify-between items-center bg-[#1E2431]">
         <div>
           <div className="flex items-center gap-2 mb-1">
             {cardTypeDetails.icon}
             <h3 className="font-medium text-white">{style.name}</h3>
           </div>
-          <div className="flex items-center text-sm text-white/60">
+          <div className="flex items-center text-sm text-white/70">
             {style.source === "creator" ? (
               <>
                 <img
@@ -159,7 +159,7 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
           <Button
             variant="ghost"
             size="sm"
-            className="text-white/60 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
+            className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
             onClick={toggleFavorite}
           >
             <Heart
@@ -170,11 +170,11 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
           <Button
             variant="ghost"
             size="sm"
-            className="text-white/60 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
+            className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
             onClick={togglePin}
           >
             <Pin
-              className={`h-4 w-4 ${isPinned ? "text-primary-500" : ""}`}
+              className={`h-4 w-4 ${isPinned ? "text-[#3260ea]" : ""}`}
             />
           </Button>
 
@@ -183,13 +183,13 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white/60 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
+                className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="w-56 bg-[#1A1F2C] border-white/10 text-white"
+              className="w-56 bg-[#1A202C] border-white/10 text-white"
               align="end"
               forceMount
             >
@@ -238,11 +238,11 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
       {/* Card Content */}
       <div className="p-4 space-y-3">
         {style.description && (
-          <p className="text-sm text-white/70">{style.description}</p>
+          <p className="text-sm text-white/80">{style.description}</p>
         )}
 
-        <ScrollArea className="h-28 w-full rounded-md border border-white/10 p-3 bg-black/30">
-          <p className="text-sm whitespace-pre-wrap">{style.example}</p>
+        <ScrollArea className="h-28 w-full rounded-md border border-white/10 p-3 bg-[#151A24] shadow-inner">
+          <p className="text-sm whitespace-pre-wrap text-white/90">{style.example}</p>
         </ScrollArea>
 
         <div className="flex flex-wrap gap-2">
@@ -254,7 +254,7 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
                   ? "bg-amber-500/20 text-amber-400"
                   : style.isTemplate
                     ? "bg-emerald-500/20 text-emerald-400"
-                    : "bg-primary-500/20 text-primary-400"
+                    : "bg-[#3260ea]/20 text-blue-400"
               } border-none`}
             >
               {tag}
@@ -264,7 +264,7 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
       </div>
 
       {/* Card Footer */}
-      <div className="border-t border-white/10 p-3 bg-black/20 flex items-center justify-between">
+      <div className="border-t border-white/10 p-3 bg-[#1E2431] flex items-center justify-between">
         <div className="text-xs text-white/50 flex items-center gap-1">
           {cardTypeDetails.icon}
           <span>{cardTypeDetails.label} • {style.folder}</span>
@@ -275,7 +275,7 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
             <Button
               variant="outline"
               size="sm"
-              className="h-8 bg-transparent border-white/20"
+              className="h-8 bg-transparent border-white/20 hover:bg-white/10"
               onClick={handleConvertToStyle}
             >
               <Edit className="h-3.5 w-3.5 mr-1" />
@@ -283,7 +283,7 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
             </Button>
             <Button
               size="sm"
-              className="h-8 bg-primary-500 hover:bg-primary-600"
+              className="h-8 bg-[#3260ea] hover:bg-[#2853c6]"
               onClick={handleUseStyle}
             >
               Use in Post
@@ -292,7 +292,7 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
         ) : (
           <Button
             size="sm"
-            className="h-8 bg-primary-500 hover:bg-primary-600"
+            className="h-8 bg-[#3260ea] hover:bg-[#2853c6]"
             onClick={handleUseStyle}
           >
             Use This {style.isTemplate ? "Template" : "Style"}

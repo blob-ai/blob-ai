@@ -1,9 +1,8 @@
-
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from "lucide-react";
+import { Search } from "lucide-react";
 import CreatorCard from "./CreatorCard";
 
 // Sample creator data - in a real app this would come from an API
@@ -71,22 +70,19 @@ const SAMPLE_CREATORS = [
 ];
 
 const categories = ["All", "Tech", "Marketing", "Personal Growth", "Humor"];
-const tones = ["All", "Bold", "Thoughtful", "Casual", "Analytical", "Motivational", "Educational", "Sarcastic"];
 const sortOptions = ["Popularity", "Most Recent", "A-Z"];
 
 const LibraryExploreStyles: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedTone, setSelectedTone] = useState("All");
   const [sortBy, setSortBy] = useState("Popularity");
 
   const filteredCreators = SAMPLE_CREATORS.filter(creator => {
     const matchesSearch = creator.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           creator.handle.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "All" || creator.category === selectedCategory;
-    const matchesTone = selectedTone === "All" || creator.tone.includes(selectedTone);
     
-    return matchesSearch && matchesCategory && matchesTone;
+    return matchesSearch && matchesCategory;
   });
 
   return (
@@ -97,39 +93,28 @@ const LibraryExploreStyles: React.FC = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 h-4 w-4" />
           <Input
             placeholder="Search creator styles"
-            className="pl-10 bg-black/20 border-white/10 h-10"
+            className="pl-10 bg-[#1A202C] border-white/10 h-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex gap-2 flex-wrap sm:flex-nowrap">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-[130px] bg-black/20 border-white/10 h-10">
+            <SelectTrigger className="w-[130px] bg-[#1A202C] border-white/10 h-10">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1A1F2C] border-white/10 text-white">
+            <SelectContent className="bg-[#1A202C] border-white/10 text-white">
               {categories.map((category) => (
                 <SelectItem key={category} value={category}>{category}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-          
-          <Select value={selectedTone} onValueChange={setSelectedTone}>
-            <SelectTrigger className="w-[130px] bg-black/20 border-white/10 h-10">
-              <SelectValue placeholder="Tone" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#1A1F2C] border-white/10 text-white">
-              {tones.map((tone) => (
-                <SelectItem key={tone} value={tone}>{tone}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-[130px] bg-black/20 border-white/10 h-10">
+            <SelectTrigger className="w-[130px] bg-[#1A202C] border-white/10 h-10">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1A1F2C] border-white/10 text-white">
+            <SelectContent className="bg-[#1A202C] border-white/10 text-white">
               {sortOptions.map((option) => (
                 <SelectItem key={option} value={option}>{option}</SelectItem>
               ))}

@@ -232,10 +232,10 @@ const LibraryCreateStyle: React.FC = () => {
           {stepTitles.map((title, idx) => (
             <div key={idx} className="flex flex-col items-center">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
-                idx + 1 === step ? "bg-primary-500" : 
-                idx + 1 < step ? "bg-primary-500/50" : "bg-white/10"
+                idx + 1 === step ? "bg-[#3260ea]" : 
+                idx + 1 < step ? "bg-[#3260ea]/50" : "bg-[#1E2431]"
               }`}>
-                {idx + 1}
+                <span className="text-white">{idx + 1}</span>
               </div>
               <span className={`text-xs ${idx + 1 === step ? "text-white" : "text-white/50"}`}>
                 {title}
@@ -246,13 +246,13 @@ const LibraryCreateStyle: React.FC = () => {
       </div>
 
       {/* Content area */}
-      <CardContainer className="max-w-5xl mx-auto w-full bg-black/20 border-white/10 flex-grow overflow-hidden">
+      <CardContainer className="max-w-5xl mx-auto w-full bg-[#1A202C] border-white/10 flex-grow overflow-hidden shadow-md">
         <ScrollArea className="h-full p-4">
           {/* Step 1: Name your style */}
           {step === 1 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-medium mb-4">Name your style</h2>
-              <p className="text-white/70 mb-6">
+              <h2 className="text-xl font-medium mb-4 text-white">Name your style</h2>
+              <p className="text-white/80 mb-6">
                 Give your style a descriptive name that will help you remember what it's for.
               </p>
               
@@ -260,11 +260,11 @@ const LibraryCreateStyle: React.FC = () => {
                 placeholder="My Professional Tech Style"
                 value={styleName}
                 onChange={(e) => setStyleName(e.target.value)}
-                className="bg-black/30 border-white/10 max-w-md"
+                className="bg-[#151A24] border-white/10 max-w-md"
               />
               
               <div className="mt-8 pt-6 border-t border-white/10">
-                <h3 className="text-lg font-medium mb-2">What are you creating?</h3>
+                <h3 className="text-lg font-medium mb-2 text-white">What are you creating?</h3>
                 <div className="flex items-center space-x-6 mt-4">
                   <div className="flex items-center space-x-2">
                     <Switch 
@@ -272,8 +272,8 @@ const LibraryCreateStyle: React.FC = () => {
                       onCheckedChange={() => setCreationType("style")}
                     />
                     <div className="flex items-center">
-                      <Type className="h-4 w-4 mr-2 text-primary-400" />
-                      <span>Style (tone & voice)</span>
+                      <Type className="h-4 w-4 mr-2 text-blue-400" />
+                      <span className="text-white">Style (tone & voice)</span>
                     </div>
                   </div>
                   
@@ -283,19 +283,19 @@ const LibraryCreateStyle: React.FC = () => {
                       onCheckedChange={() => setCreationType("template")}
                     />
                     <div className="flex items-center">
-                      <Layout className="h-4 w-4 mr-2 text-primary-400" />
-                      <span>Template (structure)</span>
+                      <Layout className="h-4 w-4 mr-2 text-emerald-400" />
+                      <span className="text-white">Template (structure)</span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="mt-4 p-3 bg-black/30 rounded-md">
+                <div className="mt-4 p-3 bg-[#151A24] rounded-md">
                   {creationType === "style" ? (
-                    <p className="text-sm text-white/70">
+                    <p className="text-sm text-white/80">
                       A <strong>style</strong> focuses on how something is said—the tone, word choice, and attitude of your writing.
                     </p>
                   ) : (
-                    <p className="text-sm text-white/70">
+                    <p className="text-sm text-white/80">
                       A <strong>template</strong> focuses on how content is structured—the format, sections, and organization of your posts.
                     </p>
                   )}
@@ -307,13 +307,13 @@ const LibraryCreateStyle: React.FC = () => {
           {/* Step 2: Choose creation method */}
           {step === 2 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-medium mb-4">
+              <h2 className="text-xl font-medium mb-4 text-white">
                 How would you like to create your {creationType === "style" ? "style" : "template"}?
               </h2>
               
               <CardContainer 
                 className={`cursor-pointer transition-all p-4 ${
-                  creationMethod === "upload" ? "border-primary-400 bg-black/40" : "hover:border-white/20"
+                  creationMethod === "upload" ? "border-[#3260ea] bg-[#151A24]" : "hover:border-white/20"
                 }`}
                 onClick={() => setCreationMethod("upload")}
               >
@@ -346,7 +346,7 @@ const LibraryCreateStyle: React.FC = () => {
               
               <CardContainer 
                 className={`cursor-pointer transition-all p-4 ${
-                  creationMethod === "paste" ? "border-primary-400 bg-black/40" : "hover:border-white/20"
+                  creationMethod === "paste" ? "border-[#3260ea] bg-[#151A24]" : "hover:border-white/20"
                 }`}
                 onClick={() => setCreationMethod("paste")}
               >
@@ -374,7 +374,7 @@ const LibraryCreateStyle: React.FC = () => {
               
               <CardContainer 
                 className={`cursor-pointer transition-all p-4 ${
-                  creationMethod === "chat" ? "border-primary-400 bg-black/40" : "hover:border-white/20"
+                  creationMethod === "chat" ? "border-[#3260ea] bg-[#151A24]" : "hover:border-white/20"
                 }`}
                 onClick={() => setCreationMethod("chat")}
               >
@@ -404,40 +404,29 @@ const LibraryCreateStyle: React.FC = () => {
             <div className="flex flex-col md:flex-row h-full gap-6">
               {/* Left Panel - Chat Interface */}
               <div className="flex-1 h-[500px] md:h-auto">
-                <div className="bg-black/30 border border-white/10 rounded-lg p-3 h-full flex flex-col">
-                  <h3 className="font-medium text-lg mb-2">Chat with AI</h3>
-                  <p className="text-sm text-white/60 mb-3">
+                <div className="bg-[#151A24] border border-white/10 rounded-lg p-3 h-full flex flex-col shadow-md">
+                  <h3 className="font-medium text-lg mb-2 text-white">Chat with AI</h3>
+                  <p className="text-sm text-white/80 mb-3">
                     Describe your ideal {creationType} and we'll help you build it
                   </p>
                   
                   {/* Chat Messages */}
-                  <div className="flex-grow overflow-auto p-2 bg-black/20 rounded-md mb-3">
+                  <div className="flex-grow overflow-auto p-2 bg-[#141821] rounded-md mb-3 border border-white/5">
                     <div className="space-y-4">
                       {chatMessages.map((msg, idx) => (
                         <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                           <div 
                             className={`max-w-[80%] p-3 rounded-lg ${
                               msg.role === "user" 
-                                ? "bg-primary-500/20 text-white" 
-                                : "bg-white/10 text-white"
+                                ? "bg-[#3260ea]/20 text-white/90 border border-[#3260ea]/20" 
+                                : "bg-[#1E2431] text-white/90 border border-white/10"
                             }`}
                           >
                             {msg.content}
                           </div>
                         </div>
                       ))}
-                      {isAnalyzing && (
-                        <div className="flex justify-start">
-                          <div className="bg-white/10 text-white max-w-[80%] p-3 rounded-lg flex items-center space-x-2">
-                            <div className="flex space-x-1">
-                              <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                              <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                              <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                            </div>
-                            <span className="text-white/60 text-sm">AI is thinking...</span>
-                          </div>
-                        </div>
-                      )}
+                      {/* ... keep existing code (isAnalyzing spinner) */}
                       <div ref={chatEndRef}></div>
                     </div>
                   </div>
@@ -448,7 +437,7 @@ const LibraryCreateStyle: React.FC = () => {
                       value={currentMessage}
                       onChange={(e) => setCurrentMessage(e.target.value)}
                       placeholder="Describe your preferred style..."
-                      className="bg-black/30 border-white/10"
+                      className="bg-[#1A202C] border-white/10"
                       onKeyPress={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -459,7 +448,7 @@ const LibraryCreateStyle: React.FC = () => {
                     <Button 
                       onClick={sendChatMessage} 
                       disabled={!currentMessage.trim() || isAnalyzing}
-                      className="bg-primary-500 hover:bg-primary-600 px-3"
+                      className="bg-[#3260ea] hover:bg-[#2853c6] px-3"
                     >
                       <Send className="h-4 w-4" />
                     </Button>
@@ -467,48 +456,16 @@ const LibraryCreateStyle: React.FC = () => {
                   
                   {/* Chat Suggestions */}
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-transparent border-white/20 text-xs"
-                      onClick={() => {
-                        setCurrentMessage("I prefer a direct and bold tone");
-                        setTimeout(() => sendChatMessage(), 100);
-                      }}
-                    >
-                      I prefer a direct and bold tone
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-transparent border-white/20 text-xs"
-                      onClick={() => {
-                        setCurrentMessage("I like storytelling with examples");
-                        setTimeout(() => sendChatMessage(), 100);
-                      }}
-                    >
-                      I like storytelling with examples
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-transparent border-white/20 text-xs"
-                      onClick={() => {
-                        setCurrentMessage("I want to sound educational but friendly");
-                        setTimeout(() => sendChatMessage(), 100);
-                      }}
-                    >
-                      I want to sound educational but friendly
-                    </Button>
+                    {/* ... keep existing code (chat suggestion buttons) */}
                   </div>
                 </div>
               </div>
               
               {/* Right Panel - Style Builder */}
               <div className="flex-1 h-[500px] md:h-auto">
-                <div className="bg-black/30 border border-white/10 rounded-lg p-3 h-full flex flex-col">
+                <div className="bg-[#151A24] border border-white/10 rounded-lg p-3 h-full flex flex-col shadow-md">
                   <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-medium text-lg">Style Builder</h3>
+                    <h3 className="font-medium text-lg text-white">Style Builder</h3>
                     <Button 
                       variant="ghost" 
                       size="sm" 
@@ -522,17 +479,17 @@ const LibraryCreateStyle: React.FC = () => {
                   
                   {/* Style Name */}
                   <div className="mb-4">
-                    <label className="text-sm text-white/60 block mb-1">Style Name</label>
+                    <label className="text-sm text-white/70 block mb-1">Style Name</label>
                     <Input 
                       value={styleName} 
                       onChange={(e) => setStyleName(e.target.value)}
-                      className="bg-black/20 border-white/10"
+                      className="bg-[#1A202C] border-white/10"
                     />
                   </div>
                   
                   {/* Tone Tags */}
                   <div className="mb-4">
-                    <label className="text-sm text-white/60 block mb-1">Tone (select up to 3)</label>
+                    <label className="text-sm text-white/70 block mb-1">Tone (select up to 3)</label>
                     <div className="flex flex-wrap gap-2">
                       {tones.map((tone) => (
                         <Badge 
@@ -540,7 +497,7 @@ const LibraryCreateStyle: React.FC = () => {
                           variant={selectedTones.includes(tone) ? "default" : "outline"}
                           className={`cursor-pointer ${
                             selectedTones.includes(tone) 
-                              ? "bg-primary-500 hover:bg-primary-600 text-white" 
+                              ? "bg-[#3260ea] hover:bg-[#2853c6] text-white" 
                               : "bg-transparent hover:bg-white/10"
                           }`}
                           onClick={() => handleToneToggle(tone)}
@@ -556,7 +513,7 @@ const LibraryCreateStyle: React.FC = () => {
                   
                   {/* Format Tags */}
                   <div className="mb-4">
-                    <label className="text-sm text-white/60 block mb-1">Format (select up to 2)</label>
+                    <label className="text-sm text-white/70 block mb-1">Format (select up to 2)</label>
                     <div className="flex flex-wrap gap-2">
                       {formats.map((format) => (
                         <Badge 
@@ -564,7 +521,7 @@ const LibraryCreateStyle: React.FC = () => {
                           variant={selectedFormats.includes(format) ? "default" : "outline"}
                           className={`cursor-pointer ${
                             selectedFormats.includes(format) 
-                              ? "bg-primary-500/80 hover:bg-primary-600 text-white" 
+                              ? "bg-[#3260ea]/80 hover:bg-[#3260ea] text-white" 
                               : "bg-transparent hover:bg-white/10"
                           }`}
                           onClick={() => handleFormatToggle(format)}
@@ -580,7 +537,7 @@ const LibraryCreateStyle: React.FC = () => {
                   
                   {/* Preview Examples */}
                   <div className="flex-grow mb-4 overflow-hidden">
-                    <label className="text-sm text-white/60 block mb-1">Preview Examples</label>
+                    <label className="text-sm text-white/70 block mb-1">Preview Examples</label>
                     <div className="h-full max-h-[250px] overflow-y-auto">
                       <ScrollArea className="h-full">
                         <div className="space-y-3 p-2">
@@ -593,8 +550,8 @@ const LibraryCreateStyle: React.FC = () => {
                             </div>
                           ) : (
                             previewExamples.map((example, idx) => (
-                              <div key={idx} className="bg-black/30 p-3 rounded-md border border-white/5">
-                                <p className="whitespace-pre-wrap text-sm">{example}</p>
+                              <div key={idx} className="bg-[#1E2431] p-3 rounded-md border border-white/10 shadow-sm">
+                                <p className="whitespace-pre-wrap text-sm text-white/90">{example}</p>
                               </div>
                             ))
                           )}
@@ -606,35 +563,9 @@ const LibraryCreateStyle: React.FC = () => {
                   {/* Tone Sliders (if tones are selected) */}
                   {selectedTones.length > 0 && (
                     <div className="mb-4">
-                      <label className="text-sm text-white/60 block mb-2">Tone Adjustments</label>
+                      <label className="text-sm text-white/70 block mb-2">Tone Adjustments</label>
                       <div className="space-y-4">
-                        {selectedTones.includes("Bold") && (
-                          <div className="space-y-1">
-                            <div className="flex justify-between text-xs text-white/60">
-                              <span>More Subtle</span>
-                              <span>More Bold</span>
-                            </div>
-                            <Slider defaultValue={[75]} max={100} step={1} />
-                          </div>
-                        )}
-                        {selectedTones.includes("Casual") && (
-                          <div className="space-y-1">
-                            <div className="flex justify-between text-xs text-white/60">
-                              <span>More Formal</span>
-                              <span>More Casual</span>
-                            </div>
-                            <Slider defaultValue={[60]} max={100} step={1} />
-                          </div>
-                        )}
-                        {(selectedTones.includes("Analytical") || selectedTones.includes("Educational")) && (
-                          <div className="space-y-1">
-                            <div className="flex justify-between text-xs text-white/60">
-                              <span>Simpler</span>
-                              <span>More Technical</span>
-                            </div>
-                            <Slider defaultValue={[50]} max={100} step={1} />
-                          </div>
-                        )}
+                        {/* ... keep existing code (tone sliders) */}
                       </div>
                     </div>
                   )}
@@ -657,30 +588,30 @@ const LibraryCreateStyle: React.FC = () => {
           {/* Step 3: Add details (manual) */}
           {step === 3 && creationMethod !== "chat" && (
             <div className="space-y-6">
-              <h2 className="text-xl font-medium mb-4">Style details</h2>
+              <h2 className="text-xl font-medium mb-4 text-white">Style details</h2>
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">
+                  <label className="block text-sm font-medium text-white/80 mb-1">
                     Description (optional)
                   </label>
                   <Textarea
                     placeholder="A brief description of your style..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="bg-black/30 border-white/10"
+                    className="bg-[#151A24] border-white/10"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">
+                  <label className="block text-sm font-medium text-white/80 mb-1">
                     Category
                   </label>
                   <Select value={selectedCategory || ""} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="bg-black/30 border-white/10">
+                    <SelectTrigger className="bg-[#151A24] border-white/10">
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1A1F2C] border-white/10 text-white">
+                    <SelectContent className="bg-[#1A202C] border-white/10 text-white">
                       {categories.map((category) => (
                         <SelectItem key={category} value={category}>{category}</SelectItem>
                       ))}
@@ -689,7 +620,7 @@ const LibraryCreateStyle: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-white/70 mb-1">
+                  <label className="block text-sm font-medium text-white/80 mb-1">
                     Tone Tags (select up to 3)
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -699,7 +630,7 @@ const LibraryCreateStyle: React.FC = () => {
                         variant={selectedTones.includes(tone) ? "default" : "outline"}
                         className={`cursor-pointer ${
                           selectedTones.includes(tone) 
-                            ? "bg-primary-500 hover:bg-primary-600 text-white" 
+                            ? "bg-[#3260ea] hover:bg-[#2853c6] text-white" 
                             : "bg-transparent hover:bg-white/10"
                         }`}
                         onClick={() => handleToneToggle(tone)}
@@ -716,40 +647,40 @@ const LibraryCreateStyle: React.FC = () => {
           {/* Step 4: Review and save */}
           {step === 4 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-medium mb-4">Review and save your {creationType}</h2>
+              <h2 className="text-xl font-medium mb-4 text-white">Review and save your {creationType}</h2>
               
-              <CardContainer className="bg-black/30 border-white/10 p-4">
+              <CardContainer className="bg-[#151A24] border-white/10 p-4 shadow-md">
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-lg font-medium">{styleName}</h3>
-                    {description && <p className="text-white/70 text-sm mt-1">{description}</p>}
+                    <h3 className="text-lg font-medium text-white">{styleName}</h3>
+                    {description && <p className="text-white/80 text-sm mt-1">{description}</p>}
                   </div>
                   
                   <div className="flex flex-wrap gap-2">
                     {selectedCategory && (
-                      <Badge className="bg-white/10 border-none">
+                      <Badge className="bg-white/10 border-none text-white/80">
                         {selectedCategory}
                       </Badge>
                     )}
                     
                     {selectedTones.map((tone) => (
-                      <Badge key={tone} className="bg-primary-500/20 text-primary-400 border-none">
+                      <Badge key={tone} className="bg-[#3260ea]/20 text-blue-400 border-none">
                         {tone}
                       </Badge>
                     ))}
                     
                     {selectedFormats.map((format) => (
-                      <Badge key={format} className="bg-white/10 border-none">
+                      <Badge key={format} className="bg-white/10 border-none text-white/80">
                         {format}
                       </Badge>
                     ))}
                   </div>
                   
                   <div className="pt-2">
-                    <p className="text-sm text-white/70">
+                    <p className="text-sm text-white/80">
                       <strong>Created by:</strong> You
                     </p>
-                    <p className="text-sm text-white/70">
+                    <p className="text-sm text-white/80">
                       <strong>Method:</strong> {
                         creationMethod === "upload" ? `File upload (${uploadedFile?.name})` :
                         creationMethod === "paste" ? "Text samples" :
@@ -761,22 +692,22 @@ const LibraryCreateStyle: React.FC = () => {
                   {/* Preview section for examples */}
                   {creationMethod === "chat" && previewExamples.length > 0 && (
                     <div className="mt-2 border-t border-white/10 pt-3">
-                      <h4 className="text-sm font-medium mb-2">Example output:</h4>
-                      <div className="bg-black/30 p-3 rounded-md border border-white/5">
-                        <p className="whitespace-pre-wrap text-sm">{previewExamples[0]}</p>
+                      <h4 className="text-sm font-medium mb-2 text-white/90">Example output:</h4>
+                      <div className="bg-[#1E2431] p-3 rounded-md border border-white/10">
+                        <p className="whitespace-pre-wrap text-sm text-white/90">{previewExamples[0]}</p>
                       </div>
                     </div>
                   )}
                 </div>
               </CardContainer>
               
-              <div className="bg-gradient-to-br from-[#1e1e2d] to-[#1a1f2c] border-white/5 rounded-lg p-4 flex items-center gap-4">
-                <div className="bg-primary-400/20 p-3 rounded-full">
-                  <Sparkles className="h-6 w-6 text-primary-400" />
+              <div className="bg-gradient-to-br from-[#1E2431] to-[#1A202C] border-white/5 rounded-lg p-4 flex items-center gap-4 shadow-md">
+                <div className="bg-[#3260ea]/20 p-3 rounded-full">
+                  <Sparkles className="h-6 w-6 text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">Your {creationType} is ready!</h3>
-                  <p className="text-sm text-white/70">
+                  <h3 className="font-medium mb-1 text-white">Your {creationType} is ready!</h3>
+                  <p className="text-sm text-white/80">
                     Once saved, you can use this {creationType} for your posts or chat with an AI that mimics this style.
                   </p>
                 </div>
@@ -792,7 +723,7 @@ const LibraryCreateStyle: React.FC = () => {
           variant="outline"
           onClick={handleBack}
           disabled={step === 1}
-          className="bg-transparent"
+          className="bg-transparent border-white/20 hover:bg-white/5"
         >
           Back
         </Button>
@@ -801,14 +732,14 @@ const LibraryCreateStyle: React.FC = () => {
           <Button
             onClick={handleNext}
             disabled={isNextDisabled()}
-            className="bg-primary-500 hover:bg-primary-600"
+            className="bg-[#3260ea] hover:bg-[#2853c6]"
           >
             Continue
           </Button>
         ) : (
           <Button
             onClick={handleSaveStyle}
-            className="bg-primary-500 hover:bg-primary-600"
+            className="bg-[#3260ea] hover:bg-[#2853c6]"
           >
             <Save className="h-4 w-4 mr-2" />
             Save {creationType === "style" ? "Style" : "Template"}

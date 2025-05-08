@@ -176,7 +176,7 @@ const LibraryMyStyles: React.FC = () => {
       {/* Sidebar with folders */}
       <div className="hidden sm:flex flex-col w-64 border-r border-white/10 pr-4 mr-4 overflow-auto">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">Folders</h3>
+          <h3 className="text-lg font-medium text-white">Folders</h3>
           <Button 
             variant="outline" 
             size="sm" 
@@ -192,7 +192,9 @@ const LibraryMyStyles: React.FC = () => {
             <Button
               key={folder.id}
               variant={selectedFolder === folder.name ? "secondary" : "ghost"} 
-              className={`w-full justify-start ${selectedFolder === folder.name ? 'bg-white/10' : ''}`}
+              className={`w-full justify-start ${
+                selectedFolder === folder.name ? 'bg-[#24293A] text-white' : ''
+              }`}
               onClick={() => setSelectedFolder(folder.name)}
             >
               <Folder className="h-4 w-4 mr-2" />
@@ -205,7 +207,7 @@ const LibraryMyStyles: React.FC = () => {
         <div className="space-y-2 mt-8">
           <Button 
             onClick={handleCreateStyle}
-            className="w-full bg-primary-500 hover:bg-primary-600"
+            className="w-full bg-[#3260ea] hover:bg-[#2853c6]"
           >
             <Plus className="h-4 w-4 mr-2" />
             Create Your Own Style
@@ -214,7 +216,7 @@ const LibraryMyStyles: React.FC = () => {
           <Button 
             onClick={handleQuickSave}
             variant="outline" 
-            className="w-full bg-transparent border-white/20"
+            className="w-full bg-transparent border-white/20 hover:bg-white/5"
           >
             <Save className="h-4 w-4 mr-2" />
             Quick Save Inspiration
@@ -225,20 +227,20 @@ const LibraryMyStyles: React.FC = () => {
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Hero card for Quick Save */}
-        <CardContainer className="mb-4 p-4 bg-gradient-to-r from-[#1e1e2d]/80 to-[#1a1f2c]/80">
+        <CardContainer className="mb-4 p-4 bg-gradient-to-r from-[#1F2937] to-[#1A202C] shadow-md">
           <div className="flex items-center gap-4">
-            <div className="hidden sm:block bg-primary-500/20 p-3 rounded-full">
-              <Sparkles className="h-6 w-6 text-primary-400" />
+            <div className="hidden sm:block bg-[#3260ea]/20 p-3 rounded-full">
+              <Sparkles className="h-6 w-6 text-blue-400" />
             </div>
             <div className="flex-1">
-              <h3 className="text-base font-medium">Have a bookmarked post that inspired you?</h3>
-              <p className="text-sm text-white/70">
+              <h3 className="text-base font-medium text-white">Have a bookmarked post that inspired you?</h3>
+              <p className="text-sm text-white/80">
                 <strong>Quick Save</strong> it and reuse it later.
               </p>
             </div>
             <Button 
               onClick={handleQuickSave} 
-              className="bg-primary-500 hover:bg-primary-600 whitespace-nowrap"
+              className="bg-[#3260ea] hover:bg-[#2853c6] whitespace-nowrap"
               size="sm"
             >
               <Save className="h-4 w-4 mr-1" />
@@ -253,7 +255,7 @@ const LibraryMyStyles: React.FC = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 h-4 w-4" />
           <Input
             placeholder="Search saved styles"
-            className="pl-10 bg-black/20 border-white/10 h-10"
+            className="pl-10 bg-[#1A202C] border-white/10 h-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -261,20 +263,32 @@ const LibraryMyStyles: React.FC = () => {
 
         {/* View tabs */}
         <Tabs value={activeView} onValueChange={setActiveView} className="mb-6">
-          <TabsList className="bg-black/20 border border-white/10 p-1">
-            <TabsTrigger value="all" className="data-[state=active]:bg-white/10">
+          <TabsList className="bg-[#1A202C] border border-white/10 p-1">
+            <TabsTrigger 
+              value="all" 
+              className="data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
+            >
               <Star className="h-4 w-4 mr-2" />
               All
             </TabsTrigger>
-            <TabsTrigger value="pinned" className="data-[state=active]:bg-white/10">
+            <TabsTrigger 
+              value="pinned" 
+              className="data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
+            >
               <Pin className="h-4 w-4 mr-2" />
               Pinned
             </TabsTrigger>
-            <TabsTrigger value="favorites" className="data-[state=active]:bg-white/10">
+            <TabsTrigger 
+              value="favorites" 
+              className="data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
+            >
               <Heart className="h-4 w-4 mr-2" />
               Favorites
             </TabsTrigger>
-            <TabsTrigger value="recent" className="data-[state=active]:bg-white/10">
+            <TabsTrigger 
+              value="recent" 
+              className="data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
+            >
               <Clock className="h-4 w-4 mr-2" />
               Recent
             </TabsTrigger>
@@ -284,7 +298,7 @@ const LibraryMyStyles: React.FC = () => {
         {/* Mobile folder selector and buttons */}
         <div className="sm:hidden mb-4 space-y-3">
           <select 
-            className="w-full bg-black/20 border border-white/10 rounded-md h-10 px-3 text-white"
+            className="w-full bg-[#1A202C] border border-white/10 rounded-md h-10 px-3 text-white"
             value={selectedFolder}
             onChange={(e) => setSelectedFolder(e.target.value)}
           >
@@ -298,7 +312,7 @@ const LibraryMyStyles: React.FC = () => {
           <div className="flex gap-2">
             <Button 
               onClick={handleCreateStyle}
-              className="flex-1 bg-primary-500 hover:bg-primary-600"
+              className="flex-1 bg-[#3260ea] hover:bg-[#2853c6]"
             >
               <Plus className="h-4 w-4 mr-2" />
               Create Style
@@ -307,7 +321,7 @@ const LibraryMyStyles: React.FC = () => {
             <Button 
               onClick={handleQuickSave}
               variant="outline" 
-              className="flex-1 bg-transparent border-white/20"
+              className="flex-1 bg-transparent border-white/20 hover:bg-white/5"
             >
               <Save className="h-4 w-4 mr-2" />
               Quick Save
@@ -324,10 +338,10 @@ const LibraryMyStyles: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center p-6">
+            <div className="flex flex-col items-center justify-center h-full text-center p-6 bg-[#1A202C]/50 rounded-lg border border-white/5">
               <Star className="h-16 w-16 text-white/20 mb-4" />
               <h3 className="text-lg font-medium text-white mb-2">No saved styles found</h3>
-              <p className="text-white/60 mb-4">
+              <p className="text-white/70 mb-4">
                 {searchTerm ? 'Try adjusting your search' : 'Start saving styles from the Explore tab or Quick Save your inspiration'}
               </p>
               <div className="flex gap-2">
@@ -340,7 +354,7 @@ const LibraryMyStyles: React.FC = () => {
                 </Button>
                 <Button
                   onClick={handleQuickSave}
-                  className="bg-primary-500 hover:bg-primary-600"
+                  className="bg-[#3260ea] hover:bg-[#2853c6]"
                 >
                   <Save className="h-4 w-4 mr-2" />
                   Quick Save
