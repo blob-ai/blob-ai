@@ -3,11 +3,13 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Folder, Star, Clock, Heart, Pin } from "lucide-react";
+import { Plus, Search, Folder, Star, Clock, Heart, Pin, Save } from "lucide-react";
 import { CardContainer } from "@/components/ui/card-container";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import StyleCard from "./StyleCard";
 import { useNavigate } from "react-router-dom";
+import QuickSaveModal from "./QuickSaveModal";
+import { toast } from "sonner";
 
 // Sample saved styles - in a real app this would come from an API
 const SAMPLE_SAVED_STYLES = [
@@ -82,16 +84,20 @@ const FOLDERS = [
   { id: "f1", name: "All", count: 12 },
   { id: "f2", name: "Inspiration", count: 5 },
   { id: "f3", name: "Business", count: 3 },
-  { id: "f4", name: "Personal", count: 4 }
+  { id: "f4", name: "Personal", count: 4 },
+  { id: "f5", name: "Inspirations", count: 0 }
 ];
 
 const LibraryMyStyles: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeView, setActiveView] = useState("all");
   const [selectedFolder, setSelectedFolder] = useState("All");
+  const [showQuickSaveModal, setShowQuickSaveModal] = useState(false);
+  const [savedStyles, setSavedStyles] = useState(SAMPLE_SAVED_STYLES);
+  const [folders, setFolders] = useState(FOLDERS);
   const navigate = useNavigate();
 
-  const filteredStyles = SAMPLE_SAVED_STYLES.filter(style => {
+  const filteredStyles = savedStyles.filter(style => {
     // Filter by search term
     const matchesSearch = 
       style.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -123,6 +129,27 @@ const LibraryMyStyles: React.FC = () => {
       search: `?tab=${params.tab}`
     });
   };
+  
+  const handleQuickSave = () => {
+    setShowQuickSaveModal(true);
+  };
+  
+  const handleSaveInspiration = (newStyle: any) => {
+    // Add the new style to the savedStyles array
+    setSavedStyles(prevStyles => [newStyle, ...prevStyles]);
+    
+    // Update the folder count
+    setFolders(prevFolders => 
+      prevFolders.map(folder => 
+        folder.name === newStyle.folder ? 
+          { ...folder, count: folder.count + 1 } : 
+          folder
+      )
+    );
+    
+    // Show success message
+    toast.success("Inspiration saved successfully!");
+  };
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -141,7 +168,7 @@ const LibraryMyStyles: React.FC = () => {
         </div>
         
         <div className="space-y-1">
-          {FOLDERS.map((folder) => (
+          {folders.map((folder) => (
             <Button
               key={folder.id}
               variant={selectedFolder === folder.name ? "secondary" : "ghost"} 
@@ -155,13 +182,24 @@ const LibraryMyStyles: React.FC = () => {
           ))}
         </div>
         
-        <Button 
-          onClick={handleCreateStyle}
-          className="mt-8 bg-primary-500 hover:bg-primary-600"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Create Your Own Style
-        </Button>
+        <div className="space-y-2 mt-8">
+          <Button 
+            onClick={handleCreateStyle}
+            className="w-full bg-primary-500 hover:bg-primary-600"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Your Own Style
+          </Button>
+          
+          <Button 
+            onClick={handleQuickSave}
+            variant="outline" 
+            className="w-full bg-transparent border-white/20"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            Quick Save Inspiration
+          </Button>
+        </div>
       </div>
 
       {/* Main content area */}
@@ -199,27 +237,38 @@ const LibraryMyStyles: React.FC = () => {
           </TabsList>
         </Tabs>
 
-        {/* Mobile folder selector and create button */}
+        {/* Mobile folder selector and buttons */}
         <div className="sm:hidden mb-4 space-y-3">
           <select 
             className="w-full bg-black/20 border border-white/10 rounded-md h-10 px-3 text-white"
             value={selectedFolder}
             onChange={(e) => setSelectedFolder(e.target.value)}
           >
-            {FOLDERS.map((folder) => (
+            {folders.map((folder) => (
               <option key={folder.id} value={folder.name}>
                 {folder.name} ({folder.count})
               </option>
             ))}
           </select>
           
-          <Button 
-            onClick={handleCreateStyle}
-            className="w-full bg-primary-500 hover:bg-primary-600"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Your Own Style
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={handleCreateStyle}
+              className="flex-1 bg-primary-500 hover:bg-primary-600"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Style
+            </Button>
+            
+            <Button 
+              onClick={handleQuickSave}
+              variant="outline" 
+              className="flex-1 bg-transparent border-white/20"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Quick Save
+            </Button>
+          </div>
         </div>
 
         {/* Saved styles grid */}
@@ -247,6 +296,13 @@ const LibraryMyStyles: React.FC = () => {
           )}
         </ScrollArea>
       </div>
+      
+      {/* Quick Save Modal */}
+      <QuickSaveModal 
+        isOpen={showQuickSaveModal}
+        onClose={() => setShowQuickSaveModal(false)}
+        onSave={handleSaveInspiration}
+      />
     </div>
   );
 };

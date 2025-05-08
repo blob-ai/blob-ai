@@ -1,229 +1,259 @@
 
 import React, { useState } from "react";
 import { CardContainer } from "@/components/ui/card-container";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Heart, 
-  HeartOff, 
-  MessageSquare, 
-  MoreHorizontal, 
-  Pencil, 
-  Pin, 
-  PinOff, 
-  Trash2 
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Heart,
+  MessageSquare,
+  Trash2,
+  Pin,
+  Copy,
+  Edit,
+  Share,
+  MoreHorizontal,
 } from "lucide-react";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-interface Style {
-  id: string;
-  name: string;
-  creatorName: string;
-  creatorHandle?: string;
-  creatorAvatar?: string;
-  description: string;
-  tone: string[];
-  example: string;
-  date: string;
-  isFavorite: boolean;
-  isPinned: boolean;
-  folder: string;
-  isTemplate: boolean;
-  source: "user" | "creator";
-}
-
 interface StyleCardProps {
-  style: Style;
+  style: {
+    id: string;
+    name: string;
+    creatorName: string;
+    creatorHandle: string;
+    creatorAvatar: string;
+    description: string;
+    tone: string[];
+    example: string;
+    date: string;
+    isFavorite: boolean;
+    isPinned: boolean;
+    folder: string;
+    isTemplate: boolean;
+    source: "user" | "creator";
+    isSavedInspiration?: boolean;
+  };
 }
 
 const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
   const [isFavorite, setIsFavorite] = useState(style.isFavorite);
   const [isPinned, setIsPinned] = useState(style.isPinned);
   const navigate = useNavigate();
-  
-  const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation();
+
+  const toggleFavorite = () => {
     setIsFavorite(!isFavorite);
-    toast.success(!isFavorite ? "Added to favorites" : "Removed from favorites");
+    toast.success(
+      !isFavorite ? 
+        `Added ${style.name} to favorites` : 
+        `Removed ${style.name} from favorites`
+    );
   };
-  
-  const handleTogglePin = (e: React.MouseEvent) => {
-    e.stopPropagation();
+
+  const togglePin = () => {
     setIsPinned(!isPinned);
-    toast.success(!isPinned ? "Style pinned successfully" : "Style unpinned");
+    toast.success(
+      !isPinned ? 
+        `Pinned ${style.name} to top` : 
+        `Unpinned ${style.name}`
+    );
   };
-  
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toast.success("Style deleted");
-    // In a real app, you would call an API to delete the style
+
+  const handleDelete = () => {
+    toast.success(`Deleted ${style.name}`);
   };
-  
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(`/dashboard/library?tab=create&edit=${style.id}`);
-  };
-  
+
   const handleUseStyle = () => {
-    navigate("/dashboard/content/create", { 
-      state: { selectedStyle: style.id }
-    });
-    toast.success(`Using style: ${style.name}`);
-  };
-  
-  const handleChatWithVoice = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toast.info("Premium feature: Chat with this voice");
-    // In a real app, this would open a chat interface or show upgrade modal
-  };
-  
-  // Get initials for avatar fallback
-  const getInitials = (name: string) => {
-    return name.charAt(0).toUpperCase();
-  };
-  
-  // Format the date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", { 
-      month: "short", 
-      day: "numeric", 
-      year: "numeric" 
+    toast.success(`Using ${style.name} style`);
+    navigate('/dashboard/content?step=canvas', { 
+      state: { selectedStyle: style } 
     });
   };
 
+  const handleChatAbout = () => {
+    toast.success(`Opening chat about ${style.name}`);
+  };
+
+  const handleConvertToStyle = () => {
+    navigate('/dashboard/library?tab=create', { 
+      state: { 
+        convertFromInspiration: true,
+        inspirationData: style 
+      }
+    });
+    toast.success(`Converting ${style.name} to style`);
+  };
+
   return (
-    <CardContainer className="hover:border-primary-400/40 transition-all cursor-pointer">
-      <div>
-        {/* Card header with avatar and actions */}
-        <div className="flex justify-between items-start mb-3">
-          <div className="flex items-center gap-3">
-            {style.source === "creator" && style.creatorAvatar ? (
-              <Avatar className="h-10 w-10 border border-white/10">
-                <AvatarImage src={style.creatorAvatar} alt={style.creatorName} />
-                <AvatarFallback>{getInitials(style.creatorName)}</AvatarFallback>
-              </Avatar>
-            ) : (
-              <div className="h-10 w-10 rounded-full bg-primary-500/30 flex items-center justify-center border border-primary-500/50">
-                <span className="font-medium text-primary-400">{getInitials(style.name)}</span>
-              </div>
-            )}
-            
-            <div>
-              <h3 className="text-white font-medium">{style.name}</h3>
-              <p className="text-white/60 text-xs">
-                {style.source === "creator" ? `From ${style.creatorHandle || style.creatorName}` : "Created by you"}
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10"
-              onClick={handleToggleFavorite}
-              title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-            >
-              {isFavorite ? <Heart className="h-4 w-4 text-red-500" /> : <HeartOff className="h-4 w-4" />}
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10"
-              onClick={handleTogglePin}
-              title={isPinned ? "Unpin style" : "Pin style"}
-            >
-              {isPinned ? <Pin className="h-4 w-4 text-primary-400" /> : <PinOff className="h-4 w-4" />}
-            </Button>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10"
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-[#1A1F2C] border-white/10 text-white">
-                <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
-                  <Pencil className="h-4 w-4 mr-2" />
-                  Edit style
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem onClick={handleDelete} className="cursor-pointer text-red-500 focus:text-red-500">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete style
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-        
-        {/* Card content */}
+    <CardContainer className="bg-black/20 border-white/10 p-0 overflow-hidden">
+      {/* Card Header */}
+      <div className="p-4 border-b border-white/10 flex justify-between items-center">
         <div>
-          {style.description && (
-            <p className="text-sm text-white/80 mb-3">{style.description}</p>
-          )}
-          
-          <div className="flex flex-wrap gap-1 mb-3">
-            {style.tone.map((tone, index) => (
-              <Badge key={index} variant="secondary" className="bg-white/10 text-white/80 border-none">
-                {tone}
-              </Badge>
-            ))}
-            
-            {style.isTemplate && (
-              <Badge variant="outline" className="bg-primary-500/20 text-primary-400 border-none">
-                Template
-              </Badge>
+          <h3 className="font-medium text-white">{style.name}</h3>
+          <div className="flex items-center text-sm text-white/60 mt-1">
+            {style.source === "creator" ? (
+              <>
+                <img
+                  src={style.creatorAvatar || "/placeholder.svg"}
+                  alt={style.creatorName}
+                  className="w-5 h-5 rounded-full mr-1"
+                />
+                <span>{style.creatorHandle || style.creatorName}</span>
+              </>
+            ) : style.isSavedInspiration ? (
+              <span>Saved Inspiration</span>
+            ) : (
+              <span>Created by you</span>
             )}
           </div>
-          
-          {/* Example preview */}
-          <div className="bg-black/20 border border-white/5 rounded-md p-3 my-3">
-            <p className="text-sm text-white/80 italic">"{style.example}"</p>
-          </div>
         </div>
-        
-        {/* Card footer */}
-        <div className="flex items-center justify-between mt-4">
-          <div className="text-xs text-white/40">
-            Saved on {formatDate(style.date)}
-          </div>
-          
+
+        <div className="flex items-center space-x-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-white/60 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
+            onClick={toggleFavorite}
+          >
+            <Heart
+              className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`}
+            />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-white/60 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
+            onClick={togglePin}
+          >
+            <Pin
+              className={`h-4 w-4 ${isPinned ? "text-primary-500" : ""}`}
+            />
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white/60 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-56 bg-[#1A1F2C] border-white/10 text-white"
+              align="end"
+              forceMount
+            >
+              <DropdownMenuLabel>{style.name}</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuGroup>
+                <DropdownMenuItem onClick={handleUseStyle}>
+                  <Copy className="mr-2 h-4 w-4" />
+                  <span>Use this style</span>
+                </DropdownMenuItem>
+                
+                {style.isSavedInspiration && (
+                  <DropdownMenuItem onClick={handleConvertToStyle}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    <span>Convert to Style</span>
+                  </DropdownMenuItem>
+                )}
+                
+                <DropdownMenuItem onClick={handleChatAbout}>
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  <span>{style.isSavedInspiration ? 'Chat about this' : 'Chat with this voice'}</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem>
+                  <Edit className="mr-2 h-4 w-4" />
+                  <span>Edit</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem>
+                  <Share className="mr-2 h-4 w-4" />
+                  <span>Share</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator className="bg-white/10" />
+                
+                <DropdownMenuItem onClick={handleDelete} className="text-red-500 focus:text-red-500">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  <span>Delete</span>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* Card Content */}
+      <div className="p-4 space-y-3">
+        {style.description && (
+          <p className="text-sm text-white/70">{style.description}</p>
+        )}
+
+        <ScrollArea className="h-28 w-full rounded-md border border-white/10 p-3 bg-black/30">
+          <p className="text-sm whitespace-pre-wrap">{style.example}</p>
+        </ScrollArea>
+
+        <div className="flex flex-wrap gap-2">
+          {style.tone.map((tag) => (
+            <Badge
+              key={tag}
+              className="bg-primary-500/20 text-primary-400 border-none"
+            >
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      </div>
+
+      {/* Card Footer */}
+      <div className="border-t border-white/10 p-3 bg-black/20 flex items-center justify-between">
+        <div className="text-xs text-white/50">
+          {style.isTemplate ? "Template" : "Style"} • {style.folder}
+        </div>
+
+        {style.isSavedInspiration ? (
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="bg-transparent hover:bg-white/10"
-              onClick={handleChatWithVoice}
+              className="h-8 bg-transparent border-white/20"
+              onClick={handleConvertToStyle}
             >
-              <MessageSquare className="h-3.5 w-3.5 mr-1" />
-              Chat with Voice
+              <Edit className="h-3.5 w-3.5 mr-1" />
+              Convert to Style
             </Button>
-            
             <Button
               size="sm"
-              className="bg-primary-500 hover:bg-primary-600"
+              className="h-8 bg-primary-500 hover:bg-primary-600"
               onClick={handleUseStyle}
             >
-              Use This Style
+              Use in Post
             </Button>
           </div>
-        </div>
+        ) : (
+          <Button
+            size="sm"
+            className="h-8 bg-primary-500 hover:bg-primary-600"
+            onClick={handleUseStyle}
+          >
+            Use This Style
+          </Button>
+        )}
       </div>
     </CardContainer>
   );
