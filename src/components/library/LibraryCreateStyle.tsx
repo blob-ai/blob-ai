@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -8,12 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   File, FileText, MessageSquare, Save, Settings, Sparkles, 
-  RefreshCw, Sliders, X, CheckCircle, Send, Layout, Type
+  RefreshCw, X, CheckCircle, Send, Layout, Type, ArrowLeft
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
 
 const stepTitles = [
   "Name your style",
@@ -220,17 +221,73 @@ const LibraryCreateStyle: React.FC = () => {
     toast.success("Generated new preview examples");
   };
   
-  const handleSaveStyle = () => {
-    toast.success(`${creationType === 'style' ? 'Style' : 'Template'} saved successfully!`);
+  const handleSaveStyle = async () => {
+    try {
+      // Prepare the style data
+      const styleData = {
+        name: styleName,
+        description: description,
+        tone: selectedTones,
+        format: selectedFormats,
+        example: previewExamples[0] || "",
+        creator_name: "You",
+        is_template: creationType === "template",
+        folder_id: null, // Will be set to default folder later
+        source: "user",
+        created_by: creationMethod || "user"
+      };
+      
+      // Get the default folder based on the style type
+      const folderName = creationType === "template" ? "Templates" : "Personal";
+      const { data: folderData, error: folderError } = await supabase
+        .from('style_folders')
+        .select('id')
+        .eq('name', folderName)
+        .single();
+      
+      if (folderError && folderError.code !== 'PGRST116') {
+        throw folderError;
+      }
+      
+      // Insert the style
+      const { data, error } = await supabase
+        .from('styles')
+        .insert({
+          ...styleData,
+          folder_id: folderData?.id || null
+        })
+        .select();
+      
+      if (error) throw error;
+      
+      toast.success(`${creationType === 'style' ? 'Style' : 'Template'} saved successfully!`);
+      
+      // Navigate back to the styles library
+      // This would be handled by the parent component's router
+    } catch (error) {
+      console.error('Error saving style:', error);
+      toast.error(`Failed to save ${creationType}. Please try again.`);
+    }
   };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Step indicator */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between max-w-2xl mx-auto">
+      {/* Back button and step indicator */}
+      <div className="flex items-center mb-6">
+        {step > 1 && (
+          <Button
+            variant="ghost"
+            onClick={handleBack}
+            className="mr-auto text-white/70 hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+        )}
+        
+        <div className="flex items-center mx-auto">
           {stepTitles.map((title, idx) => (
-            <div key={idx} className="flex flex-col items-center">
+            <div key={idx} className="flex flex-col items-center mx-4">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
                 idx + 1 === step ? "bg-[#3260ea]" : 
                 idx + 1 < step ? "bg-[#3260ea]/50" : "bg-[#1E2431]"
@@ -243,6 +300,9 @@ const LibraryCreateStyle: React.FC = () => {
             </div>
           ))}
         </div>
+        
+        {/* Spacer for alignment */}
+        {step > 1 && <div className="ml-auto w-[73px]"></div>}
       </div>
 
       {/* Content area */}
@@ -426,7 +486,17 @@ const LibraryCreateStyle: React.FC = () => {
                           </div>
                         </div>
                       ))}
-                      {/* ... keep existing code (isAnalyzing spinner) */}
+                      {isAnalyzing && (
+                        <div className="flex justify-start">
+                          <div className="bg-[#1E2431] p-3 rounded-lg border border-white/10 flex items-center">
+                            <div className="flex space-x-1">
+                              <div className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+                              <div className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                              <div className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       <div ref={chatEndRef}></div>
                     </div>
                   </div>
@@ -456,7 +526,39 @@ const LibraryCreateStyle: React.FC = () => {
                   
                   {/* Chat Suggestions */}
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {/* ... keep existing code (chat suggestion buttons) */}
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="bg-transparent border-white/20 text-xs"
+                      onClick={() => {
+                        setCurrentMessage("I want a bold, direct style for business advice");
+                        setTimeout(() => sendChatMessage(), 100);
+                      }}
+                    >
+                      Business advice style
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="bg-transparent border-white/20 text-xs"
+                      onClick={() => {
+                        setCurrentMessage("I want an educational style with clear explanations");
+                        setTimeout(() => sendChatMessage(), 100);
+                      }}
+                    >
+                      Educational style
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="bg-transparent border-white/20 text-xs"
+                      onClick={() => {
+                        setCurrentMessage("I want to tell engaging stories");
+                        setTimeout(() => sendChatMessage(), 100);
+                      }}
+                    >
+                      Storytelling style
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -559,16 +661,6 @@ const LibraryCreateStyle: React.FC = () => {
                       </ScrollArea>
                     </div>
                   </div>
-                  
-                  {/* Tone Sliders (if tones are selected) */}
-                  {selectedTones.length > 0 && (
-                    <div className="mb-4">
-                      <label className="text-sm text-white/70 block mb-2">Tone Adjustments</label>
-                      <div className="space-y-4">
-                        {/* ... keep existing code (tone sliders) */}
-                      </div>
-                    </div>
-                  )}
                   
                   <div className="text-center py-1 mt-auto">
                     <Button 
@@ -717,17 +809,8 @@ const LibraryCreateStyle: React.FC = () => {
         </ScrollArea>
       </CardContainer>
       
-      {/* Navigation buttons */}
-      <div className="flex justify-between mt-6">
-        <Button
-          variant="outline"
-          onClick={handleBack}
-          disabled={step === 1}
-          className="bg-transparent border-white/20 hover:bg-white/5"
-        >
-          Back
-        </Button>
-        
+      {/* Navigation button */}
+      <div className="flex justify-end mt-6">
         {step < stepTitles.length ? (
           <Button
             onClick={handleNext}
