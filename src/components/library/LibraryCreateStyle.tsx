@@ -196,7 +196,8 @@ const LibraryCreateStyle: React.FC = () => {
             Back
           </Button>
         ) : (
-          <div></div> {/* Empty placeholder for alignment */}
+          // Empty placeholder for alignment - Fixed the syntax error here
+          <div></div>
         )}
         
         <div className="flex items-center gap-2">
@@ -218,7 +219,7 @@ const LibraryCreateStyle: React.FC = () => {
           ))}
         </div>
         
-        <div className="w-20"></div> {/* Empty placeholder for alignment */}
+        <div className="w-20"></div>
       </div>
 
       {/* Step 1: Enter Example */}

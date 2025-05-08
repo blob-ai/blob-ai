@@ -67,7 +67,7 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
 
         <Button
           onClick={handleViewCreator}
-          className="w-full bg-[#3260ea] hover:bg-[#2853c6]"
+          className="w-full bg-[#1EAEDB] hover:bg-[#0FA0CE]"
         >
           <Sparkles className="h-4 w-4 mr-2" />
           View Styles
