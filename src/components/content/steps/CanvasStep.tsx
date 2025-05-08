@@ -12,6 +12,12 @@ interface CanvasStepProps {
     title: string;
     category: string;
   } | null;
+  selectedStyle?: {
+    id: string;
+    name: string;
+    source: "user" | "creator";
+    tone: string[];
+  } | null;
 }
 
 const CanvasStep: React.FC<CanvasStepProps> = ({
@@ -21,6 +27,7 @@ const CanvasStep: React.FC<CanvasStepProps> = ({
   onSchedule,
   contentGoal,
   selectedIdea,
+  selectedStyle,
 }) => {
   const [content, setContent] = useState(initialContent);
 
@@ -35,6 +42,7 @@ const CanvasStep: React.FC<CanvasStepProps> = ({
         buttonColor="#3260ea" // Updated to match sidebar button blue
         contentGoal={contentGoal}
         selectedIdea={selectedIdea}
+        selectedStyle={selectedStyle}
       />
     </div>
   );

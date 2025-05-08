@@ -1,10 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { CardContainer } from "@/components/ui/card-container";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { BookmarkCheck, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface Creator {
   id: string;
@@ -23,9 +25,20 @@ interface CreatorCardProps {
 
 const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
   const navigate = useNavigate();
+  const [isSaved, setIsSaved] = useState(false);
   
   const handleCardClick = () => {
     navigate(`/dashboard/library/creator/${creator.id}`);
+  };
+
+  const handleSaveStyle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsSaved(!isSaved);
+    if (!isSaved) {
+      toast.success(`${creator.name}'s style saved to My Styles`);
+    } else {
+      toast.info(`${creator.name}'s style removed from My Styles`);
+    }
   };
 
   // Get first letter of name for avatar fallback
@@ -33,8 +46,8 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
     return name.charAt(0).toUpperCase();
   };
 
-  // Get tone badges - limit to first 2
-  const tones = creator.tone.split(', ').slice(0, 2);
+  // Get tone badges - limit to first 3
+  const tones = creator.tone.split(', ').slice(0, 3);
 
   return (
     <CardContainer 
@@ -62,16 +75,37 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
 
         <p className="mt-3 text-sm text-white/80 flex-grow">{creator.summary}</p>
 
-        <div className="mt-4 flex items-center justify-between">
-          <div className="flex gap-2">
+        <div className="mt-3">
+          <div className="flex flex-wrap gap-1 mb-3">
             {tones.map((tone, index) => (
               <Badge key={index} variant="secondary" className="bg-white/10 text-white/80 border-none">
                 {tone}
               </Badge>
             ))}
           </div>
-          <Button variant="ghost" size="sm" className="text-primary-400 hover:bg-primary-400/10">
-            View
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="bg-transparent"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/dashboard/library/creator/${creator.id}`);
+            }}
+          >
+            <Eye className="h-4 w-4 mr-1" />
+            Preview
+          </Button>
+          <Button 
+            variant={isSaved ? "secondary" : "default"}
+            size="sm" 
+            className={isSaved ? "bg-white/10" : "bg-primary-500 hover:bg-primary-600"}
+            onClick={handleSaveStyle}
+          >
+            <BookmarkCheck className="h-4 w-4 mr-1" />
+            {isSaved ? "Saved" : "Save to My Styles"}
           </Button>
         </div>
       </div>
