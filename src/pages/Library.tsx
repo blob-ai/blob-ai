@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { PageContainer } from "@/components/ui/page-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,18 +5,16 @@ import LibraryDiscover from "@/components/library/LibraryDiscover";
 import LibraryMyVault from "@/components/library/LibraryMyVault";
 import LibraryStyleLab from "@/components/library/LibraryStyleLab";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
 const Library = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "discover";
   const navigate = useNavigate();
-
   const handleTabChange = (value: string) => {
-    setSearchParams({ tab: value });
+    setSearchParams({
+      tab: value
+    });
   };
-
-  return (
-    <div className="flex flex-col w-full h-full">
+  return <div className="flex flex-col w-full h-full">
       {/* Library Header */}
       <div className="border-b border-white/10 bg-background sticky top-0 z-10">
         <div className="px-4 py-6 max-w-[1200px] mx-auto">
@@ -31,17 +28,10 @@ const Library = () => {
       </div>
 
       <PageContainer className="flex flex-col flex-grow overflow-hidden">
-        <Tabs
-          defaultValue="discover"
-          value={activeTab}
-          onValueChange={handleTabChange}
-          className="w-full h-full flex flex-col"
-        >
+        <Tabs defaultValue="discover" value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
           <div className="flex justify-center mb-6">
             <TabsList className="bg-black/20 border border-white/10 p-1">
-              <TabsTrigger value="discover" className="px-8">
-                Discover
-              </TabsTrigger>
+              <TabsTrigger value="discover" className="px-8">Inspiration</TabsTrigger>
               <TabsTrigger value="vault" className="px-8">
                 My Vault
               </TabsTrigger>
@@ -64,8 +54,6 @@ const Library = () => {
           </TabsContent>
         </Tabs>
       </PageContainer>
-    </div>
-  );
+    </div>;
 };
-
 export default Library;
