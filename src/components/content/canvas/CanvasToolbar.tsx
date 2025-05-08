@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
@@ -30,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { ActionButton } from "@/components/ui/action-button";
 import { Separator } from "@/components/ui/separator";
 import ContentPreviewModal from "./ContentPreviewModal";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CanvasToolbarProps {
   onToggleMobileView: () => void;
@@ -65,6 +65,7 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
   currentPlatformView
 }) => {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const isMobile = useIsMobile();
   
   const platformIcons = {
     default: <Eye className="h-4 w-4" />,
@@ -89,8 +90,8 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
   ];
 
   return (
-    <div className="flex items-center justify-between p-3 border-b border-white/10 bg-[#0a0b0e]">
-      <div className="flex items-center space-x-2">
+    <div className="flex items-center justify-between p-2 sm:p-3 border-b border-white/10 bg-[#0a0b0e] flex-wrap gap-2">
+      <div className="flex items-center flex-wrap gap-1 sm:gap-2">
         {/* Group 1: Text Formatting Options */}
         <div className="flex items-center">
           {formatOptions.map((option) => (
@@ -98,7 +99,7 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
               key={option.id}
               variant="ghost"
               size="sm"
-              className="text-white/70 hover:text-white hover:bg-white/5 h-8 px-2.5"
+              className="text-white/70 hover:text-white hover:bg-white/5 h-8 px-2"
               onClick={() => onFormat(option.id)}
               title={option.id.charAt(0).toUpperCase() + option.id.slice(1)}
             >
@@ -107,40 +108,40 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           ))}
         </div>
 
-        <Separator orientation="vertical" className="h-6 mx-2 bg-white/10" />
+        <Separator orientation="vertical" className="h-6 mx-1 sm:mx-2 bg-white/10 hidden sm:block" />
         
         {/* Group 2: Content Operations */}
         <Button 
           variant="ghost" 
           size="sm" 
-          className="text-white/70 hover:text-white hover:bg-white/5 h-8"
+          className="text-white/70 hover:text-white hover:bg-white/5 h-8 px-2 sm:px-2.5"
           onClick={() => {
             toast.info("Image upload feature coming soon");
           }}
         >
-          <Image className="h-4 w-4 mr-1" />
-          <span className="text-sm">Image</span>
+          <Image className="h-4 w-4 sm:mr-1" />
+          <span className="text-xs sm:text-sm hidden sm:inline">Image</span>
         </Button>
         
         {/* Preview Button - now opens the modal */}
         <Button 
           variant="ghost" 
           size="sm" 
-          className="text-white/70 hover:text-white hover:bg-white/5 h-8"
+          className="text-white/70 hover:text-white hover:bg-white/5 h-8 px-2 sm:px-2.5"
           onClick={() => setShowPreviewModal(true)}
         >
-          <Eye className="h-4 w-4 mr-1" />
-          <span className="text-sm">Preview</span>
+          <Eye className="h-4 w-4 sm:mr-1" />
+          <span className="text-xs sm:text-sm hidden sm:inline">Preview</span>
         </Button>
         
-        <Separator orientation="vertical" className="h-6 mx-2 bg-white/10" />
+        <Separator orientation="vertical" className="h-6 mx-1 sm:mx-2 bg-white/10 hidden sm:block" />
         
         {/* Group 3: AI Assistant Toggle - More prominent */}
         <Button
           variant={showChatPanel ? "default" : "outline"}
           size="sm"
           className={cn(
-            "h-8",
+            "h-8 px-2 sm:px-2.5",
             showChatPanel 
               ? "bg-blue-600 hover:bg-blue-500 text-white" 
               : "border-white/10 text-white/70 hover:bg-white/5 hover:text-white"
@@ -149,44 +150,44 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
         >
           {showChatPanel ? (
             <>
-              <EyeOff className="h-4 w-4 mr-1" />
-              <span className="text-sm">Hide AI</span>
+              <EyeOff className="h-4 w-4 sm:mr-1" />
+              <span className="text-xs sm:text-sm hidden sm:inline">Hide AI</span>
             </>
           ) : (
             <>
-              <Eye className="h-4 w-4 mr-1" />
-              <span className="text-sm">Show AI</span>
+              <Eye className="h-4 w-4 sm:mr-1" />
+              <span className="text-xs sm:text-sm hidden sm:inline">Show AI</span>
             </>
           )}
         </Button>
         
-        <Separator orientation="vertical" className="h-6 mx-2 bg-white/10" />
+        <Separator orientation="vertical" className="h-6 mx-1 sm:mx-2 bg-white/10 hidden sm:block" />
         
         {/* Group 4: Tools */}
         <Button
           variant="ghost"
           size="sm"
-          className="text-white/70 hover:text-white hover:bg-white/5 h-8"
+          className="text-white/70 hover:text-white hover:bg-white/5 h-8 px-2 sm:px-2.5"
           onClick={onToggleHistory}
         >
-          <History className="h-4 w-4 mr-1" />
-          <span className="text-sm">History</span>
+          <History className="h-4 w-4 sm:mr-1" />
+          <span className="text-xs sm:text-sm hidden sm:inline">History</span>
         </Button>
         
         <Button
           variant="ghost"
           size="sm"
-          className="text-white/70 hover:text-white hover:bg-white/5 h-8"
+          className="text-white/70 hover:text-white hover:bg-white/5 h-8 px-2 sm:px-2.5"
           onClick={onShowKeyboardShortcuts}
         >
-          <Keyboard className="h-4 w-4 mr-1" />
-          <span className="text-sm">Shortcuts</span>
+          <Keyboard className="h-4 w-4 sm:mr-1" />
+          <span className="text-xs sm:text-sm hidden sm:inline">Shortcuts</span>
         </Button>
       </div>
       
       {/* Group 5: Save, Schedule, Publish - Right Side */}
-      <div className="flex items-center gap-3">
-        <div className="text-xs text-white/50 mr-1">
+      <div className="flex items-center gap-1 sm:gap-3">
+        <div className="text-xs text-white/50 mr-0 sm:mr-1 hidden sm:block">
           {isSaving ? (
             <span>Saving...</span>
           ) : lastSaved ? (
@@ -199,7 +200,7 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           size="sm" 
           className="border-white/10 hover:bg-white/5 h-8"
           icon={<Save className="h-4 w-4" />}
-          label="Save Draft"
+          label={isMobile ? "Save" : "Save Draft"}
           onClick={handleAutoSave}
         />
         
@@ -208,13 +209,13 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           size="sm" 
           className="border-white/10 hover:bg-white/5 h-8"
           icon={<Calendar className="h-4 w-4" />}
-          label="Schedule"
+          label={isMobile ? "Schedule" : "Schedule"}
           onClick={() => onSchedule(content, new Date())}
         />
         
         <ActionButton 
           size="sm" 
-          className="bg-blue-600 hover:bg-blue-500 text-white h-8 px-5"
+          className="bg-blue-600 hover:bg-blue-500 text-white h-8 px-3 sm:px-5"
           label="Publish"
           onClick={() => onPublish(content)}
         />

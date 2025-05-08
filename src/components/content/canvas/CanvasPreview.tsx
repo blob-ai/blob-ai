@@ -2,6 +2,7 @@
 import React from "react";
 import { Twitter, Linkedin, Facebook } from "lucide-react";
 import { marked } from "marked";
+import { cn } from "@/lib/utils";
 
 interface CanvasPreviewProps {
   content: string;
@@ -44,21 +45,36 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   
   const formattedContent = getFormattedContent();
   
+  // Platform icon components
+  const getPlatformIcon = () => {
+    switch(platform) {
+      case "twitter":
+        return <Twitter className="h-4 w-4 md:h-5 md:w-5 text-blue-400" />;
+      case "linkedin":
+        return <Linkedin className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />;
+      case "facebook":
+        return <Facebook className="h-4 w-4 md:h-5 md:w-5 text-blue-500" />;
+      default:
+        return null;
+    }
+  };
+  
   return (
-    <div className="relative">
+    <div className="relative w-full">
       {/* Platform Header */}
       {platform !== "default" && (
-        <div className="py-3 px-4 border border-white/10 rounded-t-lg bg-black/20 flex items-center justify-between">
+        <div className="py-2 px-3 md:py-3 md:px-4 border border-white/10 rounded-t-lg bg-black/20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {platform === "twitter" && <Twitter className="h-5 w-5 text-blue-400" />}
-            {platform === "linkedin" && <Linkedin className="h-5 w-5 text-blue-600" />}
-            {platform === "facebook" && <Facebook className="h-5 w-5 text-blue-500" />}
-            <span className="font-medium capitalize">{platform}</span>
-            <div className="h-5 w-px bg-white/10 mx-2"></div>
-            <span className="text-sm text-white/60">Preview</span>
+            {getPlatformIcon()}
+            <span className="font-medium text-sm md:text-base capitalize">{platform}</span>
+            <div className="h-4 md:h-5 w-px bg-white/10 mx-2"></div>
+            <span className="text-xs md:text-sm text-white/60">Preview</span>
           </div>
           
-          <div className={`text-sm ${isOverLimit ? 'text-red-500' : 'text-white/60'}`}>
+          <div className={cn(
+            "text-xs md:text-sm", 
+            isOverLimit ? 'text-red-500' : 'text-white/60'
+          )}>
             {charCount}/{limit} characters
           </div>
         </div>
@@ -66,15 +82,18 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
       
       {/* Content Preview */}
       <div 
-        className={`px-6 py-4 bg-[#16181c] border border-white/10 ${platform !== "default" ? 'rounded-b-lg' : 'rounded-lg'}`}
+        className={cn(
+          "px-3 py-3 md:px-6 md:py-4 bg-[#16181c] border border-white/10",
+          platform !== "default" ? 'rounded-b-lg' : 'rounded-lg'
+        )}
       >
         {isOverLimit && platform !== "default" ? (
           <div>
             <div 
-              className="prose prose-invert max-w-full"
+              className="prose prose-invert max-w-full text-sm md:text-base"
               dangerouslySetInnerHTML={{ __html: marked(formattedContent) }}
             />
-            <div className="mt-3 py-2 px-3 bg-red-500/10 border border-red-500/30 rounded-md text-sm">
+            <div className="mt-3 py-2 px-3 bg-red-500/10 border border-red-500/30 rounded-md text-xs md:text-sm">
               <span className="font-medium text-red-400">Character limit exceeded</span>
               <p className="text-red-300/80 mt-1">
                 Your content exceeds the {platform} character limit of {limit} characters. 
@@ -88,58 +107,58 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
             {platform === "twitter" ? (
               <div>
                 {/* Profile bar - simplified version */}
-                <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/10">
-                  <div className="h-10 w-10 rounded-full bg-white/20"></div>
+                <div className="flex items-center gap-2 md:gap-3 mb-3 pb-2 md:mb-4 md:pb-3 border-b border-white/10">
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-white/20"></div>
                   <div>
-                    <div className="font-medium">User Name</div>
-                    <div className="text-sm text-white/60">@username</div>
+                    <div className="font-medium text-sm md:text-base">User Name</div>
+                    <div className="text-xs md:text-sm text-white/60">@username</div>
                   </div>
                 </div>
                 <div 
-                  className="prose prose-invert max-w-full"
+                  className="prose prose-invert max-w-full text-sm md:text-base"
                   dangerouslySetInnerHTML={{ __html: marked(formattedContent) }}
                 />
               </div>
             ) : platform === "linkedin" ? (
               <div>
                 {/* Profile bar - simplified version */}
-                <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/10">
-                  <div className="h-10 w-10 rounded-full bg-white/20"></div>
+                <div className="flex items-center gap-2 md:gap-3 mb-3 pb-2 md:mb-4 md:pb-3 border-b border-white/10">
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-white/20"></div>
                   <div>
-                    <div className="font-medium">User Name</div>
-                    <div className="text-sm text-white/60">Professional Title</div>
+                    <div className="font-medium text-sm md:text-base">User Name</div>
+                    <div className="text-xs md:text-sm text-white/60">Professional Title</div>
                   </div>
                 </div>
                 <div 
-                  className="prose prose-invert max-w-full"
+                  className="prose prose-invert max-w-full text-sm md:text-base"
                   dangerouslySetInnerHTML={{ __html: marked(formattedContent) }}
                 />
               </div>
             ) : platform === "facebook" ? (
               <div>
                 {/* Profile bar - simplified version */}
-                <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/10">
-                  <div className="h-10 w-10 rounded-full bg-white/20"></div>
+                <div className="flex items-center gap-2 md:gap-3 mb-3 pb-2 md:mb-4 md:pb-3 border-b border-white/10">
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-white/20"></div>
                   <div>
-                    <div className="font-medium">User Name</div>
-                    <div className="text-sm text-white/60">Just now</div>
+                    <div className="font-medium text-sm md:text-base">User Name</div>
+                    <div className="text-xs md:text-sm text-white/60">Just now</div>
                   </div>
                 </div>
                 <div 
-                  className="prose prose-invert max-w-full"
+                  className="prose prose-invert max-w-full text-sm md:text-base"
                   dangerouslySetInnerHTML={{ __html: marked(formattedContent) }}
                 />
               </div>
             ) : (
               <div 
-                className="prose prose-invert max-w-full"
+                className="prose prose-invert max-w-full text-sm md:text-base"
                 dangerouslySetInnerHTML={{ __html: marked(content) }}
               />
             )}
             
             {/* Engagement indicators */}
             {platform !== "default" && (
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/10 text-sm text-white/60">
+              <div className="flex items-center justify-between mt-3 pt-2 md:mt-4 md:pt-3 border-t border-white/10 text-xs md:text-sm text-white/60">
                 {platform === "twitter" && (
                   <>
                     <span>💬 0</span>
