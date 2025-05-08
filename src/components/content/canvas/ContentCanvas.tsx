@@ -25,6 +25,12 @@ interface ContentCanvasProps {
     title: string;
     category: string;
   } | null;
+  selectedStyle?: {
+    id: string;
+    name: string;
+    source: "user" | "creator";
+    tone: string[];
+  } | null;
 }
 
 const ContentCanvas: React.FC<ContentCanvasProps> = ({

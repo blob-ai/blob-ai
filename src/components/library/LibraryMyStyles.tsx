@@ -25,7 +25,7 @@ const SAMPLE_SAVED_STYLES = [
     isPinned: true,
     folder: "Inspiration",
     isTemplate: false,
-    source: "creator"
+    source: "creator" as const
   },
   {
     id: "p2",
@@ -41,7 +41,7 @@ const SAMPLE_SAVED_STYLES = [
     isPinned: false,
     folder: "Business",
     isTemplate: true,
-    source: "creator"
+    source: "creator" as const
   },
   {
     id: "p3",
@@ -57,7 +57,7 @@ const SAMPLE_SAVED_STYLES = [
     isPinned: true,
     folder: "Inspiration",
     isTemplate: false,
-    source: "creator"
+    source: "creator" as const
   },
   {
     id: "p4",
@@ -73,7 +73,7 @@ const SAMPLE_SAVED_STYLES = [
     isPinned: false,
     folder: "Personal",
     isTemplate: false,
-    source: "user"
+    source: "user" as const
   }
 ];
 
