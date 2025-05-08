@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { StyleFolder, Style, StyleUIObject } from '@/types/styles';
+import { StyleFolder, Style, StyleUIObject, StyleFolderInsert, StyleInsert } from '@/types/styles';
 import { toast } from 'sonner';
 
 export function useStyles() {
@@ -118,13 +118,15 @@ export function useStyles() {
     }
     
     try {
+      const folderData: StyleFolderInsert = {
+        name,
+        position: folders.length + 1,
+        user_id: userId
+      };
+      
       const { data, error } = await supabase
         .from('style_folders')
-        .insert({ 
-          name,
-          position: folders.length + 1,
-          user_id: userId
-        })
+        .insert(folderData)
         .select();
 
       if (error) throw new Error(error.message);
