@@ -1,9 +1,9 @@
 
 // Type definitions for styles and folders
-import type { Database as SupabaseDatabase } from "@/integrations/supabase/types";
+import type { Database } from "@/integrations/supabase/types";
 
 // Use the existing Database type from Supabase
-export type Tables = SupabaseDatabase['public']['Tables'];
+export type Tables = Database['public']['Tables'];
 
 // Define the StyleFolder type based on the database schema
 export type StyleFolder = Tables['style_folders']['Row'];
