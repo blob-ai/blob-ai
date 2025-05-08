@@ -53,29 +53,34 @@ const ResizablePanelsWrapper: React.FC<ResizablePanelsWrapperProps> = ({
 
   return (
     <div className="flex h-full w-full overflow-hidden relative">
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="h-full w-full rounded-lg"
-        onLayout={handleResizeEnd}
-      >
-        <ResizablePanel 
-          defaultSize={initialLeftSize} 
-          minSize={15}
-          maxSize={50}
-          className={cn(
-            "left-panel-container transition-all duration-300 ease-in-out",
-            collapsed ? "w-0 p-0 m-0 overflow-hidden" : ""
-          )}
-        >
-          {leftPanel}
-        </ResizablePanel>
-        
-        <ResizableHandle withHandle className={cn(collapsed ? "opacity-0 pointer-events-none" : "")} />
-        
-        <ResizablePanel defaultSize={initialRightSize}>
+      {collapsed ? (
+        // Render only the right panel in full width when collapsed
+        <div className="flex-1 h-full w-full transition-all duration-300 ease-in-out">
           {rightPanel}
-        </ResizablePanel>
-      </ResizablePanelGroup>
+        </div>
+      ) : (
+        // Use resizable panels when expanded
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="h-full w-full rounded-lg"
+          onLayout={handleResizeEnd}
+        >
+          <ResizablePanel 
+            defaultSize={initialLeftSize} 
+            minSize={15}
+            maxSize={50}
+            className="left-panel-container transition-all duration-300 ease-in-out"
+          >
+            {leftPanel}
+          </ResizablePanel>
+          
+          <ResizableHandle withHandle />
+          
+          <ResizablePanel defaultSize={initialRightSize}>
+            {rightPanel}
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      )}
       
       {collapsible && (
         <Button
