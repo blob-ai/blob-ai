@@ -1,18 +1,16 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { PageContainer } from "@/components/ui/page-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LibraryExploreStyles from "@/components/library/LibraryExploreStyles";
 import LibraryMyStyles from "@/components/library/LibraryMyStyles";
 import LibraryCreateStyle from "@/components/library/LibraryCreateStyle";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { RainbowButton } from "@/components/ui/rainbow-button";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Library = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "myStyles";
   const navigate = useNavigate();
-  const location = useLocation();
   
   const handleTabChange = (value: string) => {
     setSearchParams({
