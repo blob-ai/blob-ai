@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { 
   Image, 
@@ -29,6 +29,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ActionButton } from "@/components/ui/action-button";
 import { Separator } from "@/components/ui/separator";
+import ContentPreviewModal from "./ContentPreviewModal";
 
 interface CanvasToolbarProps {
   onToggleMobileView: () => void;
@@ -63,6 +64,8 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
   onChangePlatformView,
   currentPlatformView
 }) => {
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  
   const platformIcons = {
     default: <Eye className="h-4 w-4" />,
     twitter: <Twitter className="h-4 w-4" />,
@@ -119,59 +122,16 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           <span className="text-sm">Image</span>
         </Button>
         
-        {/* Platform View Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-white/70 hover:text-white hover:bg-white/5 h-8"
-            >
-              {platformIcons[currentPlatformView]}
-              <span className="text-sm ml-1">{platformLabels[currentPlatformView]}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="bg-[#16181c] border border-white/10 text-white">
-            <DropdownMenuLabel>Select Platform View</DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-white/10" />
-            <DropdownMenuItem 
-              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
-              onClick={() => {
-                onChangePlatformView("default");
-                onToggleMobileView();
-              }}
-            >
-              <Eye className="h-4 w-4" /> Standard Preview
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
-              onClick={() => {
-                onChangePlatformView("twitter");
-                onToggleMobileView();
-              }}
-            >
-              <Twitter className="h-4 w-4" /> Twitter
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
-              onClick={() => {
-                onChangePlatformView("linkedin");
-                onToggleMobileView();
-              }}
-            >
-              <Linkedin className="h-4 w-4" /> LinkedIn
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="flex items-center gap-2 cursor-pointer hover:bg-white/5"
-              onClick={() => {
-                onChangePlatformView("facebook");
-                onToggleMobileView();
-              }}
-            >
-              <Facebook className="h-4 w-4" /> Facebook
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Preview Button - now opens the modal */}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-white/70 hover:text-white hover:bg-white/5 h-8"
+          onClick={() => setShowPreviewModal(true)}
+        >
+          <Eye className="h-4 w-4 mr-1" />
+          <span className="text-sm">Preview</span>
+        </Button>
         
         <Separator orientation="vertical" className="h-6 mx-2 bg-white/10" />
         
@@ -259,6 +219,13 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           onClick={() => onPublish(content)}
         />
       </div>
+
+      {/* Preview Modal */}
+      <ContentPreviewModal
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        content={content}
+      />
     </div>
   );
 };

@@ -12,11 +12,6 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
   content,
   platform = "default"
 }) => {
-  // Convert markdown to HTML
-  const createMarkup = () => {
-    return { __html: marked(content) };
-  };
-  
   // Platform-specific character limits
   const characterLimits = {
     twitter: 280,
@@ -91,7 +86,15 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
           <div>
             {/* Platform-specific styling */}
             {platform === "twitter" ? (
-              <div className="font-medium text-lg">
+              <div>
+                {/* Profile bar - simplified version */}
+                <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/10">
+                  <div className="h-10 w-10 rounded-full bg-white/20"></div>
+                  <div>
+                    <div className="font-medium">User Name</div>
+                    <div className="text-sm text-white/60">@username</div>
+                  </div>
+                </div>
                 <div 
                   className="prose prose-invert max-w-full"
                   dangerouslySetInnerHTML={{ __html: marked(formattedContent) }}
@@ -99,6 +102,14 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
               </div>
             ) : platform === "linkedin" ? (
               <div>
+                {/* Profile bar - simplified version */}
+                <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/10">
+                  <div className="h-10 w-10 rounded-full bg-white/20"></div>
+                  <div>
+                    <div className="font-medium">User Name</div>
+                    <div className="text-sm text-white/60">Professional Title</div>
+                  </div>
+                </div>
                 <div 
                   className="prose prose-invert max-w-full"
                   dangerouslySetInnerHTML={{ __html: marked(formattedContent) }}
@@ -106,6 +117,14 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
               </div>
             ) : platform === "facebook" ? (
               <div>
+                {/* Profile bar - simplified version */}
+                <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/10">
+                  <div className="h-10 w-10 rounded-full bg-white/20"></div>
+                  <div>
+                    <div className="font-medium">User Name</div>
+                    <div className="text-sm text-white/60">Just now</div>
+                  </div>
+                </div>
                 <div 
                   className="prose prose-invert max-w-full"
                   dangerouslySetInnerHTML={{ __html: marked(formattedContent) }}
@@ -114,8 +133,36 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
             ) : (
               <div 
                 className="prose prose-invert max-w-full"
-                dangerouslySetInnerHTML={createMarkup()}
+                dangerouslySetInnerHTML={{ __html: marked(content) }}
               />
+            )}
+            
+            {/* Engagement indicators */}
+            {platform !== "default" && (
+              <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/10 text-sm text-white/60">
+                {platform === "twitter" && (
+                  <>
+                    <span>💬 0</span>
+                    <span>🔄 0</span>
+                    <span>❤️ 0</span>
+                    <span>📊 0</span>
+                  </>
+                )}
+                {platform === "linkedin" && (
+                  <>
+                    <span>👍 0</span>
+                    <span>💭 0</span>
+                    <span>🔄 0</span>
+                  </>
+                )}
+                {platform === "facebook" && (
+                  <>
+                    <span>👍 0</span>
+                    <span>💬 0</span>
+                    <span>↗️ 0</span>
+                  </>
+                )}
+              </div>
             )}
           </div>
         )}
