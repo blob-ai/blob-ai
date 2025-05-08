@@ -1,10 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { CardContainer } from "@/components/ui/card-container";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Sparkles, Twitter } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { BookmarkCheck, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface Creator {
   id: string;
@@ -23,56 +25,89 @@ interface CreatorCardProps {
 
 const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
   const navigate = useNavigate();
+  const [isSaved, setIsSaved] = useState(false);
   
-  const handleViewCreator = () => {
+  const handleCardClick = () => {
     navigate(`/dashboard/library/creator/${creator.id}`);
   };
 
+  const handleSaveStyle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsSaved(!isSaved);
+    if (!isSaved) {
+      toast.success(`${creator.name}'s style saved to My Styles`);
+    } else {
+      toast.info(`${creator.name}'s style removed from My Styles`);
+    }
+  };
+
+  // Get first letter of name for avatar fallback
+  const getInitials = (name: string) => {
+    return name.charAt(0).toUpperCase();
+  };
+
+  // Get tone badges - limit to first 3
+  const tones = creator.tone.split(', ').slice(0, 3);
+
   return (
-    <CardContainer className="bg-[#1e2431] border-white/10 p-0 overflow-hidden shadow-md hover:shadow-lg transition-all">
-      {/* Card Header */}
-      <div className="p-4 border-b border-white/10 flex items-center gap-3">
-        <img
-          src={creator.avatar || "/placeholder.svg"}
-          alt={creator.name}
-          className="w-12 h-12 rounded-full object-cover border border-white/20"
-        />
-        <div>
-          <h3 className="font-medium text-white">{creator.name}</h3>
-          <div className="flex items-center gap-2 text-sm text-white/70">
-            <Twitter className="h-3.5 w-3.5 text-blue-400" />
-            <span>{creator.handle}</span>
-            <span className="text-white/50">•</span>
-            <span>{creator.followers} followers</span>
+    <CardContainer 
+      className="hover:border-primary-400/50 transition-all cursor-pointer h-full"
+      onClick={handleCardClick}
+    >
+      <div className="flex flex-col h-full">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-12 w-12 border border-white/10">
+            <AvatarImage src={creator.avatar} alt={creator.name} />
+            <AvatarFallback>{getInitials(creator.name)}</AvatarFallback>
+          </Avatar>
+          <div>
+            <h3 className="text-white font-medium">{creator.name}</h3>
+            <p className="text-white/60 text-sm">{creator.handle}</p>
           </div>
         </div>
-      </div>
 
-      {/* Card Body */}
-      <div className="p-4">
-        <p className="text-sm text-white/80 mb-4">
-          {creator.summary}
-        </p>
-        
-        <div className="flex flex-wrap gap-2 mb-4">
-          <Badge className="bg-blue-500/20 text-blue-400 border-none">
+        <div className="mt-3 flex items-center justify-between">
+          <Badge variant="outline" className="bg-black/30 text-white/80 border-white/10">
             {creator.category}
           </Badge>
-          {creator.tone.split(", ").map((tone) => (
-            <Badge key={tone} className="bg-[#3260ea]/20 text-blue-400 border-none">
-              {tone}
-            </Badge>
-          ))}
+          <span className="text-sm text-white/60">{creator.followers} followers</span>
         </div>
 
-        <Button
-          onClick={handleViewCreator}
-          className="w-full bg-[#3260ea] hover:bg-[#2853c6]"
-        >
-          <Sparkles className="h-4 w-4 mr-2" />
-          View Styles
-          <ArrowRight className="h-4 w-4 ml-1" />
-        </Button>
+        <p className="mt-3 text-sm text-white/80 flex-grow">{creator.summary}</p>
+
+        <div className="mt-3">
+          <div className="flex flex-wrap gap-1 mb-3">
+            {tones.map((tone, index) => (
+              <Badge key={index} variant="secondary" className="bg-white/10 text-white/80 border-none">
+                {tone}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="bg-transparent"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/dashboard/library/creator/${creator.id}`);
+            }}
+          >
+            <Eye className="h-4 w-4 mr-1" />
+            Preview
+          </Button>
+          <Button 
+            variant={isSaved ? "secondary" : "default"}
+            size="sm" 
+            className={isSaved ? "bg-white/10" : "bg-primary-500 hover:bg-primary-600"}
+            onClick={handleSaveStyle}
+          >
+            <BookmarkCheck className="h-4 w-4 mr-1" />
+            {isSaved ? "Saved" : "Save to My Styles"}
+          </Button>
+        </div>
       </div>
     </CardContainer>
   );
