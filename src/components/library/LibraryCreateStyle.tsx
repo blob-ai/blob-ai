@@ -69,7 +69,7 @@ const LibraryCreateStyle: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { folders, refetch } = useStyles();
+  const { folders, userId, refetch } = useStyles();
   
   useEffect(() => {
     if (activeStep === 1 && exampleText && useAI) {
@@ -137,6 +137,11 @@ const LibraryCreateStyle: React.FC = () => {
       return;
     }
     
+    if (!userId) {
+      toast.error("You must be logged in to save styles");
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
@@ -156,7 +161,8 @@ const LibraryCreateStyle: React.FC = () => {
           is_template: false,
           is_favorite: false,
           is_pinned: false,
-          source: "user"
+          source: "user",
+          user_id: userId
         })
         .select();
       
@@ -487,7 +493,7 @@ const LibraryCreateStyle: React.FC = () => {
                 <Button
                   onClick={handleSaveStyle}
                   className="bg-[#3260ea] hover:bg-[#2853c6]"
-                  disabled={isSubmitting || !styleName.trim()}
+                  disabled={isSubmitting || !styleName.trim() || !userId}
                 >
                   {isSubmitting ? (
                     <>

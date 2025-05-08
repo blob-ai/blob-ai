@@ -9,6 +9,18 @@ export function useStyles() {
   const [styles, setStyles] = useState<StyleUIObject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Get current user ID
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data?.user) {
+        setUserId(data.user.id);
+      }
+    };
+    getCurrentUser();
+  }, []);
 
   const fetchFolders = async () => {
     try {
@@ -100,12 +112,18 @@ export function useStyles() {
   };
 
   const createFolder = async (name: string) => {
+    if (!userId) {
+      toast.error('You must be logged in to create folders');
+      return;
+    }
+    
     try {
       const { data, error } = await supabase
         .from('style_folders')
         .insert({ 
           name,
           position: folders.length + 1,
+          user_id: userId
         })
         .select();
 
@@ -149,6 +167,7 @@ export function useStyles() {
     styles,
     isLoading,
     error,
+    userId,
     refetch: fetchData,
     createFolder,
     deleteFolder

@@ -56,7 +56,7 @@ export type StyleUIObject = {
   isSavedInspiration?: boolean;
 };
 
-// Extend Database types to include our tables
+// Use referenced module augmentation instead of redeclaring
 declare module "@/integrations/supabase/types" {
   interface Database {
     public: {
