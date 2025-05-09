@@ -82,7 +82,7 @@ export const getContentIdeasByThemeAndCategories = async (
 };
 
 // User Content
-export const saveUserContent = async (content: Partial<UserContent>): Promise<UserContent> => {
+export const saveUserContent = async (content: Required<Pick<UserContent, "user_id" | "title" | "content">> & Partial<Omit<UserContent, "user_id" | "title" | "content">>): Promise<UserContent> => {
   const { data, error } = await supabase
     .from("user_content")
     .insert(content)
@@ -94,10 +94,10 @@ export const saveUserContent = async (content: Partial<UserContent>): Promise<Us
     throw new Error(error.message);
   }
   
-  return data;
+  return data as UserContent;
 };
 
-export const updateUserContent = async (id: string, updates: Partial<UserContent>): Promise<UserContent> => {
+export const updateUserContent = async (id: string, updates: Partial<Omit<UserContent, "id">>): Promise<UserContent> => {
   const { data, error } = await supabase
     .from("user_content")
     .update(updates)
@@ -110,7 +110,7 @@ export const updateUserContent = async (id: string, updates: Partial<UserContent
     throw new Error(error.message);
   }
   
-  return data;
+  return data as UserContent;
 };
 
 export const getUserContentById = async (id: string): Promise<UserContent | null> => {
@@ -128,10 +128,10 @@ export const getUserContentById = async (id: string): Promise<UserContent | null
     throw new Error(error.message);
   }
   
-  return data;
+  return data as UserContent;
 };
 
-export const getUserContentList = async (status?: string): Promise<UserContent[]> => {
+export const getUserContentList = async (status?: 'draft' | 'published' | 'scheduled'): Promise<UserContent[]> => {
   let query = supabase
     .from("user_content")
     .select("*")
@@ -148,7 +148,7 @@ export const getUserContentList = async (status?: string): Promise<UserContent[]
     throw new Error(error.message);
   }
   
-  return data || [];
+  return data as UserContent[];
 };
 
 // User Usage
@@ -163,7 +163,7 @@ export const getUserUsage = async (): Promise<UserUsage | null> => {
     throw new Error(error.message);
   }
   
-  return data;
+  return data as UserUsage | null;
 };
 
 export const initializeUserUsage = async (userId: string): Promise<UserUsage> => {
@@ -175,7 +175,7 @@ export const initializeUserUsage = async (userId: string): Promise<UserUsage> =>
     .maybeSingle();
   
   if (existingUsage) {
-    return existingUsage;
+    return existingUsage as UserUsage;
   }
   
   // Create new usage record
@@ -195,7 +195,7 @@ export const initializeUserUsage = async (userId: string): Promise<UserUsage> =>
     throw new Error(error.message);
   }
   
-  return data;
+  return data as UserUsage;
 };
 
 export const incrementUsageCounter = async (userId: string): Promise<UserUsage> => {
@@ -231,5 +231,5 @@ export const incrementUsageCounter = async (userId: string): Promise<UserUsage> 
     throw new Error(error.message);
   }
   
-  return data;
+  return data as UserUsage;
 };

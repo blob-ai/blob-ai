@@ -32,7 +32,7 @@ export interface ContentHook {
   author_credential: string | null;
   author_avatar: string | null;
   created_at: string;
-  author?: {
+  author: {
     name: string;
     avatar: string;
     credential: string;

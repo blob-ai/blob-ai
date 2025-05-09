@@ -6,10 +6,21 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { initializeUserUsage } from "@/services/contentService";
 
+interface UserProfile {
+  id: string;
+  username?: string;
+  full_name?: string;
+  avatar_url?: string;
+  plan_tier?: string;
+}
+
 type AuthContextType = {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isLoading: boolean; // Added to fix type error
+  profile: UserProfile | null; // Added to fix type error
+  refreshProfile: () => Promise<void>; // Added to fix type error
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -22,7 +33,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const navigate = useNavigate();
+
+  // Alias loading as isLoading for components that use that name
+  const isLoading = loading;
 
   useEffect(() => {
     // Set up the auth state listener
@@ -35,7 +50,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Initialize usage when user signs in
           setTimeout(() => {
             initializeUserUsage(session.user.id).catch(console.error);
+            fetchProfile(session.user.id);
           }, 0);
+        } else if (event === "SIGNED_OUT") {
+          setProfile(null);
         }
       }
     );
@@ -44,12 +62,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
       
       if (session?.user) {
         // Initialize usage if user is already signed in
         initializeUserUsage(session.user.id).catch(console.error);
+        fetchProfile(session.user.id);
       }
+      
+      setLoading(false);
     });
 
     return () => {
@@ -57,12 +77,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+      
+      setProfile(data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchProfile(user.id);
+    }
+  };
+
   const signIn = async (email: string, password: string) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       toast.success("Signed in successfully!");
-      navigate("/dashboard");
+      navigate("/dashboard/content");
     } catch (error: any) {
       toast.error(error.message || "Error signing in");
     }
@@ -94,6 +139,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         session,
         loading,
+        isLoading,
+        profile,
+        refreshProfile,
         signIn,
         signUp,
         signOut,

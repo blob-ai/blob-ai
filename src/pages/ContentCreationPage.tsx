@@ -53,9 +53,23 @@ const ContentCreationPageContent = () => {
         return (
           <IdeasGalleryStep
             theme={theme}
-            ideas={generatedIdeas}
+            ideas={generatedIdeas.map(idea => ({
+              id: idea.id,
+              title: idea.title,
+              category: idea.category,
+              hooks: idea.hooks?.map(hook => ({
+                id: hook.id,
+                text: hook.text,
+                author: hook.author,
+              }))
+            }))}
             onRefresh={() => handleThemeSubmit(theme, [], contentGoal)}
-            onCombinationSelect={handleCombinationSelect}
+            onCombinationSelect={(idea, hookId) => {
+              const originalIdea = generatedIdeas.find(i => i.id === idea.id);
+              if (originalIdea) {
+                handleCombinationSelect(originalIdea, hookId);
+              }
+            }}
             onToggleFavorite={(id) => 
               setFavorites(prev => 
                 prev.includes(id) 
@@ -78,7 +92,10 @@ const ContentCreationPageContent = () => {
             onSaveDraft={handleSaveDraft}
             onSchedule={handleSchedule}
             contentGoal={contentGoal}
-            selectedIdea={selectedIdea}
+            selectedIdea={selectedIdea ? {
+              title: selectedIdea.title,
+              category: selectedIdea.category
+            } : null}
           />
         );
         
