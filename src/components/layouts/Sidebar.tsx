@@ -31,14 +31,14 @@ const Sidebar = () => {
     },
     {
       name: "Dashboard",
-      path: "/dashboard/dashboard",
+      path: "/dashboard",
       icon: <LayoutDashboard className="h-6 w-6" />,
       exact: true,
       hasAction: false
     },
     {
       name: "Styles",
-      path: "/dashboard/library",
+      path: "/dashboard/styles",
       icon: <Palette className="h-6 w-6" />,
       exact: true,
       hasAction: false
