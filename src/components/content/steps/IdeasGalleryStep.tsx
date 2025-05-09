@@ -11,7 +11,6 @@ interface IdeasGalleryStepProps {
   favorites: string[];
   usageCount: number;
   maxUsage: number;
-  isLoading?: boolean;
 }
 
 const IdeasGalleryStep: React.FC<IdeasGalleryStepProps> = ({
@@ -23,7 +22,6 @@ const IdeasGalleryStep: React.FC<IdeasGalleryStepProps> = ({
   favorites,
   usageCount,
   maxUsage,
-  isLoading = false,
 }) => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-black border border-white/10 rounded-xl shadow-lg">
@@ -36,7 +34,6 @@ const IdeasGalleryStep: React.FC<IdeasGalleryStepProps> = ({
         favorites={favorites}
         usageCount={usageCount}
         maxUsage={maxUsage}
-        isLoading={isLoading}
       />
     </div>
   );

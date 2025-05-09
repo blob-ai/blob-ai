@@ -5,7 +5,6 @@ import ContentCreationModal from "@/components/content/ContentCreationModal";
 import PublishModal from "@/components/content/publish/PublishModal";
 import { toast } from "sonner";
 import { useContentCreation, CreationStep } from "@/hooks/useContentCreation";
-import { AuthProvider } from "@/contexts/AuthContext";
 
 // Step components
 import StartStep from "@/components/content/steps/StartStep";
@@ -13,9 +12,8 @@ import ThemeSelectionStep from "@/components/content/steps/ThemeSelectionStep";
 import IdeasGalleryStep from "@/components/content/steps/IdeasGalleryStep";
 import CanvasStep from "@/components/content/steps/CanvasStep";
 import BackNavigation from "@/components/content/steps/BackNavigation";
-import AuthRequired from "@/components/auth/AuthRequired";
 
-const ContentCreationPageContent = () => {
+const ContentCreationPage = () => {
   const {
     currentStep,
     showCreationModal,
@@ -27,7 +25,6 @@ const ContentCreationPageContent = () => {
     favorites,
     usageCount,
     maxUsage,
-    isLoading,
     selectedIdea,
     setShowCreationModal,
     setFavorites,
@@ -53,23 +50,9 @@ const ContentCreationPageContent = () => {
         return (
           <IdeasGalleryStep
             theme={theme}
-            ideas={generatedIdeas.map(idea => ({
-              id: idea.id,
-              title: idea.title,
-              category: idea.category,
-              hooks: idea.hooks?.map(hook => ({
-                id: hook.id,
-                text: hook.text,
-                author: hook.author,
-              }))
-            }))}
-            onRefresh={() => handleThemeSubmit(theme, [], contentGoal)}
-            onCombinationSelect={(idea, hookId) => {
-              const originalIdea = generatedIdeas.find(i => i.id === idea.id);
-              if (originalIdea) {
-                handleCombinationSelect(originalIdea, hookId);
-              }
-            }}
+            ideas={generatedIdeas}
+            onRefresh={() => handleThemeSubmit(theme, [])}
+            onCombinationSelect={handleCombinationSelect}
             onToggleFavorite={(id) => 
               setFavorites(prev => 
                 prev.includes(id) 
@@ -80,7 +63,6 @@ const ContentCreationPageContent = () => {
             favorites={favorites}
             usageCount={usageCount}
             maxUsage={maxUsage}
-            isLoading={isLoading}
           />
         );
         
@@ -92,10 +74,7 @@ const ContentCreationPageContent = () => {
             onSaveDraft={handleSaveDraft}
             onSchedule={handleSchedule}
             contentGoal={contentGoal}
-            selectedIdea={selectedIdea ? {
-              title: selectedIdea.title,
-              category: selectedIdea.category
-            } : null}
+            selectedIdea={selectedIdea}
           />
         );
         
@@ -139,16 +118,6 @@ const ContentCreationPageContent = () => {
         }}
       />
     </PageContainer>
-  );
-};
-
-const ContentCreationPage = () => {
-  return (
-    <AuthProvider>
-      <AuthRequired>
-        <ContentCreationPageContent />
-      </AuthRequired>
-    </AuthProvider>
   );
 };
 

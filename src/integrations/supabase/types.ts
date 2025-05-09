@@ -112,35 +112,6 @@ export type Database = {
           },
         ]
       }
-      content_categories: {
-        Row: {
-          created_at: string
-          goal_id: string | null
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          goal_id?: string | null
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string
-          goal_id?: string | null
-          id?: string
-          name?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "content_categories_goal_id_fkey"
-            columns: ["goal_id"]
-            isOneToOne: false
-            referencedRelation: "content_goals"
-            referencedColumns: ["goal_id"]
-          },
-        ]
-      }
       content_drafts: {
         Row: {
           content: string
@@ -192,103 +163,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "chat_threads"
             referencedColumns: ["id"]
-          },
-        ]
-      }
-      content_goals: {
-        Row: {
-          created_at: string
-          description: string
-          goal_id: string
-          icon: string
-          id: string
-          title: string
-        }
-        Insert: {
-          created_at?: string
-          description: string
-          goal_id: string
-          icon: string
-          id?: string
-          title: string
-        }
-        Update: {
-          created_at?: string
-          description?: string
-          goal_id?: string
-          icon?: string
-          id?: string
-          title?: string
-        }
-        Relationships: []
-      }
-      content_hooks: {
-        Row: {
-          author_avatar: string | null
-          author_credential: string | null
-          author_name: string
-          created_at: string
-          id: string
-          idea_id: string | null
-          text: string
-        }
-        Insert: {
-          author_avatar?: string | null
-          author_credential?: string | null
-          author_name: string
-          created_at?: string
-          id?: string
-          idea_id?: string | null
-          text: string
-        }
-        Update: {
-          author_avatar?: string | null
-          author_credential?: string | null
-          author_name?: string
-          created_at?: string
-          id?: string
-          idea_id?: string | null
-          text?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "content_hooks_idea_id_fkey"
-            columns: ["idea_id"]
-            isOneToOne: false
-            referencedRelation: "content_ideas"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      content_ideas: {
-        Row: {
-          category: string
-          created_at: string
-          goal_id: string | null
-          id: string
-          title: string
-        }
-        Insert: {
-          category: string
-          created_at?: string
-          goal_id?: string | null
-          id?: string
-          title: string
-        }
-        Update: {
-          category?: string
-          created_at?: string
-          goal_id?: string | null
-          id?: string
-          title?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "content_ideas_goal_id_fkey"
-            columns: ["goal_id"]
-            isOneToOne: false
-            referencedRelation: "content_goals"
-            referencedColumns: ["goal_id"]
           },
         ]
       }
@@ -483,73 +357,6 @@ export type Database = {
           },
         ]
       }
-      user_content: {
-        Row: {
-          content: string
-          created_at: string
-          goal_id: string | null
-          hook_id: string | null
-          id: string
-          idea_id: string | null
-          published_at: string | null
-          status: string
-          theme: string | null
-          title: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          content: string
-          created_at?: string
-          goal_id?: string | null
-          hook_id?: string | null
-          id?: string
-          idea_id?: string | null
-          published_at?: string | null
-          status?: string
-          theme?: string | null
-          title: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          content?: string
-          created_at?: string
-          goal_id?: string | null
-          hook_id?: string | null
-          id?: string
-          idea_id?: string | null
-          published_at?: string | null
-          status?: string
-          theme?: string | null
-          title?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_content_goal_id_fkey"
-            columns: ["goal_id"]
-            isOneToOne: false
-            referencedRelation: "content_goals"
-            referencedColumns: ["goal_id"]
-          },
-          {
-            foreignKeyName: "user_content_hook_id_fkey"
-            columns: ["hook_id"]
-            isOneToOne: false
-            referencedRelation: "content_hooks"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_content_idea_id_fkey"
-            columns: ["idea_id"]
-            isOneToOne: false
-            referencedRelation: "content_ideas"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_metrics: {
         Row: {
           analysis_count: number | null
@@ -579,30 +386,6 @@ export type Database = {
           id?: string
           templates_used?: Json | null
           total_tokens_used?: number | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_usage: {
-        Row: {
-          content_generations_limit: number
-          content_generations_used: number
-          id: string
-          last_reset_date: string
-          user_id: string
-        }
-        Insert: {
-          content_generations_limit?: number
-          content_generations_used?: number
-          id?: string
-          last_reset_date?: string
-          user_id: string
-        }
-        Update: {
-          content_generations_limit?: number
-          content_generations_used?: number
-          id?: string
-          last_reset_date?: string
           user_id?: string
         }
         Relationships: []

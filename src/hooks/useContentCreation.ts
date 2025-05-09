@@ -2,18 +2,8 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ContentIdea } from "@/types/content";
+import { ContentIdea } from "@/components/content/idea-generation/IdeasGallery";
 import { getCategoryColors } from "@/utils/categoryColors";
-import { useAuth } from "@/contexts/AuthContext";
-import { 
-  getContentGoals, 
-  getContentCategoriesByGoal, 
-  getContentIdeasByThemeAndCategories, 
-  saveUserContent,
-  updateUserContent,
-  getUserUsage,
-  incrementUsageCounter
-} from "@/services/contentService";
 
 export enum CreationStep {
   START,
@@ -24,9 +14,6 @@ export enum CreationStep {
 }
 
 export const useContentCreation = () => {
-  // Auth state
-  const { user, isAuthenticated } = useAuth();
-  
   // State variables
   const [currentStep, setCurrentStep] = useState<CreationStep>(CreationStep.START);
   const [showCreationModal, setShowCreationModal] = useState(false);
@@ -37,14 +24,10 @@ export const useContentCreation = () => {
   const [generatedIdeas, setGeneratedIdeas] = useState<ContentIdea[]>([]);
   const [selectedIdea, setSelectedIdea] = useState<ContentIdea | null>(null);
   const [content, setContent] = useState("");
-  const [currentContentId, setCurrentContentId] = useState<string | null>(null);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
-
-  // Usage tracking
-  const [usageCount, setUsageCount] = useState(0);
-  const [maxUsage, setMaxUsage] = useState(5);
-  const [isLoading, setIsLoading] = useState(false);
+  const [usageCount, setUsageCount] = useState(2);
+  const [maxUsage] = useState(5);
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -64,114 +47,221 @@ export const useContentCreation = () => {
     }
   }, [location]);
 
-  // Load usage data when the component mounts
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      loadUsageData();
-    }
-  }, [isAuthenticated, user]);
+  // Function to generate mock ideas based on theme, categories, and goal
+  const generateIdeas = (theme: string, categories: string[], goal: string) => {
+    // This would be an API call in a real application
+    const goalPrefix = getGoalPrefix(goal);
+    
+    // Define common categories for our mock data
+    const ideaCategories = [
+      "Best practices",
+      "Explanation / Analysis",
+      "List of advice/rules/etc",
+      "Useful resources",
+      "Personal reflection", 
+      "Thought-provoking"
+    ];
+    
+    const mockIdeas: ContentIdea[] = [
+      {
+        id: "1",
+        title: `${goalPrefix}: How to integrate AI effectively in ${theme} teaching for more engaging learning experiences.`,
+        category: ideaCategories[0],
+        hooks: [
+          {
+            id: "h1",
+            text: "You only need one yes. I rewrote my story 107 times to get it.",
+            author: {
+              name: "Alex Johnson",
+              avatar: "/placeholder.svg",
+              credential: "Prev @ EdTech | Stanford",
+            }
+          },
+          {
+            id: "h2",
+            text: `10X or nothing. Why aim for just 10% better in ${theme.toLowerCase()} when you can change the game?`,
+            author: {
+              name: "Sarah Williams",
+              avatar: "/placeholder.svg",
+              credential: "Founder @ LearnTech | Harvard",
+            }
+          }
+        ]
+      },
+      {
+        id: "2",
+        title: `${goalPrefix}: Why blended learning is becoming the new normal in ${theme} schools and universities.`,
+        category: ideaCategories[1],
+        hooks: [
+          {
+            id: "h3",
+            text: `Your destiny in ${theme.toLowerCase()} is determined by the choices you make today. Choose wisely.`,
+            author: {
+              name: "Michael Chen",
+              avatar: "/placeholder.svg",
+              credential: "Director @ EducateNow | MIT",
+            }
+          },
+          {
+            id: "h4",
+            text: `The future of ${theme.toLowerCase()} isn't about technology — it's about how we use it.`,
+            author: {
+              name: "Emma Rodriguez",
+              avatar: "/placeholder.svg",
+              credential: "Digital Learning Specialist",
+            }
+          }
+        ]
+      },
+      {
+        id: "3",
+        title: `${goalPrefix}: 10 crucial skills every ${theme} educator should develop for modern classrooms.`,
+        category: ideaCategories[2],
+        hooks: [
+          {
+            id: "h5",
+            text: "The most dangerous phrase in education is 'we've always done it this way'.",
+            author: {
+              name: "James Peterson",
+              avatar: "/placeholder.svg",
+              credential: "Education Innovator | Yale",
+            }
+          },
+          {
+            id: "h6",
+            text: `Knowledge isn't power until it's applied. Here's how ${theme.toLowerCase()} is evolving.`,
+            author: {
+              name: "Lisa Wang",
+              avatar: "/placeholder.svg",
+              credential: "EdTech Researcher",
+            }
+          }
+        ]
+      },
+      {
+        id: "4",
+        title: `${goalPrefix}: Top 5 online platforms offering free courses in ${theme.toLowerCase()} and entrepreneurship for students.`,
+        category: ideaCategories[3],
+        hooks: [
+          {
+            id: "h7",
+            text: "I spent $50,000 on my degree. These free resources taught me more.",
+            author: {
+              name: "David Kim",
+              avatar: "/placeholder.svg",
+              credential: "Self-taught Expert",
+            }
+          },
+          {
+            id: "h8",
+            text: `The best ${theme.toLowerCase()} happens outside the classroom. Here's where to find it.`,
+            author: {
+              name: "Rachel Greene",
+              avatar: "/placeholder.svg",
+              credential: "Learning Advocate",
+            }
+          }
+        ]
+      },
+      {
+        id: "5",
+        title: `${goalPrefix}: Reflecting on my journey from a traditional ${theme.toLowerCase()} teacher to embracing digital tools - here's what I learned about adaptability and change.`,
+        category: ideaCategories[4],
+        hooks: [
+          {
+            id: "h9",
+            text: "After 15 years in the classroom, I realized I was teaching for the wrong century.",
+            author: {
+              name: "Thomas Wright",
+              avatar: "/placeholder.svg",
+              credential: "Education Veteran",
+            }
+          },
+          {
+            id: "h10",
+            text: `The tools change, but the principles of good ${theme.toLowerCase()} remain timeless.`,
+            author: {
+              name: "Sophia Miller",
+              avatar: "/placeholder.svg",
+              credential: "Digital Transformation Lead",
+            }
+          }
+        ]
+      },
+      {
+        id: "6",
+        title: `${goalPrefix}: Is our current ${theme.toLowerCase()} system preparing students adequately for jobs that do not exist yet?`,
+        category: ideaCategories[5],
+        hooks: [
+          {
+            id: "h11",
+            text: "We're preparing students for a world that no longer exists.",
+            author: {
+              name: "Jonathan Lee",
+              avatar: "/placeholder.svg",
+              credential: "Future of Work Analyst",
+            }
+          },
+          {
+            id: "h12",
+            text: `The skills gap in ${theme.toLowerCase()} isn't about technology — it's about adaptability.`,
+            author: {
+              name: "Olivia Chen",
+              avatar: "/placeholder.svg",
+              credential: "Industry-Education Bridge",
+            }
+          }
+        ]
+      },
+    ];
+    
+    setGeneratedIdeas(mockIdeas);
+    setCurrentStep(CreationStep.IDEAS_GALLERY);
+    setUsageCount(prev => Math.min(prev + 1, maxUsage));
+    toast.success(`Generated ideas for "${theme}" with ${goal} goal`);
+  };
 
-  const loadUsageData = async () => {
-    try {
-      const usageData = await getUserUsage();
-      if (usageData) {
-        setUsageCount(usageData.content_generations_used);
-        setMaxUsage(usageData.content_generations_limit);
-      }
-    } catch (error) {
-      console.error("Error loading usage data:", error);
+  // Helper function to get a prefix based on the content goal
+  const getGoalPrefix = (goal: string): string => {
+    switch (goal) {
+      case "knowledge":
+        return "Learn";
+      case "community":
+        return "Discuss";
+      case "growth":
+        return "Grow";
+      case "brand":
+        return "Brand";
+      case "leads":
+        return "Discover";
+      case "thought":
+        return "Insight";
+      default:
+        return "";
     }
   };
 
-  // Function to generate ideas based on theme, categories, and goal
-  const generateIdeas = async (theme: string, categories: string[], goal: string) => {
-    if (!isAuthenticated) {
-      toast.error("Please sign in to generate content ideas");
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-      // Check if user has reached usage limit
-      const usageData = await getUserUsage();
-      if (usageData && usageData.content_generations_used >= usageData.content_generations_limit) {
-        toast.error(`You've reached your daily limit of ${usageData.content_generations_limit} idea generations`);
-        setIsLoading(false);
-        return;
-      }
-      
-      // Get ideas from the backend
-      const ideas = await getContentIdeasByThemeAndCategories(theme, categories, goal);
-      
-      // If we have ideas, increment the usage counter
-      if (ideas && ideas.length > 0) {
-        setGeneratedIdeas(ideas);
-        
-        // Update the usage count
-        if (user) {
-          const updatedUsage = await incrementUsageCounter(user.id);
-          setUsageCount(updatedUsage.content_generations_used);
-        }
-        
-        setCurrentStep(CreationStep.IDEAS_GALLERY);
-        toast.success(`Generated ideas for "${theme}" with ${goal} goal`);
-      } else {
-        toast.error("No ideas found for the selected criteria");
-      }
-    } catch (error) {
-      console.error("Error generating ideas:", error);
-      toast.error("Failed to generate ideas. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleThemeSubmit = async (theme: string, categories: string[], goal: string = "knowledge") => {
+  const handleThemeSubmit = (theme: string, categories: string[], goal: string = "knowledge") => {
     setTheme(theme);
     setCategories(categories);
     setContentGoal(goal);
-    await generateIdeas(theme, categories, goal);
+    generateIdeas(theme, categories, goal);
   };
 
-  const handleCombinationSelect = async (idea: ContentIdea, hookId: string) => {
+  const handleCombinationSelect = (idea: ContentIdea, hookId: string) => {
     const selectedHook = idea.hooks?.find(hook => hook.id === hookId);
     
-    setSelectedIdea(idea);
-    
-    try {
-      let initialContent = "";
+    if (selectedHook) {
+      setSelectedIdea(idea);
       
-      if (selectedHook) {
-        // Generate content based on selected idea and hook
-        initialContent = `${selectedHook.text}\n\nHere's my perspective on ${idea.title}:\n\n[Your content will be generated here based on the selected idea and hook]`;
-      } else {
-        // Just use the idea without a hook
-        initialContent = `Here's my perspective on ${idea.title}:\n\n[Your content will be generated here based on the selected idea]`;
-      }
-      
-      setContent(initialContent);
-      
-      // Save draft to database
-      if (user) {
-        const savedContent = await saveUserContent({
-          user_id: user.id,
-          title: idea.title,
-          content: initialContent,
-          theme,
-          goal_id: contentGoal,
-          idea_id: idea.id,
-          hook_id: hookId || null,
-          status: 'draft'
-        });
-        
-        setCurrentContentId(savedContent.id);
-      }
-      
+      // Generate content based on selected idea and hook
+      setContent(`${selectedHook.text}\n\nHere's my perspective on ${idea.title}:\n\n[Your content will be generated here based on the selected idea and hook]`);
       setCurrentStep(CreationStep.CONTENT_CANVAS);
-    } catch (error) {
-      console.error("Error saving content:", error);
-      toast.error("Failed to save content. Please try again.");
+    } else {
+      // Just use the idea without a hook
+      setSelectedIdea(idea);
+      setContent(`Here's my perspective on ${idea.title}:\n\n[Your content will be generated here based on the selected idea]`);
+      setCurrentStep(CreationStep.CONTENT_CANVAS);
     }
   };
 
@@ -192,99 +282,19 @@ export const useContentCreation = () => {
     }
   };
 
-  const handlePublish = async (content: string) => {
+  const handlePublish = (content: string) => {
     setContent(content);
-    
-    try {
-      // Update content in database if we have a content ID
-      if (currentContentId) {
-        await updateUserContent(currentContentId, { content });
-      }
-      // If no content ID, create a new one
-      else if (user) {
-        const savedContent = await saveUserContent({
-          user_id: user.id,
-          title: selectedIdea?.title || "New Content",
-          content,
-          theme,
-          goal_id: contentGoal,
-          idea_id: selectedIdea?.id,
-          status: 'draft'
-        });
-        
-        setCurrentContentId(savedContent.id);
-      }
-      
-      setShowPublishModal(true);
-    } catch (error) {
-      console.error("Error updating content:", error);
-      toast.error("Failed to save content. Please try again.");
-    }
+    setShowPublishModal(true);
   };
 
-  const handleSaveDraft = async (content: string) => {
+  const handleSaveDraft = (content: string) => {
     setContent(content);
-    
-    try {
-      // Update content in database if we have a content ID
-      if (currentContentId) {
-        await updateUserContent(currentContentId, { content });
-      }
-      // If no content ID, create a new one
-      else if (user) {
-        const savedContent = await saveUserContent({
-          user_id: user.id,
-          title: selectedIdea?.title || "New Content",
-          content,
-          theme,
-          goal_id: contentGoal,
-          idea_id: selectedIdea?.id,
-          status: 'draft'
-        });
-        
-        setCurrentContentId(savedContent.id);
-      }
-      
-      toast.success("Draft saved successfully");
-    } catch (error) {
-      console.error("Error saving draft:", error);
-      toast.error("Failed to save draft. Please try again.");
-    }
+    toast.success("Draft saved successfully");
   };
 
-  const handleSchedule = async (content: string, date: Date) => {
+  const handleSchedule = (content: string, date: Date) => {
     setContent(content);
-    
-    try {
-      // Update content in database if we have a content ID
-      if (currentContentId) {
-        await updateUserContent(currentContentId, { 
-          content, 
-          status: 'scheduled', 
-          published_at: date.toISOString()
-        });
-      }
-      // If no content ID, create a new one
-      else if (user) {
-        const savedContent = await saveUserContent({
-          user_id: user.id,
-          title: selectedIdea?.title || "New Content",
-          content,
-          theme,
-          goal_id: contentGoal,
-          idea_id: selectedIdea?.id,
-          status: 'scheduled',
-          published_at: date.toISOString()
-        });
-        
-        setCurrentContentId(savedContent.id);
-      }
-      
-      toast.success(`Scheduled for publication on ${date.toLocaleDateString()}`);
-    } catch (error) {
-      console.error("Error scheduling content:", error);
-      toast.error("Failed to schedule content. Please try again.");
-    }
+    toast.success(`Scheduled for publication on ${date.toLocaleDateString()}`);
   };
 
   const navigateToStep = (step: CreationStep) => {
@@ -314,7 +324,6 @@ export const useContentCreation = () => {
     favorites,
     usageCount,
     maxUsage,
-    isLoading,
     setShowCreationModal,
     setCurrentStep,
     setFavorites,
@@ -325,7 +334,6 @@ export const useContentCreation = () => {
     handleSaveDraft,
     handleSchedule,
     navigateToStep,
-    setShowPublishModal,
-    isAuthenticated,
+    setShowPublishModal
   };
 };
