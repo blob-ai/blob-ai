@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Smartphone, Tablet, Monitor, Twitter, Linkedin, Facebook } from "lucide-react";
-import { marked } from "marked";
+import { X, Smartphone, Tablet, Monitor, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import TwitterPreview from "../preview/TwitterPreview";
+import LinkedInPreview from "../preview/LinkedInPreview";
+import FacebookPreview from "../preview/FacebookPreview";
 
 interface ContentPreviewModalProps {
   isOpen: boolean;
@@ -15,6 +17,7 @@ interface ContentPreviewModalProps {
 
 type PlatformType = "twitter" | "linkedin" | "facebook";
 type DeviceType = "mobile" | "tablet" | "desktop";
+type AppearanceType = "light" | "dark";
 
 const ContentPreviewModal: React.FC<ContentPreviewModalProps> = ({
   isOpen,
@@ -23,8 +26,27 @@ const ContentPreviewModal: React.FC<ContentPreviewModalProps> = ({
 }) => {
   const [selectedPlatform, setSelectedPlatform] = useState<PlatformType>("twitter");
   const [selectedDevice, setSelectedDevice] = useState<DeviceType>("desktop");
+  const [appearance, setAppearance] = useState<AppearanceType>("dark");
   const isMobile = useIsMobile();
   const [layout, setLayout] = useState<"horizontal" | "vertical">("horizontal");
+  
+  // Mock profile info
+  const profileInfo = {
+    name: "John Smith",
+    handle: "johnsmith",
+    title: "Marketing Director at TechCorp",
+    avatar: "", // Default empty will show initials
+    verified: true,
+    timestamp: "2h"
+  };
+
+  // Mock engagement stats
+  const engagementStats = {
+    likes: 24,
+    comments: 5,
+    shares: 3,
+    views: 247
+  };
   
   // Adjust layout based on screen size
   useEffect(() => {
@@ -58,36 +80,40 @@ const ContentPreviewModal: React.FC<ContentPreviewModalProps> = ({
     facebook: "Facebook",
   };
 
-  // Helper function to render markdown content
-  const renderContent = () => {
-    return { __html: marked(content) };
-  };
-
-  // Helper function to get platform icon
-  const getPlatformIcon = (platform: PlatformType, active: boolean = false) => {
-    const className = `h-5 w-5 ${active ? "text-white" : "text-white/60"}`;
-    
-    switch (platform) {
-      case "twitter":
-        return <Twitter className={className} />;
-      case "linkedin":
-        return <Linkedin className={className} />;
-      case "facebook":
-        return <Facebook className={className} />;
-    }
-  };
-
   // Get device-specific width classes
   const getDevicePreviewClasses = () => {
     switch (selectedDevice) {
       case "mobile":
-        return "max-w-[320px] w-full";
+        return "max-w-[320px]";
       case "tablet":
-        return "max-w-[600px] w-full";
+        return "max-w-[600px]";
       case "desktop":
         return "w-full max-w-[100%]";
       default:
         return "w-full";
+    }
+  };
+
+  // Render appropriate platform preview
+  const renderPlatformPreview = () => {
+    const commonProps = {
+      content,
+      profileInfo,
+      engagementStats,
+      mode: appearance,
+      device: selectedDevice,
+      className: getDevicePreviewClasses(),
+    };
+
+    switch (selectedPlatform) {
+      case "twitter":
+        return <TwitterPreview {...commonProps} />;
+      case "linkedin":
+        return <LinkedInPreview {...commonProps} />;
+      case "facebook":
+        return <FacebookPreview {...commonProps} />;
+      default:
+        return null;
     }
   };
 
@@ -106,7 +132,7 @@ const ContentPreviewModal: React.FC<ContentPreviewModalProps> = ({
           </Button>
         </div>
         
-        {/* Platform and device selector */}
+        {/* Platform, device and mode selectors */}
         <div className="border-b border-white/10 p-3 md:p-4 flex flex-col sm:flex-row justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {(["twitter", "linkedin", "facebook"] as PlatformType[]).map((platform) => (
@@ -117,25 +143,40 @@ const ContentPreviewModal: React.FC<ContentPreviewModalProps> = ({
                 className={cn(
                   "flex items-center gap-1 sm:gap-2 flex-shrink-0", 
                   selectedPlatform === platform 
-                    ? "bg-blue-600 hover:bg-blue-500 text-white" 
+                    ? "bg-[#3260ea] hover:bg-[#2853c6] text-white" 
                     : "bg-transparent border-white/10 hover:bg-white/5 text-white/70"
                 )}
                 onClick={() => setSelectedPlatform(platform)}
               >
-                {getPlatformIcon(platform, selectedPlatform === platform)}
+                {platform === "twitter" && (
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+                  </svg>
+                )}
+                {platform === "linkedin" && (
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                  </svg>
+                )}
+                {platform === "facebook" && (
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z" />
+                  </svg>
+                )}
                 <span className={cn(isMobile ? "text-xs" : "text-sm")}>{platformLabels[platform]}</span>
               </Button>
             ))}
           </div>
           
           <div className="flex items-center gap-2">
+            {/* Device selectors */}
             <Button
               variant={selectedDevice === "mobile" ? "default" : "outline"}
               size="icon"
               className={cn(
                 "rounded-full", 
                 selectedDevice === "mobile" 
-                  ? "bg-blue-600 hover:bg-blue-500" 
+                  ? "bg-[#3260ea] hover:bg-[#2853c6]" 
                   : "bg-transparent border-white/10 hover:bg-white/5"
               )}
               onClick={() => setSelectedDevice("mobile")}
@@ -149,7 +190,7 @@ const ContentPreviewModal: React.FC<ContentPreviewModalProps> = ({
               className={cn(
                 "rounded-full", 
                 selectedDevice === "tablet" 
-                  ? "bg-blue-600 hover:bg-blue-500" 
+                  ? "bg-[#3260ea] hover:bg-[#2853c6]" 
                   : "bg-transparent border-white/10 hover:bg-white/5"
               )}
               onClick={() => setSelectedDevice("tablet")}
@@ -163,13 +204,45 @@ const ContentPreviewModal: React.FC<ContentPreviewModalProps> = ({
               className={cn(
                 "rounded-full", 
                 selectedDevice === "desktop" 
-                  ? "bg-blue-600 hover:bg-blue-500" 
+                  ? "bg-[#3260ea] hover:bg-[#2853c6]" 
                   : "bg-transparent border-white/10 hover:bg-white/5"
               )}
               onClick={() => setSelectedDevice("desktop")}
               title="Desktop view"
             >
               <Monitor className="h-4 w-4" />
+            </Button>
+            
+            <div className="h-4 mx-1 border-r border-white/20"></div>
+            
+            {/* Light/Dark mode toggle */}
+            <Button
+              variant={appearance === "light" ? "default" : "outline"}
+              size="icon"
+              className={cn(
+                "rounded-full", 
+                appearance === "light"
+                  ? "bg-[#3260ea] hover:bg-[#2853c6]" 
+                  : "bg-transparent border-white/10 hover:bg-white/5"
+              )}
+              onClick={() => setAppearance("light")}
+              title="Light mode"
+            >
+              <Sun className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={appearance === "dark" ? "default" : "outline"}
+              size="icon"
+              className={cn(
+                "rounded-full", 
+                appearance === "dark"
+                  ? "bg-[#3260ea] hover:bg-[#2853c6]" 
+                  : "bg-transparent border-white/10 hover:bg-white/5"
+              )}
+              onClick={() => setAppearance("dark")}
+              title="Dark mode"
+            >
+              <Moon className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -203,73 +276,8 @@ const ContentPreviewModal: React.FC<ContentPreviewModalProps> = ({
             </div>
             
             <div className="flex justify-center">
-              <div className={cn(getDevicePreviewClasses(), "mx-auto")}>
-                <div className="border border-white/10 rounded-lg overflow-hidden">
-                  {/* Platform header */}
-                  <div className="py-2 px-3 md:py-3 md:px-4 border-b border-white/10 bg-black/40 flex items-center gap-2">
-                    {getPlatformIcon(selectedPlatform)}
-                    <span className="font-medium text-sm md:text-base">{platformLabels[selectedPlatform]}</span>
-                  </div>
-                  
-                  {/* Profile bar - simplified version */}
-                  <div className="flex items-center gap-3 p-3 md:p-4 border-b border-white/10">
-                    <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-white/20"></div>
-                    <div>
-                      <div className="font-medium text-sm md:text-base">User Name</div>
-                      <div className="text-xs md:text-sm text-white/60">@username</div>
-                    </div>
-                  </div>
-                  
-                  {/* Content preview */}
-                  <div className="p-3 md:p-4">
-                    {isOverLimit ? (
-                      <div>
-                        <div 
-                          className="prose prose-invert max-w-full text-sm md:text-base"
-                          dangerouslySetInnerHTML={{ __html: marked(content.substring(0, currentLimit)) }}
-                        />
-                        <div className="mt-3 py-2 px-3 bg-red-500/10 border border-red-500/30 rounded-md text-xs md:text-sm">
-                          <span className="font-medium text-red-400">Character limit exceeded</span>
-                          <p className="text-red-300/80 mt-1">
-                            Your content exceeds the {platformLabels[selectedPlatform]} character limit of {currentLimit} characters. 
-                            The actual post will be truncated.
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div 
-                        className="prose prose-invert max-w-full text-sm md:text-base"
-                        dangerouslySetInnerHTML={renderContent()}
-                      />
-                    )}
-                  </div>
-                  
-                  {/* Engagement indicators */}
-                  <div className="flex items-center justify-between p-2 md:p-3 border-t border-white/10 text-xs md:text-sm text-white/60">
-                    {selectedPlatform === "twitter" && (
-                      <>
-                        <span>💬 0</span>
-                        <span>🔄 0</span>
-                        <span>❤️ 0</span>
-                        <span>📊 0</span>
-                      </>
-                    )}
-                    {selectedPlatform === "linkedin" && (
-                      <>
-                        <span>👍 0</span>
-                        <span>💭 0</span>
-                        <span>🔄 0</span>
-                      </>
-                    )}
-                    {selectedPlatform === "facebook" && (
-                      <>
-                        <span>👍 0</span>
-                        <span>💬 0</span>
-                        <span>↗️ 0</span>
-                      </>
-                    )}
-                  </div>
-                </div>
+              <div className="mx-auto">
+                {renderPlatformPreview()}
               </div>
             </div>
           </div>

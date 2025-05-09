@@ -89,4 +89,85 @@
   .preview-cta {
     @apply bg-[#3260ea] hover:bg-[#2853c6] text-white rounded-md px-4 py-2 font-medium transition-colors shadow-sm hover:shadow flex items-center justify-center gap-2;
   }
+
+  /* Social Media Preview Components */
+  .social-media-preview {
+    @apply border rounded-xl overflow-hidden shadow-md transition-all;
+  }
+
+  .twitter-preview {
+    @apply social-media-preview;
+  }
+
+  .twitter-preview-dark {
+    @apply bg-[#15202b] border-[#2f3336] text-white;
+  }
+
+  .twitter-preview-light {
+    @apply bg-white border-[#e1e8ed] text-[#0f1419];
+  }
+
+  .linkedin-preview {
+    @apply social-media-preview;
+  }
+
+  .linkedin-preview-dark {
+    @apply bg-[#1D2226] border-[#38434F] text-white;
+  }
+
+  .linkedin-preview-light {
+    @apply bg-white border-[#e0e0e0] text-[#000000];
+  }
+
+  .facebook-preview {
+    @apply social-media-preview;
+  }
+
+  .facebook-preview-dark {
+    @apply bg-[#242526] border-[#3E4042] text-white;
+  }
+
+  .facebook-preview-light {
+    @apply bg-white border-[#E4E6EB] text-[#050505];
+  }
+
+  .platform-header {
+    @apply flex items-center justify-between p-3 border-b border-white/10;
+  }
+
+  .profile-header {
+    @apply flex gap-3 items-start;
+  }
+
+  .platform-content {
+    @apply p-4;
+  }
+
+  .engagement-stats {
+    @apply flex justify-between text-sm text-white/60 mt-3 pt-2 border-t border-white/10;
+  }
+
+  .engagement-action {
+    @apply flex items-center gap-1 transition-colors;
+  }
+
+  .twitter-action:hover {
+    @apply text-[#1DA1F2];
+  }
+
+  .linkedin-action:hover {
+    @apply text-[#0A66C2];
+  }
+
+  .facebook-action:hover {
+    @apply text-[#1877F2];
+  }
+
+  .platform-button {
+    @apply flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors;
+  }
+
+  .platform-toggle {
+    @apply flex items-center justify-center h-8 w-8 rounded-full transition-colors;
+  }
 }

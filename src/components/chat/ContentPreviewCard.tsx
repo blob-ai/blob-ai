@@ -5,6 +5,7 @@ import { Copy, ChevronDown, ChevronUp, Pencil, BookmarkCheck } from "lucide-reac
 import { Avatar } from "@/components/ui/avatar";
 import { SaveSetupModal } from "./creation/SaveSetupModal";
 import { toast } from "@/hooks/use-toast";
+import LinkedInPreview from "../content/preview/LinkedInPreview";
 
 interface ContentPreviewCardProps {
   title: string;
@@ -32,6 +33,13 @@ const ContentPreviewCard: React.FC<ContentPreviewCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
+  // Mock profile info
+  const profileInfo = {
+    name: "Your Name",
+    title: "Your Credentials",
+    timestamp: "Just now"
+  };
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(content);
     toast({
@@ -57,17 +65,13 @@ const ContentPreviewCard: React.FC<ContentPreviewCardProps> = ({
   return (
     <div className="bg-[#1A1A1A] rounded-xl overflow-hidden border border-white/5 mb-2">
       <div className="p-4 bg-[#121212] space-y-4">
-        {/* User profile and content */}
-        <div className="flex items-center gap-2 mb-3">
-          <Avatar className="h-8 w-8">
-            <div className="bg-gray-700 h-full w-full rounded-full flex items-center justify-center text-white">
-              U
-            </div>
-          </Avatar>
-          <span className="font-medium font-sans">User</span>
-        </div>
-
-        <div className="text-white whitespace-pre-wrap font-sans">{content}</div>
+        {/* Enhanced LinkedIn-style preview */}
+        <LinkedInPreview
+          content={content}
+          profileInfo={profileInfo}
+          mode="dark"
+          device="desktop"
+        />
       </div>
 
       {/* Expanded details */}

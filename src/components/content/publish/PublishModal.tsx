@@ -1,8 +1,9 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, Calendar, Clock } from "lucide-react";
+import LinkedInPreview from "../preview/LinkedInPreview";
 
 interface PublishModalProps {
   isOpen: boolean;
@@ -19,17 +20,22 @@ const PublishModal: React.FC<PublishModalProps> = ({
   onPublish,
   onConnectPlatform,
 }) => {
-  // Mock data
-  const previewData = {
-    author: {
-      name: "Your Name",
-      credential: "Your Credentials",
-      avatar: "/placeholder.svg",
-    },
-    engagement: {
-      comments: 47,
-      likes: 251,
-    },
+  const [selectedPlatform] = useState<"linkedin">("linkedin");
+  
+  // User profile info for the preview
+  const profileInfo = {
+    name: "Your Name",
+    title: "Your Credentials",
+    avatar: "/placeholder.svg",
+    verified: false,
+    timestamp: "Just now"
+  };
+
+  // Mock engagement stats for the preview
+  const engagementStats = {
+    likes: 0,
+    comments: 0,
+    shares: 0
   };
 
   return (
@@ -46,45 +52,19 @@ const PublishModal: React.FC<PublishModalProps> = ({
         </div>
 
         <div className="p-4 space-y-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-12 w-12 rounded-full overflow-hidden bg-gray-700">
-              <img 
-                src={previewData.author.avatar} 
-                alt={previewData.author.name} 
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div>
-              <div className="font-medium">{previewData.author.name}</div>
-              <div className="text-xs text-white/60">{previewData.author.credential}</div>
-              <div className="text-xs text-white/60">23 minutes ago</div>
-            </div>
-          </div>
-          
-          <div className="prose prose-invert max-w-none text-sm">
-            {content.split("\n").map((paragraph, i) => (
-              <p key={i}>{paragraph}</p>
-            ))}
-            
-            {content.length > 280 && (
-              <button className="text-white/60 hover:text-white/80 text-sm">
-                ... show less
-              </button>
-            )}
-          </div>
-          
-          <div className="flex items-center justify-between text-sm text-white/60 pt-3 border-t border-white/10">
-            <div className="flex items-center gap-1">
-              <span>🔥</span>
-              <span>Max Müller and {previewData.engagement.likes} other people</span>
-            </div>
-            <div>{previewData.engagement.comments} Comments</div>
-          </div>
+          {/* Use our enhanced LinkedIn Preview */}
+          <LinkedInPreview 
+            content={content}
+            profileInfo={profileInfo}
+            engagementStats={engagementStats}
+            mode="dark"
+            device="mobile"
+          />
         </div>
         
         <div className="p-4 space-y-3">
           <Button 
-            className="w-full bg-blue-600 hover:bg-blue-500 py-6 flex gap-2 items-center justify-center"
+            className="w-full bg-[#3260ea] hover:bg-[#2853c6] py-6 flex gap-2 items-center justify-center"
             onClick={() => onConnectPlatform('linkedin')}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
