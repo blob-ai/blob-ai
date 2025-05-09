@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Folder, Star, Clock, Heart, Pin, Save, Sparkles } from "lucide-react";
+import { Plus, Search, Folder, Star, Clock, Heart, Pin, Sparkles } from "lucide-react";
 import { CardContainer } from "@/components/ui/card-container";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import StyleCard from "./StyleCard";
@@ -189,36 +190,11 @@ const LibraryMyStyles: React.FC = () => {
             <Plus className="h-4 w-4 mr-2" />
             Create Your Own Style
           </Button>
-          
-          <Button onClick={handleQuickSave} variant="outline" className="w-full bg-transparent border-white/20 hover:bg-white/5">
-            <Save className="h-4 w-4 mr-2" />
-            Quick Save Inspiration
-          </Button>
         </div>
       </div>
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Hero card for Quick Save */}
-        <CardContainer className="mb-4 p-4 bg-gradient-to-r from-[#1F2937] to-[#1A202C] shadow-md">
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:block bg-[#3260ea]/20 p-3 rounded-full">
-              <Sparkles className="h-6 w-6 text-blue-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-base font-medium text-white">Have a bookmarked post that inspired you?</h3>
-              <p className="text-sm text-white/80">
-                <strong>Quick Save</strong> it and reuse it later.
-              </p>
-            </div>
-            <Button onClick={handleQuickSave} className="bg-[#3260ea] hover:bg-[#2853c6] whitespace-nowrap" size="sm">
-              <Save className="h-4 w-4 mr-1" />
-              <span className="sm:inline hidden">Quick Save</span>
-              <span className="sm:hidden inline">Save</span>
-            </Button>
-          </div>
-        </CardContainer>
-
         {/* Search bar */}
         <div className="mb-4 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 h-4 w-4" />
@@ -256,14 +232,9 @@ const LibraryMyStyles: React.FC = () => {
           </select>
           
           <div className="flex gap-2">
-            <Button onClick={handleCreateStyle} className="flex-1 bg-[#3260ea] hover:bg-[#2853c6]">
+            <Button onClick={handleCreateStyle} className="w-full bg-[#3260ea] hover:bg-[#2853c6]">
               <Plus className="h-4 w-4 mr-2" />
               Create Style
-            </Button>
-            
-            <Button onClick={handleQuickSave} variant="outline" className="flex-1 bg-transparent border-white/20 hover:bg-white/5">
-              <Save className="h-4 w-4 mr-2" />
-              Quick Save
             </Button>
           </div>
         </div>
@@ -276,17 +247,13 @@ const LibraryMyStyles: React.FC = () => {
               <Star className="h-16 w-16 text-white/20 mb-4" />
               <h3 className="text-lg font-medium text-white mb-2">No saved styles found</h3>
               <p className="text-white/70 mb-4">
-                {searchTerm ? 'Try adjusting your search' : 'Start saving styles from the Explore tab or Quick Save your inspiration'}
+                {searchTerm ? 'Try adjusting your search' : 'Start saving styles from the Explore tab'}
               </p>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setSearchParams({
               tab: "explore"
             })} className="bg-transparent border-white/20">
                   Browse Explore
-                </Button>
-                <Button onClick={handleQuickSave} className="bg-[#3260ea] hover:bg-[#2853c6]">
-                  <Save className="h-4 w-4 mr-2" />
-                  Quick Save
                 </Button>
               </div>
             </div>}

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -61,7 +62,7 @@ const SAMPLE_CREATORS = [
     id: "6",
     name: "Dude With Sign",
     handle: "@dudewithsign",
-    avatar: "https://pbs.twimg.com/profile_images/1218306485326008320/7rA5nWg1_400x400.jpg",
+    avatar: "https://pbs.twimg.com/profile_images/1218306485326008320/7A5nWg1_400x400.jpg",
     followers: "348K",
     category: "Humor",
     summary: "Short, relatable observational humor paired with images.",

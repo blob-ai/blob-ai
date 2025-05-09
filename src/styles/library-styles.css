@@ -1,0 +1,75 @@
+
+/* Remove hover effect from style creation cards */
+.style-creation-card {
+  transition: transform 0.2s ease;
+  transform: translateY(0);
+}
+
+.style-creation-card:hover {
+  background-color: #1A202C;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Preview examples section styling */
+.preview-examples-section {
+  background: linear-gradient(180deg, rgba(50, 96, 234, 0.06) 0%, rgba(50, 96, 234, 0.02) 100%);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(50, 96, 234, 0.15);
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.regenerate-examples-button {
+  background-color: #2853c6;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.regenerate-examples-button:hover {
+  background-color: #1e449e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.preview-examples-heading {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.preview-examples-heading svg {
+  color: #3260ea;
+}
+
+/* Make the examples stand out with a subtle background */
+.example-content {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 3px solid #3260ea;
+}
+
+/* Override button styling for consistent blue */
+.cta-button-blue {
+  background-color: #3260ea;
+  color: white;
+}
+
+.cta-button-blue:hover {
+  background-color: #2853c6;
+}

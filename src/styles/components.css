@@ -77,4 +77,16 @@
   .loading-spinner {
     @apply animate-spin h-5 w-5 text-primary-600;
   }
+  
+  .preview-examples-container {
+    @apply bg-[#1A2839] rounded-lg border border-[#3260ea]/30 p-4 shadow-md;
+  }
+  
+  .preview-examples-header {
+    @apply bg-[#3260ea]/10 text-[#3260ea] font-medium rounded-md px-3 py-1.5 inline-flex items-center gap-2 mb-4;
+  }
+  
+  .preview-cta {
+    @apply bg-[#3260ea] hover:bg-[#2853c6] text-white rounded-md px-4 py-2 font-medium transition-colors shadow-sm hover:shadow flex items-center justify-center gap-2;
+  }
 }
