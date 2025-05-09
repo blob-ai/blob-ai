@@ -256,31 +256,33 @@ const LibraryMyStyles: React.FC = () => {
             <Plus className="h-4 w-4 mr-2" />
             Create Your Own Style
           </Button>
-          
-          <Button 
-            onClick={handleQuickSave}
-            variant="outline"
-            className="w-full bg-transparent border-white/20"
-          >
-            <Bookmark className="h-4 w-4 mr-2" />
-            Quick Save Inspiration
-          </Button>
         </div>
       </div>
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Quick save CTA + Search bar */}
-        <div className="mb-4 space-y-3">
-          {/* Quick Save CTA */}
-          <ActionButton
-            icon={<Save className="h-4 w-4" />}
-            label="Quick Save Inspiration"
+        {/* Quick save banner */}
+        <CardContainer className="mb-4 p-4 flex items-center justify-between bg-[#1A1F2C]">
+          <div className="flex items-center gap-3">
+            <div className="bg-[#3260ea]/20 rounded-full p-2">
+              <Sparkles className="h-5 w-5 text-[#3260ea]" />
+            </div>
+            <div>
+              <h3 className="font-medium text-white">Have a bookmarked post that inspired you?</h3>
+              <p className="text-sm text-white/70">Quick Save it and reuse it later.</p>
+            </div>
+          </div>
+          <Button 
             onClick={handleQuickSave}
-            className="w-full bg-[#3260ea] hover:bg-[#2853c6] mb-2"
-          />
-          
-          {/* Search bar */}
+            className="whitespace-nowrap bg-[#3260ea] hover:bg-[#2853c6]"
+          >
+            <Save className="h-4 w-4 mr-2" /> 
+            Save a Post
+          </Button>
+        </CardContainer>
+        
+        {/* Search bar */}
+        <div className="mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 h-4 w-4" />
             <Input 

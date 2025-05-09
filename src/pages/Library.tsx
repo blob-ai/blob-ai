@@ -37,22 +37,22 @@ const Library = () => {
       <PageContainer className="flex flex-col flex-grow overflow-hidden pt-4">
         <Tabs defaultValue="myStyles" value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
           <div className="flex justify-center mb-6">
-            <TabsList className="bg-[#1E2431]/70 border border-white/10 p-1 shadow-md">
+            <TabsList className="bg-black/50 border border-white/10 p-1 shadow-md rounded-full overflow-hidden">
               <TabsTrigger 
                 value="myStyles" 
-                className="px-8 data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
+                className="px-8 rounded-full data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
               >
                 My Styles
               </TabsTrigger>
               <TabsTrigger 
                 value="explore" 
-                className="px-8 data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
+                className="px-8 rounded-full data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
               >
                 Explore
               </TabsTrigger>
               <TabsTrigger 
                 value="create" 
-                className="px-8 data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
+                className="px-8 rounded-full data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
               >
                 Create Style
               </TabsTrigger>

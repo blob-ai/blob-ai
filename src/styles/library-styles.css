@@ -186,3 +186,10 @@
 .device-desktop {
   width: 100%;
 }
+
+/* Quick save banner styling */
+.quick-save-banner {
+  background-color: #1A1F2C;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(50, 96, 234, 0.3);
+}
