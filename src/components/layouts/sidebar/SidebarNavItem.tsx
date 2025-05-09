@@ -1,16 +1,9 @@
-
 import React from 'react';
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { 
-  Plus, 
-  LayoutDashboard, 
-  MessageSquare, 
-  FileText, 
-  Folder, 
-  Brush 
-} from "lucide-react";
+import { Plus } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 interface SidebarNavItemProps {
   name: string;
@@ -61,33 +54,5 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
     </li>
   );
 };
-
-export const sidebarNavItems = [
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-    icon: <LayoutDashboard className="h-5 w-5" />,
-  },
-  {
-    title: 'Chat',
-    href: '/dashboard/chat',
-    icon: <MessageSquare className="h-5 w-5" />,
-  },
-  {
-    title: 'Styles',
-    href: '/dashboard/styles',
-    icon: <Brush className="h-5 w-5" />,
-  },
-  {
-    title: 'Templates',
-    href: '/dashboard/templates',
-    icon: <FileText className="h-5 w-5" />,
-  },
-  {
-    title: 'Workspace',
-    href: '/dashboard/workspace',
-    icon: <Folder className="h-5 w-5" />,
-  },
-];
 
 export default SidebarNavItem;
