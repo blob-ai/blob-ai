@@ -1,18 +1,31 @@
 
 /* Remove hover effect from style creation cards */
 .style-creation-card {
-  transition: transform 0.2s ease;
-  transform: translateY(0);
+  transition: none;
+  transform: none;
 }
 
-/* Preview examples section styling */
+/* Preview examples section styling - enhanced for better attention */
 .preview-examples-section {
-  background: linear-gradient(180deg, rgba(50, 96, 234, 0.08) 0%, rgba(50, 96, 234, 0.03) 100%);
+  background: linear-gradient(180deg, rgba(50, 96, 234, 0.12) 0%, rgba(50, 96, 234, 0.05) 100%);
   border-radius: 0.75rem;
-  border: 1px solid rgba(50, 96, 234, 0.2);
+  border: 1px solid rgba(50, 96, 234, 0.25);
   padding: 1.5rem;
   margin-top: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Add subtle background accent to preview examples */
+.preview-examples-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3260ea, #4C74E8);
 }
 
 .regenerate-examples-button {
@@ -51,7 +64,7 @@
 
 /* Make the examples stand out with a subtle background */
 .example-content {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(50, 96, 234, 0.05);
   border-radius: 0.5rem;
   padding: 1rem;
   margin-bottom: 1rem;
