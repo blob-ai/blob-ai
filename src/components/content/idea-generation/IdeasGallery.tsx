@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Heart, ChevronDown, ChevronUp, X } from "lucide-react";
+import { RefreshCw, Heart, ChevronDown, ChevronUp, X, Loader2 } from "lucide-react";
 import { HookOption } from "../hooks/HookSelector";
 import { getCategoryColors } from "@/utils/categoryColors";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -25,6 +25,7 @@ interface IdeasGalleryProps {
   favorites: string[];
   usageCount: number;
   maxUsage: number;
+  isLoading?: boolean;
 }
 
 const IdeasGallery: React.FC<IdeasGalleryProps> = ({
@@ -36,6 +37,7 @@ const IdeasGallery: React.FC<IdeasGalleryProps> = ({
   favorites,
   usageCount,
   maxUsage,
+  isLoading = false,
 }) => {
   const [previewContent, setPreviewContent] = useState<{ideaId: string, hookId: string} | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
@@ -99,10 +101,20 @@ const IdeasGallery: React.FC<IdeasGalleryProps> = ({
           onClick={onRefresh} 
           variant="outline" 
           className="min-w-10 h-10 p-0 border-white/10 bg-white/5"
+          disabled={isLoading}
         >
-          <RefreshCw className="h-4 w-4" />
+          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
         </Button>
       </div>
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex flex-col items-center justify-center py-12">
+          <Loader2 className="h-12 w-12 text-blue-500 animate-spin mb-4" />
+          <p className="text-lg font-medium">Generating ideas...</p>
+          <p className="text-white/60">This may take a few moments</p>
+        </div>
+      )}
 
       {/* Preview Modal */}
       {previewContent && (
@@ -175,119 +187,141 @@ const IdeasGallery: React.FC<IdeasGalleryProps> = ({
         </div>
       )}
 
-      <div className="space-y-6">
-        {sortedCategories.map((category) => {
-          const categoryColors = getCategoryColors(category);
-          const isExpanded = expandedCategories.includes(category);
-          
-          return (
-            <Collapsible 
-              key={category} 
-              open={isExpanded} 
-              onOpenChange={() => toggleCategoryExpand(category)}
-              className="border border-white/10 rounded-xl overflow-hidden"
-            >
-              <CollapsibleTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className={`w-full justify-between p-4 ${categoryColors.bg} ${categoryColors.text} hover:${categoryColors.bg} hover:brightness-95`}
-                >
-                  <div className="flex items-center">
-                    <span className="font-medium">{category}</span>
-                    <Badge variant="outline" className={`ml-2 ${categoryColors.bg} ${categoryColors.text} ${categoryColors.border}`}>
-                      {groupedIdeas[category].length}
-                    </Badge>
-                  </div>
-                  {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-              </CollapsibleTrigger>
-              
-              <CollapsibleContent className="bg-black p-2 space-y-4">
-                {groupedIdeas[category].map((idea) => (
-                  <div 
-                    key={idea.id} 
-                    className="border border-white/10 rounded-xl overflow-hidden bg-black"
+      {/* No ideas message */}
+      {!isLoading && ideas.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="bg-white/5 rounded-full p-4 mb-4">
+            <RefreshCw className="h-8 w-8 text-white/40" />
+          </div>
+          <h3 className="text-lg font-medium mb-2">No ideas found</h3>
+          <p className="text-white/60 max-w-md mx-auto mb-6">
+            We couldn't find any ideas for your current selection. Try changing your theme or categories, or click refresh to try again.
+          </p>
+          <Button 
+            onClick={onRefresh}
+            className="bg-blue-600 hover:bg-blue-500"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" /> Refresh Ideas
+          </Button>
+        </div>
+      )}
+
+      {/* Ideas list */}
+      {!isLoading && ideas.length > 0 && (
+        <div className="space-y-6">
+          {sortedCategories.map((category) => {
+            const categoryColors = getCategoryColors(category);
+            const isExpanded = expandedCategories.includes(category);
+            
+            return (
+              <Collapsible 
+                key={category} 
+                open={isExpanded} 
+                onOpenChange={() => toggleCategoryExpand(category)}
+                className="border border-white/10 rounded-xl overflow-hidden"
+              >
+                <CollapsibleTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    className={`w-full justify-between p-4 ${categoryColors.bg} ${categoryColors.text} hover:${categoryColors.bg} hover:brightness-95`}
                   >
-                    {/* Idea Header - Always visible */}
-                    <div className={`p-4 min-h-[80px] relative ${categoryColors.bg} ${categoryColors.text}`}>
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-medium text-base pr-8">{idea.title}</h3>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => onToggleFavorite(idea.id)}
-                          className="h-8 w-8 rounded-full hover:bg-black/10 flex-shrink-0 ml-2"
-                        >
-                          <Heart
-                            className={`h-5 w-5 ${
-                              favorites.includes(idea.id) ? "fill-current text-red-500" : ""
-                            }`}
-                          />
-                        </Button>
-                      </div>
+                    <div className="flex items-center">
+                      <span className="font-medium">{category}</span>
+                      <Badge variant="outline" className={`ml-2 ${categoryColors.bg} ${categoryColors.text} ${categoryColors.border}`}>
+                        {groupedIdeas[category].length}
+                      </Badge>
                     </div>
-                    
-                    {/* Hooks Section - Always visible */}
-                    <div className="p-4 border-t border-white/10 bg-black/20">
-                      <h4 className="text-sm font-medium text-white/70 mb-3">Choose a hook or use the idea directly</h4>
-                      <div className="space-y-3">
-                        {idea.hooks && idea.hooks.map((hook) => (
-                          <div 
-                            key={hook.id} 
-                            className="border border-white/10 rounded-lg p-3 hover:bg-white/5 transition-colors"
-                          >
-                            <div className="flex items-center gap-3 mb-2">
-                              <div className="h-8 w-8 rounded-full overflow-hidden bg-gray-700">
-                                <img 
-                                  src={hook.author.avatar} 
-                                  alt={hook.author.name} 
-                                  className="h-full w-full object-cover" 
-                                />
-                              </div>
-                              <div>
-                                <div className="font-medium text-sm">{hook.author.name}</div>
-                                <div className="text-xs text-white/60">{hook.author.credential}</div>
-                              </div>
-                            </div>
-                            <p className="text-sm text-white/80 mb-3">{hook.text}</p>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-xs border-white/10 hover:bg-white/5"
-                                onClick={() => handlePreview(idea.id, hook.id)}
-                              >
-                                Preview
-                              </Button>
-                              <Button
-                                variant="default"
-                                size="sm"
-                                className="text-xs bg-blue-600 hover:bg-blue-500"
-                                onClick={() => onCombinationSelect(idea, hook.id)}
-                              >
-                                Use this hook
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                        <div className="border-t border-white/10 pt-3 mt-4">
+                    {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </Button>
+                </CollapsibleTrigger>
+                
+                <CollapsibleContent className="bg-black p-2 space-y-4">
+                  {groupedIdeas[category].map((idea) => (
+                    <div 
+                      key={idea.id} 
+                      className="border border-white/10 rounded-xl overflow-hidden bg-black"
+                    >
+                      {/* Idea Header - Always visible */}
+                      <div className={`p-4 min-h-[80px] relative ${categoryColors.bg} ${categoryColors.text}`}>
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-medium text-base pr-8">{idea.title}</h3>
                           <Button
-                            variant="outline"
-                            className="w-full border-white/10 hover:bg-white/5"
-                            onClick={() => onCombinationSelect(idea, "")}
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onToggleFavorite(idea.id)}
+                            className="h-8 w-8 rounded-full hover:bg-black/10 flex-shrink-0 ml-2"
                           >
-                            Use idea without a hook
+                            <Heart
+                              className={`h-5 w-5 ${
+                                favorites.includes(idea.id) ? "fill-current text-red-500" : ""
+                              }`}
+                            />
                           </Button>
                         </div>
                       </div>
+                      
+                      {/* Hooks Section - Always visible */}
+                      <div className="p-4 border-t border-white/10 bg-black/20">
+                        <h4 className="text-sm font-medium text-white/70 mb-3">Choose a hook or use the idea directly</h4>
+                        <div className="space-y-3">
+                          {idea.hooks && idea.hooks.map((hook) => (
+                            <div 
+                              key={hook.id} 
+                              className="border border-white/10 rounded-lg p-3 hover:bg-white/5 transition-colors"
+                            >
+                              <div className="flex items-center gap-3 mb-2">
+                                <div className="h-8 w-8 rounded-full overflow-hidden bg-gray-700">
+                                  <img 
+                                    src={hook.author.avatar} 
+                                    alt={hook.author.name} 
+                                    className="h-full w-full object-cover" 
+                                  />
+                                </div>
+                                <div>
+                                  <div className="font-medium text-sm">{hook.author.name}</div>
+                                  <div className="text-xs text-white/60">{hook.author.credential}</div>
+                                </div>
+                              </div>
+                              <p className="text-sm text-white/80 mb-3">{hook.text}</p>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-xs border-white/10 hover:bg-white/5"
+                                  onClick={() => handlePreview(idea.id, hook.id)}
+                                >
+                                  Preview
+                                </Button>
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  className="text-xs bg-blue-600 hover:bg-blue-500"
+                                  onClick={() => onCombinationSelect(idea, hook.id)}
+                                >
+                                  Use this hook
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                          <div className="border-t border-white/10 pt-3 mt-4">
+                            <Button
+                              variant="outline"
+                              className="w-full border-white/10 hover:bg-white/5"
+                              onClick={() => onCombinationSelect(idea, "")}
+                            >
+                              Use idea without a hook
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-          );
-        })}
-      </div>
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

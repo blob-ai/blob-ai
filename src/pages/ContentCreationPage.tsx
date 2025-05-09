@@ -5,6 +5,7 @@ import ContentCreationModal from "@/components/content/ContentCreationModal";
 import PublishModal from "@/components/content/publish/PublishModal";
 import { toast } from "sonner";
 import { useContentCreation, CreationStep } from "@/hooks/useContentCreation";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 // Step components
 import StartStep from "@/components/content/steps/StartStep";
@@ -12,8 +13,9 @@ import ThemeSelectionStep from "@/components/content/steps/ThemeSelectionStep";
 import IdeasGalleryStep from "@/components/content/steps/IdeasGalleryStep";
 import CanvasStep from "@/components/content/steps/CanvasStep";
 import BackNavigation from "@/components/content/steps/BackNavigation";
+import AuthRequired from "@/components/auth/AuthRequired";
 
-const ContentCreationPage = () => {
+const ContentCreationPageContent = () => {
   const {
     currentStep,
     showCreationModal,
@@ -25,6 +27,7 @@ const ContentCreationPage = () => {
     favorites,
     usageCount,
     maxUsage,
+    isLoading,
     selectedIdea,
     setShowCreationModal,
     setFavorites,
@@ -51,7 +54,7 @@ const ContentCreationPage = () => {
           <IdeasGalleryStep
             theme={theme}
             ideas={generatedIdeas}
-            onRefresh={() => handleThemeSubmit(theme, [])}
+            onRefresh={() => handleThemeSubmit(theme, [], contentGoal)}
             onCombinationSelect={handleCombinationSelect}
             onToggleFavorite={(id) => 
               setFavorites(prev => 
@@ -63,6 +66,7 @@ const ContentCreationPage = () => {
             favorites={favorites}
             usageCount={usageCount}
             maxUsage={maxUsage}
+            isLoading={isLoading}
           />
         );
         
@@ -118,6 +122,16 @@ const ContentCreationPage = () => {
         }}
       />
     </PageContainer>
+  );
+};
+
+const ContentCreationPage = () => {
+  return (
+    <AuthProvider>
+      <AuthRequired>
+        <ContentCreationPageContent />
+      </AuthRequired>
+    </AuthProvider>
   );
 };
 
