@@ -1,0 +1,30 @@
+
+/* Markdown styling for the editor */
+.markdown-textarea {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* We'll add these styles to make markdown more visible in the editor */
+.markdown-textarea::selection {
+  background-color: rgba(66, 153, 225, 0.3);
+}
+
+/* This would be enhanced with a proper syntax highlighting library */
+.markdown-highlight-bold {
+  font-weight: 600;
+  color: #ffd700;
+}
+
+.markdown-highlight-italic {
+  font-style: italic;
+  color: #ff69b4;
+}
+
+.markdown-highlight-underline {
+  text-decoration: underline;
+  color: #40e0d0;
+}
+
+.markdown-highlight-list {
+  color: #98fb98;
+}

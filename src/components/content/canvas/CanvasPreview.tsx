@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import TwitterPreview from "../preview/TwitterPreview";
 import LinkedInPreview from "../preview/LinkedInPreview";
 import FacebookPreview from "../preview/FacebookPreview";
+import { sanitizeForPlatform } from "@/lib/formatting";
 
 interface CanvasPreviewProps {
   content: string;
@@ -22,11 +23,16 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
     timestamp: "Just now"
   };
 
+  // Process content based on platform
+  const processedContent = platform !== "default" 
+    ? sanitizeForPlatform(content, platform)
+    : content;
+
   // If default view, render simple content
   if (platform === "default") {
     return (
       <div className="prose prose-invert max-w-full text-sm md:text-base p-4 bg-[#16181c] border border-white/10 rounded-lg">
-        <div className="whitespace-pre-wrap">{content}</div>
+        <div className="whitespace-pre-wrap">{processedContent}</div>
       </div>
     );
   }
@@ -36,21 +42,21 @@ const CanvasPreview: React.FC<CanvasPreviewProps> = ({
     <div className="w-full">
       {platform === "twitter" && (
         <TwitterPreview 
-          content={content} 
+          content={processedContent} 
           profileInfo={profileInfo}
         />
       )}
       
       {platform === "linkedin" && (
         <LinkedInPreview 
-          content={content} 
+          content={processedContent} 
           profileInfo={profileInfo}
         />
       )}
       
       {platform === "facebook" && (
         <FacebookPreview 
-          content={content} 
+          content={processedContent} 
           profileInfo={profileInfo}
         />
       )}

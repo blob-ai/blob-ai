@@ -5,6 +5,7 @@ import ContentEditingToolbar from "./ContentEditingToolbar";
 import useContentFormatting from "./hooks/useContentFormatting";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserRound } from "lucide-react";
+import { FormattingType } from "@/lib/formatting";
 
 interface CanvasEditorProps {
   content: string;
@@ -43,12 +44,17 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
     onTextTransform(operation, selection.text);
   };
 
+  // Apply formatting from the toolbar
+  const applyFormat = (format: string) => {
+    handleFormatting(format as FormattingType, content, setContent, textareaRef);
+  };
+
   // Listen for custom formatting event from the floating toolbar
   useEffect(() => {
     const handleCustomFormatEvent = (e: CustomEvent) => {
       const { format } = e.detail;
       if (format && textareaRef.current) {
-        handleFormatting(format, content, setContent, textareaRef);
+        handleFormatting(format as FormattingType, content, setContent, textareaRef);
       }
     };
     
@@ -58,6 +64,11 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       document.removeEventListener('applyFormatting', handleCustomFormatEvent as EventListener);
     };
   }, [content, handleFormatting, setContent, textareaRef]);
+
+  // For textarea styling to help show markdown formatting
+  const getTextareaClassName = () => {
+    return `min-h-[calc(100vh-200px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea`;
+  };
 
   return (
     <div className="relative">
@@ -77,8 +88,9 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         onChange={(e) => setContent(e.target.value)}
         onSelect={handleTextSelect}
         onKeyDown={onKeyDown}
-        className="min-h-[calc(100vh-200px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none"
+        className={getTextareaClassName()}
         placeholder="Start writing your content here..."
+        spellCheck={true}
       />
       
       {/* Modern floating toolbar that appears near text selection */}
@@ -88,7 +100,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       {selection && (
         <ContentEditingToolbar
           onSelect={handleTextOperation}
-          onFormat={() => {}}
+          onFormat={applyFormat}
           style={{
             position: 'absolute',
             display: 'none', // Hide the legacy toolbar

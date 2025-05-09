@@ -7,12 +7,14 @@ import {
   Underline,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FormattingType } from "@/lib/formatting";
 
 interface ContentEditingToolbarProps {
   onSelect: (option: string) => void;
   onFormat: (format: string) => void;
   style?: React.CSSProperties;
   isFloating?: boolean;
+  activeFormats?: FormattingType[];
 }
 
 const ContentEditingToolbar: React.FC<ContentEditingToolbarProps> = ({
@@ -20,6 +22,7 @@ const ContentEditingToolbar: React.FC<ContentEditingToolbarProps> = ({
   onFormat,
   style = {},
   isFloating = false,
+  activeFormats = [],
 }) => {
   const textOptions = [
     { id: "rewrite", label: "Rewrite" },
@@ -63,7 +66,10 @@ const ContentEditingToolbar: React.FC<ContentEditingToolbarProps> = ({
               key={option.id}
               variant="ghost"
               size="sm"
-              className="text-white/70 hover:text-white hover:bg-white/5"
+              className={cn(
+                "text-white/70 hover:text-white hover:bg-white/5",
+                activeFormats?.includes(option.id as FormattingType) && "bg-white/20 text-white"
+              )}
               onClick={() => onFormat(option.id)}
             >
               {option.icon}

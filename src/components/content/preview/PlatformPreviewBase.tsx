@@ -2,6 +2,7 @@
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { markdownToHtml } from "@/lib/formatting";
 
 export interface ProfileInfo {
   name: string;
@@ -61,11 +62,12 @@ export const formatContent = (content: string, limit?: number, linkifyHashtags =
   
   // Split text into paragraphs
   return displayContent.split("\n\n").map((paragraph, idx) => {
-    // Process hashtags if needed
-    let processedParagraph = paragraph;
+    // Convert markdown to HTML
+    let processedParagraph = markdownToHtml(paragraph);
     
+    // Process hashtags if needed
     if (linkifyHashtags) {
-      processedParagraph = paragraph.replace(
+      processedParagraph = processedParagraph.replace(
         /#(\w+)/g, 
         '<span class="text-blue-500">#$1</span>'
       );

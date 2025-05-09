@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 import { useRef, useEffect, useState } from "react";
 import { 
@@ -6,11 +7,13 @@ import {
   Underline,
   List 
 } from "lucide-react";
+import { applyFormatting, FormattingType, hasFormatting } from "@/lib/formatting";
 
 const useContentFormatting = () => {
   const [toolbarVisible, setToolbarVisible] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
   const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null);
+  const [activeFormats, setActiveFormats] = useState<FormattingType[]>([]);
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   // Calculate proper toolbar position based on selection
@@ -50,6 +53,18 @@ const useContentFormatting = () => {
     return { top: `${top}px`, left: `${left}px` };
   };
 
+  // Check which formatting is active for the current selection
+  const checkActiveFormats = (selectedText: string) => {
+    const formats: FormattingType[] = [];
+    
+    if (hasFormatting(selectedText, 'bold')) formats.push('bold');
+    if (hasFormatting(selectedText, 'italic')) formats.push('italic');
+    if (hasFormatting(selectedText, 'underline')) formats.push('underline');
+    if (hasFormatting(selectedText, 'list')) formats.push('list');
+    
+    setActiveFormats(formats);
+  };
+
   // Monitor selection changes
   useEffect(() => {
     const handleSelectionChange = () => {
@@ -76,6 +91,9 @@ const useContentFormatting = () => {
           start: textarea.selectionStart,
           end: textarea.selectionEnd
         });
+        
+        // Check which formats are active
+        checkActiveFormats(textContent);
       } else {
         setToolbarVisible(false);
       }
@@ -87,7 +105,7 @@ const useContentFormatting = () => {
   
   // Basic formatting operations
   const handleFormatting = (
-    format: string,
+    format: FormattingType,
     content: string,
     setContent: (content: string) => void,
     textareaRef: React.RefObject<HTMLTextAreaElement>
@@ -106,37 +124,29 @@ const useContentFormatting = () => {
     
     const selectedText = content.substring(start, end);
     
-    let formattedText = "";
-    
-    switch(format) {
-      case "bold":
-        formattedText = `**${selectedText}**`;
-        break;
-      case "italic":
-        formattedText = `*${selectedText}*`;
-        break;
-      case "underline":
-        formattedText = `_${selectedText}_`;
-        break;
-      case "list":
-        formattedText = selectedText.split("\n").map(line => `• ${line}`).join("\n");
-        break;
-      default:
-        formattedText = selectedText;
+    // If the format is already applied, remove it
+    if (hasFormatting(selectedText, format)) {
+      // This would require a more complex implementation to remove formatting
+      // For now, just apply it again as a simple implementation
+      toast.info(`Format toggle will be implemented in the next version`);
     }
     
-    const newContent = 
-      content.substring(0, start) + 
-      formattedText + 
-      content.substring(end);
-    
+    // Apply the formatting
+    const newContent = applyFormatting(content, format, start, end);
     setContent(newContent);
     
     // Restore focus to the textarea
     setTimeout(() => {
       textarea.focus();
-      textarea.setSelectionRange(start, start + formattedText.length);
+      textarea.setSelectionRange(start, start + (format === 'list' ? 
+        selectedText.split('\n').join('\n• ').length + 2 : 
+        selectedText.length + (format === 'bold' ? 4 : 2)));
     }, 0);
+    
+    // Update active formats
+    if (!activeFormats.includes(format)) {
+      setActiveFormats([...activeFormats, format]);
+    }
   };
 
   // Render the floating toolbar
@@ -144,10 +154,10 @@ const useContentFormatting = () => {
     if (!toolbarVisible) return null;
     
     const formatOptions = [
-      { id: "bold", icon: <Bold className="h-3.5 w-3.5" />, label: "Bold" },
-      { id: "italic", icon: <Italic className="h-3.5 w-3.5" />, label: "Italic" },
-      { id: "underline", icon: <Underline className="h-3.5 w-3.5" />, label: "Underline" },
-      { id: "list", icon: <List className="h-3.5 w-3.5" />, label: "List" },
+      { id: 'bold' as FormattingType, icon: <Bold className="h-3.5 w-3.5" />, label: "Bold" },
+      { id: 'italic' as FormattingType, icon: <Italic className="h-3.5 w-3.5" />, label: "Italic" },
+      { id: 'underline' as FormattingType, icon: <Underline className="h-3.5 w-3.5" />, label: "Underline" },
+      { id: 'list' as FormattingType, icon: <List className="h-3.5 w-3.5" />, label: "List" },
     ];
     
     return (
@@ -159,7 +169,9 @@ const useContentFormatting = () => {
         {formatOptions.map((option) => (
           <button
             key={option.id}
-            className="p-1.5 rounded hover:bg-white/10 transition-colors flex items-center"
+            className={`p-1.5 rounded transition-colors flex items-center ${
+              activeFormats.includes(option.id) ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/70'
+            }`}
             title={option.label}
             onClick={() => {
               // This will be connected to the formatting handler in CanvasEditor
@@ -183,7 +195,8 @@ const useContentFormatting = () => {
     handleFormatting,
     renderFloatingToolbar,
     toolbarVisible,
-    setToolbarVisible
+    setToolbarVisible,
+    activeFormats,
   };
 };
 
