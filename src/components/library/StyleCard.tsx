@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { CardContainer } from "@/components/ui/card-container";
 import { Badge } from "@/components/ui/badge";
@@ -45,9 +44,10 @@ interface StyleCardProps {
     source: "user" | "creator";
     isSavedInspiration?: boolean;
   };
+  onDelete?: (id: string) => void;
 }
 
-const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
+const StyleCard: React.FC<StyleCardProps> = ({ style, onDelete }) => {
   const [isFavorite, setIsFavorite] = useState(style.isFavorite);
   const navigate = useNavigate();
 
@@ -61,7 +61,11 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
   };
 
   const handleDelete = () => {
-    toast.success(`Deleted ${style.name}`);
+    if (onDelete) {
+      onDelete(style.id);
+    } else {
+      toast.success(`Deleted ${style.name}`);
+    }
   };
 
   const handleUseStyle = () => {
@@ -111,15 +115,15 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
   const cardTypeDetails = getCardTypeDetails();
 
   return (
-    <CardContainer className={`bg-[#1A202C] border-white/10 p-0 overflow-hidden ${
+    <CardContainer className={`border-white/10 p-0 overflow-hidden ${
       style.isSavedInspiration 
         ? "border-l-4 border-l-amber-500/50" 
         : style.isTemplate 
           ? "border-l-4 border-l-emerald-500/50" 
           : "border-l-4 border-l-[#3260ea]/50"
-    } shadow-md hover:shadow-lg transition-all style-creation-card`}>
+    } shadow-md style-creation-card`}>
       {/* Card Header */}
-      <div className="p-4 border-b border-white/10 flex justify-between items-center bg-[#1E2431]">
+      <div className="p-4 border-b border-white/10 flex justify-between items-center bg-[#151A24]">
         <div>
           <div className="flex items-center gap-2 mb-1">
             {cardTypeDetails.icon}
@@ -241,7 +245,7 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
       </div>
 
       {/* Card Footer */}
-      <div className="border-t border-white/10 p-3 bg-[#1E2431] flex items-center justify-between">
+      <div className="border-t border-white/10 p-3 bg-[#151A24] flex items-center justify-between">
         <div className="text-xs text-white/50 flex items-center gap-1">
           {cardTypeDetails.icon}
           <span>{cardTypeDetails.label} • {style.folder}</span>

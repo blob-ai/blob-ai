@@ -3,13 +3,14 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Folder, Star, Clock, Heart, Sparkles } from "lucide-react";
+import { Plus, Search, Folder, FolderPlus, Star, Clock, Heart, Sparkles, X } from "lucide-react";
 import { CardContainer } from "@/components/ui/card-container";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import StyleCard from "./StyleCard";
 import { useNavigate } from "react-router-dom";
 import QuickSaveModal from "./QuickSaveModal";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
 
 // Define the Style type to fix TypeScript errors
 type Style = {
@@ -29,99 +30,27 @@ type Style = {
   isSavedInspiration?: boolean;
 };
 
-// Sample saved styles - in a real app this would come from an API
-const SAMPLE_SAVED_STYLES: Style[] = [{
-  id: "p1",
-  name: "Naval's Wisdom",
-  creatorName: "Naval Ravikant",
-  creatorHandle: "@naval",
-  creatorAvatar: "https://pbs.twimg.com/profile_images/1256841238298292232/ycqwaMI2_400x400.jpg",
-  description: "Concise philosophical insights",
-  tone: ["Thoughtful", "Direct", "Philosophical"],
-  example: "If you aren't willing to be mocked, you'll never be original enough.",
-  date: "2023-05-15",
-  isFavorite: true,
-  folder: "Inspiration",
-  isTemplate: false,
-  source: "creator"
-}, {
-  id: "p2",
-  name: "Business Growth Tactics",
-  creatorName: "Alex Hormozi",
-  creatorHandle: "@AlexHormozi",
-  creatorAvatar: "https://pbs.twimg.com/profile_images/1602381288925261824/OBgGZqZ7_400x400.jpg",
-  description: "List-based tactical advice",
-  tone: ["Bold", "Motivational", "Strategic"],
-  example: "The 3 types of leverage:\n\n1. Money\n2. People\n3. Technology",
-  date: "2023-06-22",
-  isFavorite: false,
-  folder: "Business",
-  isTemplate: true,
-  source: "creator"
-}, {
-  id: "p3",
-  name: "5-Hour Rule Framework",
-  creatorName: "Sahil Bloom",
-  creatorHandle: "@SahilBloom",
-  creatorAvatar: "https://pbs.twimg.com/profile_images/1735694839870857216/MQW8CD5T_400x400.jpg",
-  description: "Mental models and frameworks",
-  tone: ["Educational", "Clear", "Structured"],
-  example: "The 5-hour rule: Invest in yourself for 1 hour each day.",
-  date: "2023-06-10",
-  isFavorite: true,
-  folder: "Inspiration",
-  isTemplate: false,
-  source: "creator"
-}, {
-  id: "p4",
-  name: "My Tech Commentary",
-  creatorName: "You",
-  creatorHandle: "",
-  creatorAvatar: "",
-  description: "Personal style for tech topics",
-  tone: ["Analytical", "Clear", "Opinionated"],
-  example: "Tech isn't just about features, it's about how those features change our lives.",
-  date: "2023-07-05",
-  isFavorite: false,
-  folder: "Personal",
-  isTemplate: false,
-  source: "user"
-}];
-
-// Sample folders
-const FOLDERS = [{
-  id: "f1",
-  name: "All",
-  count: 12
-}, {
-  id: "f2",
-  name: "Inspiration",
-  count: 5
-}, {
-  id: "f3",
-  name: "Business",
-  count: 3
-}, {
-  id: "f4",
-  name: "Personal",
-  count: 4
-}, {
-  id: "f5",
-  name: "Quick Inspirations",
-  count: 0
-}, {
-  id: "f6",
-  name: "Templates",
-  count: 2
-}];
+// Define the Folder type
+type Folder = {
+  id: string;
+  name: string;
+  count: number;
+};
 
 const LibraryMyStyles: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeView, setActiveView] = useState("all");
   const [selectedFolder, setSelectedFolder] = useState("All");
   const [showQuickSaveModal, setShowQuickSaveModal] = useState(false);
-  const [savedStyles, setSavedStyles] = useState<Style[]>(SAMPLE_SAVED_STYLES);
-  const [folders, setFolders] = useState(FOLDERS);
+  const [savedStyles, setSavedStyles] = useState<Style[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([
+    { id: "f1", name: "All", count: 0 },
+    { id: "f2", name: "Inspiration", count: 0 },
+    { id: "f3", name: "Business", count: 0 },
+    { id: "f4", name: "Personal", count: 0 }
+  ]);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
   const navigate = useNavigate();
 
   const filteredStyles = savedStyles.filter(style => {
@@ -171,9 +100,73 @@ const LibraryMyStyles: React.FC = () => {
   };
 
   const handleCreateFolder = () => {
-    // In a real app, this would open a modal to create a new folder
-    // For now, just show a toast
-    toast.success("Folder creation feature coming soon!");
+    setShowNewFolderInput(true);
+  };
+
+  const handleAddFolder = () => {
+    if (newFolderName.trim() === "") {
+      toast.error("Folder name cannot be empty");
+      return;
+    }
+
+    // Check if folder with same name already exists
+    if (folders.some(folder => folder.name.toLowerCase() === newFolderName.toLowerCase())) {
+      toast.error("A folder with this name already exists");
+      return;
+    }
+
+    // Add new folder
+    setFolders(prev => [...prev, { 
+      id: uuidv4(),
+      name: newFolderName.trim(), 
+      count: 0 
+    }]);
+
+    // Reset state
+    setNewFolderName("");
+    setShowNewFolderInput(false);
+    toast.success(`Folder "${newFolderName}" created`);
+  };
+
+  const handleDeleteFolder = (id: string, name: string) => {
+    // Don't allow deleting the "All" folder
+    if (name === "All") {
+      toast.error("The 'All' folder cannot be deleted");
+      return;
+    }
+
+    // Move any styles in this folder to "All"
+    setSavedStyles(prevStyles => 
+      prevStyles.map(style => 
+        style.folder === name ? { ...style, folder: "All" } : style
+      )
+    );
+
+    // Delete folder
+    setFolders(prev => prev.filter(folder => folder.id !== id));
+    
+    // If the deleted folder was selected, switch to "All"
+    if (selectedFolder === name) {
+      setSelectedFolder("All");
+    }
+
+    toast.success(`Folder "${name}" deleted`);
+  };
+
+  const handleDeleteStyle = (id: string) => {
+    // Find the style to get its folder
+    const style = savedStyles.find(s => s.id === id);
+    if (!style) return;
+    
+    // Delete style
+    setSavedStyles(prev => prev.filter(s => s.id !== id));
+    
+    // Decrement folder count
+    setFolders(prevFolders => prevFolders.map(folder => 
+      folder.name === style.folder ? { ...folder, count: Math.max(0, folder.count - 1) } : folder
+    ));
+
+    toast.success(`Style "${style.name}" deleted`);
   };
 
   return (
@@ -195,17 +188,65 @@ const LibraryMyStyles: React.FC = () => {
         
         <div className="space-y-1">
           {folders.map(folder => (
-            <Button 
-              key={folder.id} 
-              variant={selectedFolder === folder.name ? "secondary" : "ghost"} 
-              className={`w-full justify-start ${selectedFolder === folder.name ? 'bg-[#24293A] text-white' : ''}`}
-              onClick={() => setSelectedFolder(folder.name)}
-            >
-              <Folder className="h-4 w-4 mr-2" />
-              {folder.name}
-              <span className="ml-auto text-white/40 text-xs">{folder.count}</span>
-            </Button>
+            <div key={folder.id} className="flex items-center">
+              <Button 
+                variant={selectedFolder === folder.name ? "secondary" : "ghost"} 
+                className={`w-full justify-start ${selectedFolder === folder.name ? 'bg-[#24293A] text-white' : ''}`}
+                onClick={() => setSelectedFolder(folder.name)}
+              >
+                <Folder className="h-4 w-4 mr-2" />
+                {folder.name}
+                <span className="ml-auto text-white/40 text-xs">{folder.count}</span>
+              </Button>
+              {folder.name !== "All" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="ml-1 h-8 w-8 p-0 text-white/40 hover:text-white hover:bg-red-900/20"
+                  onClick={() => handleDeleteFolder(folder.id, folder.name)}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              )}
+            </div>
           ))}
+
+          {showNewFolderInput && (
+            <div className="flex mt-2 items-center gap-2">
+              <Input
+                autoFocus
+                placeholder="Folder name"
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                className="h-8 text-sm bg-[#1A202C] border-white/10"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddFolder();
+                  if (e.key === 'Escape') {
+                    setShowNewFolderInput(false);
+                    setNewFolderName("");
+                  }
+                }}
+              />
+              <Button 
+                size="sm"
+                className="h-8 bg-[#3260ea] hover:bg-[#2853c6]"
+                onClick={handleAddFolder}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="h-8 hover:bg-white/10"
+                onClick={() => {
+                  setShowNewFolderInput(false);
+                  setNewFolderName("");
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
         
         <div className="space-y-2 mt-8">
@@ -226,7 +267,7 @@ const LibraryMyStyles: React.FC = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 h-4 w-4" />
           <Input 
             placeholder="Search saved styles" 
-            className="pl-10 bg-[#1A202C] border-white/10 h-10" 
+            className="pl-10 bg-[#101217] border-white/10 h-10" 
             value={searchTerm} 
             onChange={e => setSearchTerm(e.target.value)} 
           />
@@ -234,7 +275,7 @@ const LibraryMyStyles: React.FC = () => {
 
         {/* View tabs */}
         <Tabs value={activeView} onValueChange={setActiveView} className="mb-6">
-          <TabsList className="bg-[#1A202C] border border-white/10 p-1">
+          <TabsList className="bg-[#101217] border border-white/10 p-1">
             <TabsTrigger 
               value="all" 
               className="data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
@@ -262,7 +303,7 @@ const LibraryMyStyles: React.FC = () => {
         {/* Mobile folder selector and buttons */}
         <div className="sm:hidden mb-4 space-y-3">
           <select 
-            className="w-full bg-[#1A202C] border border-white/10 rounded-md h-10 px-3 text-white" 
+            className="w-full bg-[#101217] border border-white/10 rounded-md h-10 px-3 text-white" 
             value={selectedFolder} 
             onChange={e => setSelectedFolder(e.target.value)}
           >
@@ -275,8 +316,16 @@ const LibraryMyStyles: React.FC = () => {
           
           <div className="flex gap-2">
             <Button 
+              onClick={handleCreateFolder}
+              variant="outline"
+              className="flex-1 bg-transparent border-white/20"
+            >
+              <FolderPlus className="h-4 w-4 mr-2" />
+              New Folder
+            </Button>
+            <Button 
               onClick={handleCreateStyle} 
-              className="w-full bg-[#3260ea] hover:bg-[#2853c6]"
+              className="flex-1 bg-[#3260ea] hover:bg-[#2853c6]"
             >
               <Plus className="h-4 w-4 mr-2" />
               Create Style
@@ -289,15 +338,19 @@ const LibraryMyStyles: React.FC = () => {
           {filteredStyles.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 pb-10">
               {filteredStyles.map(style => (
-                <StyleCard key={style.id} style={style} />
+                <StyleCard key={style.id} style={style} onDelete={handleDeleteStyle} />
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center p-6 bg-[#1A202C]/50 rounded-lg border border-white/5">
+            <div className="flex flex-col items-center justify-center h-full text-center p-6 bg-[#101217]/50 rounded-lg border border-white/5">
               <Star className="h-16 w-16 text-white/20 mb-4" />
               <h3 className="text-lg font-medium text-white mb-2">No saved styles found</h3>
               <p className="text-white/70 mb-4">
-                {searchTerm ? 'Try adjusting your search' : 'Start saving styles from the Explore tab'}
+                {searchTerm 
+                  ? 'Try adjusting your search' 
+                  : selectedFolder !== "All" 
+                    ? `No styles in the "${selectedFolder}" folder yet` 
+                    : 'Start saving styles from the Explore tab'}
               </p>
               <div className="flex gap-2">
                 <Button 
@@ -306,6 +359,12 @@ const LibraryMyStyles: React.FC = () => {
                   className="bg-transparent border-white/20"
                 >
                   Browse Explore
+                </Button>
+                <Button 
+                  onClick={handleCreateStyle}
+                  className="bg-[#3260ea] hover:bg-[#2853c6]"
+                >
+                  Create Style
                 </Button>
               </div>
             </div>
@@ -317,7 +376,8 @@ const LibraryMyStyles: React.FC = () => {
       <QuickSaveModal 
         isOpen={showQuickSaveModal} 
         onClose={() => setShowQuickSaveModal(false)} 
-        onSave={handleSaveInspiration} 
+        onSave={handleSaveInspiration}
+        folders={folders.filter(folder => folder.name !== "All").map(folder => folder.name)}
       />
     </div>
   );

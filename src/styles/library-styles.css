@@ -3,12 +3,13 @@
 .style-creation-card {
   transition: none;
   transform: none !important;
+  background-color: #101217 !important;
 }
 
 /* Explicitly disable hover effects */
 .style-creation-card:hover {
   transform: none !important;
-  background-color: inherit !important;
+  background-color: #101217 !important;
 }
 
 /* Preview examples section styling with enhanced visibility */

@@ -24,7 +24,7 @@ export function CardContainer({
   return (
     <div
       className={cn(
-        !transparent && "bg-black/20 border border-white/10 rounded-lg transition-all hover:bg-black/30",
+        !transparent && "bg-[#101217] border border-white/10 rounded-lg transition-all",
         !noPadding && "p-2 sm:p-3",
         fullWidth ? "w-full" : "",
         className

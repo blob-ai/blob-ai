@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PageContainer } from "@/components/ui/page-container";
@@ -172,7 +171,7 @@ const CreatorDetailPage: React.FC = () => {
                 Use This Style
               </Button>
               <Button variant="outline" className="bg-transparent">
-                Save to Vault
+                Save to Folder
               </Button>
             </div>
           </div>
