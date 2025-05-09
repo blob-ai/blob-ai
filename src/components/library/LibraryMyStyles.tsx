@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Folder, FolderPlus, Star, Clock, Heart, Sparkles, X } from "lucide-react";
+import { Plus, Search, Folder, FolderPlus, Star, Clock, Heart, Sparkles, X, Bookmark, Save } from "lucide-react";
 import { CardContainer } from "@/components/ui/card-container";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import StyleCard from "./StyleCard";
@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import QuickSaveModal from "./QuickSaveModal";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
+import { ActionButton } from "@/components/ui/action-button";
 
 // Define the Style type to fix TypeScript errors
 type Style = {
@@ -255,20 +256,40 @@ const LibraryMyStyles: React.FC = () => {
             <Plus className="h-4 w-4 mr-2" />
             Create Your Own Style
           </Button>
+          
+          <Button 
+            onClick={handleQuickSave}
+            variant="outline"
+            className="w-full bg-transparent border-white/20"
+          >
+            <Bookmark className="h-4 w-4 mr-2" />
+            Quick Save Inspiration
+          </Button>
         </div>
       </div>
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Search bar */}
-        <div className="mb-4 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 h-4 w-4" />
-          <Input 
-            placeholder="Search saved styles" 
-            className="pl-10 bg-[#101217] border-white/10 h-10" 
-            value={searchTerm} 
-            onChange={e => setSearchTerm(e.target.value)} 
+        {/* Quick save CTA + Search bar */}
+        <div className="mb-4 space-y-3">
+          {/* Quick Save CTA */}
+          <ActionButton
+            icon={<Save className="h-4 w-4" />}
+            label="Quick Save Inspiration"
+            onClick={handleQuickSave}
+            className="w-full bg-[#3260ea] hover:bg-[#2853c6] mb-2"
           />
+          
+          {/* Search bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 h-4 w-4" />
+            <Input 
+              placeholder="Search saved styles" 
+              className="pl-10 bg-[#101217] border-white/10 h-10" 
+              value={searchTerm} 
+              onChange={e => setSearchTerm(e.target.value)} 
+            />
+          </div>
         </div>
 
         {/* View tabs */}
@@ -359,10 +380,11 @@ const LibraryMyStyles: React.FC = () => {
                   Browse Explore
                 </Button>
                 <Button 
-                  onClick={handleCreateStyle}
+                  onClick={handleQuickSave}
                   className="bg-[#3260ea] hover:bg-[#2853c6]"
                 >
-                  Create Style
+                  <Bookmark className="h-4 w-4 mr-2" />
+                  Quick Save
                 </Button>
               </div>
             </div>
