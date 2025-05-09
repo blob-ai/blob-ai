@@ -29,7 +29,7 @@ const CreatorCard: React.FC<CreatorCardProps> = ({ creator }) => {
   };
 
   return (
-    <CardContainer className="bg-[#1A202C] border-white/10 hover:border-primary-400/30 transition-all flex flex-col">
+    <CardContainer className="bg-[#1A202C] border-white/10 transition-all flex flex-col style-creation-card">
       <div className="flex items-start gap-3">
         <img
           src={creator.avatar}

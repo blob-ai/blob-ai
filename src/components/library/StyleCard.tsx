@@ -8,7 +8,6 @@ import {
   Heart,
   MessageSquare,
   Trash2,
-  Pin,
   Copy,
   Edit,
   Share,
@@ -41,7 +40,6 @@ interface StyleCardProps {
     example: string;
     date: string;
     isFavorite: boolean;
-    isPinned: boolean;
     folder: string;
     isTemplate: boolean;
     source: "user" | "creator";
@@ -51,7 +49,6 @@ interface StyleCardProps {
 
 const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
   const [isFavorite, setIsFavorite] = useState(style.isFavorite);
-  const [isPinned, setIsPinned] = useState(style.isPinned);
   const navigate = useNavigate();
 
   const toggleFavorite = () => {
@@ -60,15 +57,6 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
       !isFavorite ? 
         `Added ${style.name} to favorites` : 
         `Removed ${style.name} from favorites`
-    );
-  };
-
-  const togglePin = () => {
-    setIsPinned(!isPinned);
-    toast.success(
-      !isPinned ? 
-        `Pinned ${style.name} to top` : 
-        `Unpinned ${style.name}`
     );
   };
 
@@ -164,17 +152,6 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
           >
             <Heart
               className={`h-4 w-4 ${isFavorite ? "fill-red-500 text-red-500" : ""}`}
-            />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white/70 hover:text-white hover:bg-white/10 h-8 w-8 p-0"
-            onClick={togglePin}
-          >
-            <Pin
-              className={`h-4 w-4 ${isPinned ? "text-[#3260ea]" : ""}`}
             />
           </Button>
 
