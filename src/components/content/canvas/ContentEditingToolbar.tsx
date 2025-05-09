@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormattingType } from "@/lib/formatting";
+import { cn } from "@/lib/utils";
 
 interface ContentEditingToolbarProps {
   onSelect: (option: string) => void;

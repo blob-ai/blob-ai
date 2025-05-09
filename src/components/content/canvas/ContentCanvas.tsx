@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
@@ -12,6 +11,7 @@ import KeyboardShortcutsGuide from "./KeyboardShortcutsGuide";
 import useContentFormatting from "./hooks/useContentFormatting";
 import ResizablePanelsWrapper from "./ResizablePanelsWrapper";
 import { ContentVersion } from "./ContentVersionHistory";
+import { FormattingType } from "@/lib/formatting";
 
 interface ContentCanvasProps {
   initialContent?: string;
@@ -259,7 +259,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
   };
 
   const onFormatting = (format: string) => {
-    handleFormatting(format, content, setContent, textareaRef);
+    handleFormatting(format as FormattingType, content, setContent, textareaRef);
   };
 
   const handleSendToAI = async (message: string, selection?: string) => {
