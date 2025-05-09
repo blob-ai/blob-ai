@@ -1,5 +1,4 @@
 
-
 /* Remove hover effect from style creation cards */
 .style-creation-card {
   transition: none;
@@ -186,4 +185,3 @@
 .device-desktop {
   width: 100%;
 }
-

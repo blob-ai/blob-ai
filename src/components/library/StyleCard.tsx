@@ -129,7 +129,7 @@ const StyleCard: React.FC<StyleCardProps> = ({ style }) => {
         : style.isTemplate 
           ? "border-l-4 border-l-emerald-500/50" 
           : "border-l-4 border-l-[#3260ea]/50"
-    } shadow-md hover:shadow-lg transition-all`}>
+    } shadow-md hover:shadow-lg transition-all style-creation-card`}>
       {/* Card Header */}
       <div className="p-4 border-b border-white/10 flex justify-between items-center bg-[#1E2431]">
         <div>
