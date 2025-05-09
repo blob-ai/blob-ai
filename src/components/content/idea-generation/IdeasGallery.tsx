@@ -37,14 +37,8 @@ const IdeasGallery: React.FC<IdeasGalleryProps> = ({
   usageCount,
   maxUsage,
 }) => {
-  const [expandedIdea, setExpandedIdea] = useState<string | null>(null);
   const [previewContent, setPreviewContent] = useState<{ideaId: string, hookId: string} | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
-
-  const toggleExpand = (ideaId: string) => {
-    setExpandedIdea(expandedIdea === ideaId ? null : ideaId);
-    setPreviewContent(null);
-  };
 
   const toggleCategoryExpand = (category: string) => {
     setExpandedCategories(prev => 
@@ -212,18 +206,17 @@ const IdeasGallery: React.FC<IdeasGalleryProps> = ({
                 {groupedIdeas[category].map((idea) => (
                   <div 
                     key={idea.id} 
-                    className={`border border-white/10 rounded-xl overflow-hidden transition-all duration-300 ${
-                      expandedIdea === idea.id ? 'bg-white/5' : 'bg-black'
-                    }`}
+                    className="border border-white/10 rounded-xl overflow-hidden bg-black"
                   >
-                    <div className={`p-4 min-h-[100px] relative ${categoryColors.bg} ${categoryColors.text}`}>
-                      <h3 className="font-medium text-base">{idea.title}</h3>
-                      <div className="flex items-center justify-between mt-4">
+                    {/* Idea Header - Always visible */}
+                    <div className={`p-4 min-h-[80px] relative ${categoryColors.bg} ${categoryColors.text}`}>
+                      <div className="flex justify-between items-start">
+                        <h3 className="font-medium text-base pr-8">{idea.title}</h3>
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => onToggleFavorite(idea.id)}
-                          className="h-8 w-8 rounded-full hover:bg-black/10"
+                          className="h-8 w-8 rounded-full hover:bg-black/10 flex-shrink-0 ml-2"
                         >
                           <Heart
                             className={`h-5 w-5 ${
@@ -231,89 +224,63 @@ const IdeasGallery: React.FC<IdeasGalleryProps> = ({
                             }`}
                           />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => toggleExpand(idea.id)}
-                          className="h-8 w-8 rounded-full hover:bg-black/10"
-                        >
-                          {expandedIdea === idea.id ? (
-                            <ChevronUp className="h-5 w-5" />
-                          ) : (
-                            <ChevronDown className="h-5 w-5" />
-                          )}
-                        </Button>
                       </div>
                     </div>
                     
-                    {expandedIdea === idea.id && idea.hooks && (
-                      <div className="p-4 border-t border-white/10 bg-black/20">
-                        <h4 className="text-sm font-medium text-white/70 mb-3">Choose a hook or use the idea directly</h4>
-                        <div className="space-y-3">
-                          {idea.hooks.map((hook) => (
-                            <div 
-                              key={hook.id} 
-                              className="border border-white/10 rounded-lg p-3 hover:bg-white/5 transition-colors"
-                            >
-                              <div className="flex items-center gap-3 mb-2">
-                                <div className="h-8 w-8 rounded-full overflow-hidden bg-gray-700">
-                                  <img 
-                                    src={hook.author.avatar} 
-                                    alt={hook.author.name} 
-                                    className="h-full w-full object-cover" 
-                                  />
-                                </div>
-                                <div>
-                                  <div className="font-medium text-sm">{hook.author.name}</div>
-                                  <div className="text-xs text-white/60">{hook.author.credential}</div>
-                                </div>
+                    {/* Hooks Section - Always visible */}
+                    <div className="p-4 border-t border-white/10 bg-black/20">
+                      <h4 className="text-sm font-medium text-white/70 mb-3">Choose a hook or use the idea directly</h4>
+                      <div className="space-y-3">
+                        {idea.hooks && idea.hooks.map((hook) => (
+                          <div 
+                            key={hook.id} 
+                            className="border border-white/10 rounded-lg p-3 hover:bg-white/5 transition-colors"
+                          >
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className="h-8 w-8 rounded-full overflow-hidden bg-gray-700">
+                                <img 
+                                  src={hook.author.avatar} 
+                                  alt={hook.author.name} 
+                                  className="h-full w-full object-cover" 
+                                />
                               </div>
-                              <p className="text-sm text-white/80 mb-3">{hook.text}</p>
-                              <div className="flex gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="text-xs border-white/10 hover:bg-white/5"
-                                  onClick={() => handlePreview(idea.id, hook.id)}
-                                >
-                                  Preview
-                                </Button>
-                                <Button
-                                  variant="default"
-                                  size="sm"
-                                  className="text-xs bg-blue-600 hover:bg-blue-500"
-                                  onClick={() => onCombinationSelect(idea, hook.id)}
-                                >
-                                  Use this hook
-                                </Button>
+                              <div>
+                                <div className="font-medium text-sm">{hook.author.name}</div>
+                                <div className="text-xs text-white/60">{hook.author.credential}</div>
                               </div>
                             </div>
-                          ))}
-                          <div className="border-t border-white/10 pt-3 mt-4">
-                            <Button
-                              variant="outline"
-                              className="w-full border-white/10 hover:bg-white/5"
-                              onClick={() => onCombinationSelect(idea, "")}
-                            >
-                              Use idea without a hook
-                            </Button>
+                            <p className="text-sm text-white/80 mb-3">{hook.text}</p>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-xs border-white/10 hover:bg-white/5"
+                                onClick={() => handlePreview(idea.id, hook.id)}
+                              >
+                                Preview
+                              </Button>
+                              <Button
+                                variant="default"
+                                size="sm"
+                                className="text-xs bg-blue-600 hover:bg-blue-500"
+                                onClick={() => onCombinationSelect(idea, hook.id)}
+                              >
+                                Use this hook
+                              </Button>
+                            </div>
                           </div>
+                        ))}
+                        <div className="border-t border-white/10 pt-3 mt-4">
+                          <Button
+                            variant="outline"
+                            className="w-full border-white/10 hover:bg-white/5"
+                            onClick={() => onCombinationSelect(idea, "")}
+                          >
+                            Use idea without a hook
+                          </Button>
                         </div>
                       </div>
-                    )}
-                    
-                    {expandedIdea !== idea.id && (
-                      <div className="p-3 border-t border-white/10 bg-black">
-                        <Button
-                          variant="outline"
-                          onClick={() => toggleExpand(idea.id)}
-                          className="w-full bg-transparent border border-white/20 hover:bg-white/5"
-                          size="sm"
-                        >
-                          View hooks & use
-                        </Button>
-                      </div>
-                    )}
+                    </div>
                   </div>
                 ))}
               </CollapsibleContent>
