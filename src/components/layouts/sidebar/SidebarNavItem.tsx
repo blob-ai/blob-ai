@@ -1,9 +1,9 @@
+
 import React from 'react';
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { LucideIcon } from "lucide-react";
 
 interface SidebarNavItemProps {
   name: string;

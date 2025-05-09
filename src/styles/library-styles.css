@@ -1,15 +1,22 @@
 
+
 /* Remove hover effect from style creation cards */
 .style-creation-card {
-  transition: transform 0.2s ease;
-  transform: translateY(0);
+  transition: none;
+  transform: none !important;
 }
 
-/* Preview examples section styling */
+/* Explicitly disable hover effects */
+.style-creation-card:hover {
+  transform: none !important;
+  background-color: inherit !important;
+}
+
+/* Preview examples section styling with enhanced visibility */
 .preview-examples-section {
-  background: linear-gradient(180deg, rgba(50, 96, 234, 0.08) 0%, rgba(50, 96, 234, 0.03) 100%);
+  background: linear-gradient(180deg, rgba(50, 96, 234, 0.15) 0%, rgba(50, 96, 234, 0.08) 100%);
   border-radius: 0.75rem;
-  border: 1px solid rgba(50, 96, 234, 0.2);
+  border: 1px solid rgba(50, 96, 234, 0.3);
   padding: 1.5rem;
   margin-top: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -179,3 +186,4 @@
 .device-desktop {
   width: 100%;
 }
+

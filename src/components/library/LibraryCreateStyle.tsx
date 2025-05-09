@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   File, FileText, MessageSquare, Save, Settings, Sparkles, 
-  RefreshCw, Sliders, X, CheckCircle, Send, Layout, Type
+  RefreshCw, Sliders, X, CheckCircle, Send, Layout, Type, Lightbulb
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
@@ -312,14 +313,14 @@ const LibraryCreateStyle: React.FC = () => {
               </h2>
               
               <CardContainer 
-                className={`cursor-pointer transition-all p-4 ${
+                className={`style-creation-card transition-all p-4 ${
                   creationMethod === "upload" ? "border-[#3260ea] bg-[#151A24]" : "hover:border-white/20"
                 }`}
                 onClick={() => setCreationMethod("upload")}
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white/5 rounded-lg">
-                    <FileText className="h-6 w-6 text-primary-400" />
+                    <FileText className="h-6 w-6 text-[#3260ea]" />
                   </div>
                   <div>
                     <h3 className="font-medium">Upload writing samples</h3>
@@ -336,7 +337,7 @@ const LibraryCreateStyle: React.FC = () => {
                       className="bg-black/30 border-white/10"
                     />
                     {uploadedFile && (
-                      <p className="mt-2 text-sm text-primary-400">
+                      <p className="mt-2 text-sm text-[#3260ea]">
                         {uploadedFile.name} selected
                       </p>
                     )}
@@ -345,14 +346,14 @@ const LibraryCreateStyle: React.FC = () => {
               </CardContainer>
               
               <CardContainer 
-                className={`cursor-pointer transition-all p-4 ${
+                className={`style-creation-card transition-all p-4 ${
                   creationMethod === "paste" ? "border-[#3260ea] bg-[#151A24]" : "hover:border-white/20"
                 }`}
                 onClick={() => setCreationMethod("paste")}
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white/5 rounded-lg">
-                    <File className="h-6 w-6 text-primary-400" />
+                    <File className="h-6 w-6 text-[#3260ea]" />
                   </div>
                   <div>
                     <h3 className="font-medium">Paste text directly</h3>
@@ -373,14 +374,14 @@ const LibraryCreateStyle: React.FC = () => {
               </CardContainer>
               
               <CardContainer 
-                className={`cursor-pointer transition-all p-4 ${
+                className={`style-creation-card transition-all p-4 ${
                   creationMethod === "chat" ? "border-[#3260ea] bg-[#151A24]" : "hover:border-white/20"
                 }`}
                 onClick={() => setCreationMethod("chat")}
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white/5 rounded-lg">
-                    <MessageSquare className="h-6 w-6 text-primary-400" />
+                    <MessageSquare className="h-6 w-6 text-[#3260ea]" />
                   </div>
                   <div>
                     <h3 className="font-medium">Chat with AI</h3>
@@ -426,7 +427,14 @@ const LibraryCreateStyle: React.FC = () => {
                           </div>
                         </div>
                       ))}
-                      {/* ... keep existing code (isAnalyzing spinner) */}
+                      {isAnalyzing && (
+                        <div className="flex justify-start">
+                          <div className="flex items-center space-x-2 p-3 rounded-lg bg-[#1E2431] text-white/90 border border-white/10">
+                            <RefreshCw className="h-4 w-4 animate-spin" />
+                            <span>Thinking...</span>
+                          </div>
+                        </div>
+                      )}
                       <div ref={chatEndRef}></div>
                     </div>
                   </div>
@@ -456,7 +464,28 @@ const LibraryCreateStyle: React.FC = () => {
                   
                   {/* Chat Suggestions */}
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {/* ... keep existing code (chat suggestion buttons) */}
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="bg-transparent border-white/20 hover:bg-white/5 text-xs"
+                      onClick={() => {
+                        setCurrentMessage("I want a bold, direct style for marketing");
+                        setTimeout(() => sendChatMessage(), 100);
+                      }}
+                    >
+                      Bold marketing style
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="bg-transparent border-white/20 hover:bg-white/5 text-xs"
+                      onClick={() => {
+                        setCurrentMessage("I need an educational style for technical content");
+                        setTimeout(() => sendChatMessage(), 100);
+                      }}
+                    >
+                      Educational tech style
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -535,28 +564,44 @@ const LibraryCreateStyle: React.FC = () => {
                     </div>
                   </div>
                   
-                  {/* Preview Examples */}
+                  {/* Preview Examples - Enhanced styling */}
                   <div className="flex-grow mb-4 overflow-hidden">
-                    <label className="text-sm text-white/70 block mb-1">Preview Examples</label>
-                    <div className="h-full max-h-[250px] overflow-y-auto">
-                      <ScrollArea className="h-full">
-                        <div className="space-y-3 p-2">
-                          {isAnalyzing ? (
-                            <div className="flex items-center justify-center h-32 text-white/50">
-                              <div className="flex flex-col items-center">
-                                <RefreshCw className="h-5 w-5 animate-spin mb-2" />
-                                <span>Generating examples...</span>
+                    <div className="preview-examples-section">
+                      <div className="preview-examples-heading">
+                        <Lightbulb className="h-5 w-5" />
+                        Preview Examples
+                      </div>
+                      
+                      <div className="max-h-[200px] overflow-y-auto">
+                        <ScrollArea className="h-full">
+                          <div className="space-y-3">
+                            {isAnalyzing ? (
+                              <div className="flex items-center justify-center h-32 text-white/50">
+                                <div className="flex flex-col items-center">
+                                  <RefreshCw className="h-5 w-5 animate-spin mb-2" />
+                                  <span>Generating examples...</span>
+                                </div>
                               </div>
-                            </div>
-                          ) : (
-                            previewExamples.map((example, idx) => (
-                              <div key={idx} className="bg-[#1E2431] p-3 rounded-md border border-white/10 shadow-sm">
-                                <p className="whitespace-pre-wrap text-sm text-white/90">{example}</p>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </ScrollArea>
+                            ) : (
+                              previewExamples.map((example, idx) => (
+                                <div key={idx} className="example-content">
+                                  <p className="whitespace-pre-wrap text-sm text-white/90">{example}</p>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </ScrollArea>
+                      </div>
+                      
+                      <div className="mt-4 flex justify-center">
+                        <button 
+                          onClick={refreshExamples}
+                          className="regenerate-examples-button"
+                        >
+                          <RefreshCw className="h-4 w-4" />
+                          Regenerate Examples
+                        </button>
+                      </div>
                     </div>
                   </div>
                   
@@ -565,21 +610,23 @@ const LibraryCreateStyle: React.FC = () => {
                     <div className="mb-4">
                       <label className="text-sm text-white/70 block mb-2">Tone Adjustments</label>
                       <div className="space-y-4">
-                        {/* ... keep existing code (tone sliders) */}
+                        {selectedTones.slice(0, 1).map((tone) => (
+                          <div key={tone} className="space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span>Less {tone}</span>
+                              <span>More {tone}</span>
+                            </div>
+                            <Slider 
+                              defaultValue={[75]} 
+                              max={100} 
+                              step={1} 
+                              className="cursor-pointer"
+                            />
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
-                  
-                  <div className="text-center py-1 mt-auto">
-                    <Button 
-                      onClick={refreshExamples}
-                      variant="outline"
-                      className="bg-transparent border-white/20"
-                    >
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Regenerate Examples
-                    </Button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -640,6 +687,66 @@ const LibraryCreateStyle: React.FC = () => {
                     ))}
                   </div>
                 </div>
+                
+                {/* Format Tags */}
+                <div className="mb-4">
+                  <label className="text-sm text-white/70 block mb-1">Format (select up to 2)</label>
+                  <div className="flex flex-wrap gap-2">
+                    {formats.map((format) => (
+                      <Badge 
+                        key={format}
+                        variant={selectedFormats.includes(format) ? "default" : "outline"}
+                        className={`cursor-pointer ${
+                          selectedFormats.includes(format) 
+                            ? "bg-[#3260ea]/80 hover:bg-[#3260ea] text-white" 
+                            : "bg-transparent hover:bg-white/10"
+                        }`}
+                        onClick={() => handleFormatToggle(format)}
+                      >
+                        {format}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Preview Examples Section - Enhanced for non-chat method too */}
+                <div className="preview-examples-section">
+                  <div className="preview-examples-heading">
+                    <Lightbulb className="h-5 w-5" />
+                    Preview Examples
+                  </div>
+                  
+                  <div className="max-h-[200px] overflow-y-auto">
+                    <ScrollArea className="h-full">
+                      <div className="space-y-3">
+                        {isAnalyzing ? (
+                          <div className="flex items-center justify-center h-32 text-white/50">
+                            <div className="flex flex-col items-center">
+                              <RefreshCw className="h-5 w-5 animate-spin mb-2" />
+                              <span>Generating examples...</span>
+                            </div>
+                          </div>
+                        ) : (
+                          previewExamples.map((example, idx) => (
+                            <div key={idx} className="example-content">
+                              <p className="whitespace-pre-wrap text-sm text-white/90">{example}</p>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                  
+                  <div className="mt-4 flex justify-center">
+                    <button 
+                      onClick={refreshExamples}
+                      className="regenerate-examples-button"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                      Regenerate Examples
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -693,7 +800,7 @@ const LibraryCreateStyle: React.FC = () => {
                   {creationMethod === "chat" && previewExamples.length > 0 && (
                     <div className="mt-2 border-t border-white/10 pt-3">
                       <h4 className="text-sm font-medium mb-2 text-white/90">Example output:</h4>
-                      <div className="bg-[#1E2431] p-3 rounded-md border border-white/10">
+                      <div className="example-content">
                         <p className="whitespace-pre-wrap text-sm text-white/90">{previewExamples[0]}</p>
                       </div>
                     </div>
