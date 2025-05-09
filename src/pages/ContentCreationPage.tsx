@@ -1,4 +1,3 @@
-
 import React from "react";
 import { PageContainer } from "@/components/ui/page-container";
 import ContentCreationModal from "@/components/content/ContentCreationModal";
@@ -26,6 +25,7 @@ const ContentCreationPage = () => {
     usageCount,
     maxUsage,
     selectedIdea,
+    categories, // Use the categories from useContentCreation
     setShowCreationModal,
     setFavorites,
     handleThemeSubmit,
@@ -63,6 +63,7 @@ const ContentCreationPage = () => {
             favorites={favorites}
             usageCount={usageCount}
             maxUsage={maxUsage}
+            selectedCategories={categories} // Pass the selected categories
           />
         );
         
