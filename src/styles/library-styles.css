@@ -1,7 +1,7 @@
 
 /* Remove hover effect from style creation cards */
 .style-creation-card {
-  transition: none;
+  transition: none !important;
   transform: none !important;
   background-color: #101217 !important;
 }

@@ -45,9 +45,7 @@ const LibraryMyStyles: React.FC = () => {
   const [savedStyles, setSavedStyles] = useState<Style[]>([]);
   const [folders, setFolders] = useState<Folder[]>([
     { id: "f1", name: "All", count: 0 },
-    { id: "f2", name: "Inspiration", count: 0 },
-    { id: "f3", name: "Business", count: 0 },
-    { id: "f4", name: "Personal", count: 0 }
+    { id: "f2", name: "Inspiration", count: 0 }
   ]);
   const [newFolderName, setNewFolderName] = useState("");
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);

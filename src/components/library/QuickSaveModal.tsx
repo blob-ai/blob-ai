@@ -16,17 +16,20 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CardContainer } from "@/components/ui/card-container";
 import { v4 as uuidv4 } from "uuid";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface QuickSaveModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (style: any) => void;
+  folders?: string[];
 }
 
 const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  folders = [],
 }) => {
   // State for the form
   const [urlInput, setUrlInput] = useState("");
@@ -36,6 +39,7 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   const [title, setTitle] = useState("");
+  const [selectedFolder, setSelectedFolder] = useState("Inspiration");
 
   // Mock function to simulate fetching content from URL
   const fetchContentFromURL = async (url: string) => {
@@ -96,8 +100,7 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
       example: content,
       date: new Date().toISOString().split('T')[0],
       isFavorite: false,
-      isPinned: false,
-      folder: "Inspirations",
+      folder: selectedFolder || "Inspiration",
       isTemplate: false,
       source: "user" as const,
       isSavedInspiration: true
@@ -115,6 +118,7 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
     setUploadedFile(null);
     setSuggestedTags([]);
     setTitle("");
+    setSelectedFolder("Inspiration");
   };
 
   const handleURLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -231,7 +235,7 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
               
               <div>
                 <label className="text-sm font-medium text-white/70 mb-1 block">Content Preview</label>
-                <ScrollArea className="h-24 w-full rounded-md border border-white/10 p-3 bg-black/20">
+                <ScrollArea className="h-24 w-full rounded-md border border-white/10 p-3 bg-black/20 shadow-inner">
                   <div className="whitespace-pre-wrap">{content}</div>
                 </ScrollArea>
               </div>
@@ -258,6 +262,28 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
                   onKeyDown={handleAddTag}
                   disabled={suggestedTags.length >= 5}
                 />
+              </div>
+              
+              {/* Add folder selection */}
+              <div>
+                <label className="text-sm font-medium text-white/70 mb-1 block">Save to folder</label>
+                <Select 
+                  value={selectedFolder} 
+                  onValueChange={setSelectedFolder}
+                >
+                  <SelectTrigger className="bg-black/20 border-white/10">
+                    <SelectValue placeholder="Select a folder" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1A1F2C] border-white/10 text-white">
+                    {folders.length > 0 ? (
+                      folders.map((folder) => (
+                        <SelectItem key={folder} value={folder}>{folder}</SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="Inspiration">Inspiration</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div>
