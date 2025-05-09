@@ -55,4 +55,32 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   );
 };
 
+export const sidebarNavItems = [
+  {
+    title: 'Dashboard',
+    href: '/dashboard',
+    icon: <LayoutDashboard className="h-5 w-5" />,
+  },
+  {
+    title: 'Chat',
+    href: '/dashboard/chat',
+    icon: <MessageSquare className="h-5 w-5" />,
+  },
+  {
+    title: 'Styles',
+    href: '/dashboard/styles',
+    icon: <Brush className="h-5 w-5" />,
+  },
+  {
+    title: 'Templates',
+    href: '/dashboard/templates',
+    icon: <FileText className="h-5 w-5" />,
+  },
+  {
+    title: 'Workspace',
+    href: '/dashboard/workspace',
+    icon: <Folder className="h-5 w-5" />,
+  },
+];
+
 export default SidebarNavItem;

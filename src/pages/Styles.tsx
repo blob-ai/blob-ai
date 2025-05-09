@@ -8,7 +8,7 @@ import LibraryCreateStyle from "@/components/library/LibraryCreateStyle";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 
-const Library = () => {
+const Styles = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "myStyles";
   const navigate = useNavigate();
@@ -76,4 +76,4 @@ const Library = () => {
   );
 };
 
-export default Library;
+export default Styles;
