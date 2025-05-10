@@ -11,8 +11,14 @@
     
     /* Blues for primary actions */
     --accent-primary: #4a72f5;  /* Bright blue - CTAs */
+    --accent-primary-rgb: 74, 114, 245;  /* RGB values for opacity */
     --accent-hover: #5b80fa;    /* Lighter blue - hover */
     --accent-subtle: #374151;   /* Subtle blue-gray */
+    
+    /* RGB values for opacity support */
+    --accent-blue: #4a72f5;
+    --accent-blue-rgb: 74, 114, 245;
+    --accent-blue-hover: #5b80fa;
     
     /* Grays for secondary elements */
     --gray-100: #f8fafc;        /* White text */
@@ -83,6 +89,6 @@
   }
   
   ::selection {
-    @apply bg-primary/15 text-foreground;
+    @apply bg-opacity-15 bg-[var(--accent-blue)] text-foreground;
   }
 }

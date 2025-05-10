@@ -83,7 +83,7 @@
   }
   
   .preview-examples-header {
-    @apply bg-[var(--accent-blue)]/10 text-[var(--accent-blue)] font-medium rounded-md px-3 py-1.5 inline-flex items-center gap-2 mb-4;
+    @apply bg-[color:rgba(var(--accent-blue-rgb),0.1)] text-[var(--accent-blue)] font-medium rounded-md px-3 py-1.5 inline-flex items-center gap-2 mb-4;
   }
   
   .preview-cta {
@@ -173,7 +173,7 @@
   
   /* Selection styles */
   ::selection {
-    @apply bg-[var(--accent-blue)]/15 text-white;
+    @apply bg-opacity-15 bg-[var(--accent-blue)] text-white;
   }
   
   /* Enhanced Markdown Styling */

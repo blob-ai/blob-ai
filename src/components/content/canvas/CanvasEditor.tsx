@@ -79,7 +79,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
   // For textarea styling to help show markdown formatting
   const getTextareaClassName = () => {
-    return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea selection:bg-[var(--accent-blue)] selection:bg-opacity-15 selection:text-white`;
+    return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea selection:bg-opacity-15 selection:bg-[var(--accent-blue)] selection:text-white`;
   };
 
   return (
