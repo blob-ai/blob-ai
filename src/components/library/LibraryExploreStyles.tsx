@@ -109,7 +109,7 @@ const LibraryExploreStyles: React.FC = () => {
           </div>
           <div>
             <h3 className="font-medium text-white">Have a bookmarked post that inspired you?</h3>
-            <p className="text-sm text-white/80">Quick Save it and reuse it later.</p>
+            <p className="text-sm text-white/80">Save a post and reuse it later.</p>
           </div>
         </div>
         <Button onClick={() => setShowQuickSaveModal(true)} className="whitespace-nowrap bg-[var(--accent-blue)] hover:bg-[var(--accent-blue-hover)]">
