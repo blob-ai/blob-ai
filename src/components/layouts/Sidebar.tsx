@@ -7,7 +7,7 @@ import {
   MessageSquare, 
   FileText, 
   Users,
-  Palette
+  BookmarkIcon
 } from "lucide-react";
 
 // Import refactored sidebar components
@@ -19,7 +19,7 @@ import SidebarFooter from "./sidebar/SidebarFooter";
 const Sidebar = () => {
   const { isSidebarOpen } = useSidebar();
 
-  // Main navigation items - renamed Library to Styles and changed icon
+  // Main navigation items - renamed Library and changed icon
   const navItems = [
     {
       name: "AI Chat",
@@ -37,9 +37,9 @@ const Sidebar = () => {
       hasAction: false
     },
     {
-      name: "Styles",
+      name: "Library",
       path: "/dashboard/library",
-      icon: <Palette className="h-6 w-6" />,
+      icon: <BookmarkIcon className="h-6 w-6" />,
       exact: true,
       hasAction: false
     }

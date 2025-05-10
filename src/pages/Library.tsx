@@ -4,13 +4,12 @@ import { PageContainer } from "@/components/ui/page-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LibraryExploreStyles from "@/components/library/LibraryExploreStyles";
 import LibraryMyStyles from "@/components/library/LibraryMyStyles";
-import LibraryCreateStyle from "@/components/library/LibraryCreateStyle";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { RainbowButton } from "@/components/ui/rainbow-button";
+import { BookmarkIcon } from "lucide-react";
 
 const Library = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get("tab") || "myStyles";
+  const activeTab = searchParams.get("tab") || "explore"; // Change default to "explore"
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -26,7 +25,7 @@ const Library = () => {
       <div className="border-b border-white/10 bg-[#141921] sticky top-0 z-10 shadow-md">
         <div className="px-4 py-6 max-w-[1200px] mx-auto">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">Styles</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Library</h1>
             <p className="text-white/80 text-sm sm:text-base">
               Discover, save, and apply content styles to create your unique voice
             </p>
@@ -35,15 +34,9 @@ const Library = () => {
       </div>
 
       <PageContainer className="flex flex-col flex-grow overflow-hidden pt-4">
-        <Tabs defaultValue="myStyles" value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
+        <Tabs defaultValue="explore" value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
           <div className="flex justify-center mb-6">
             <TabsList className="bg-black/50 border border-white/10 p-1 shadow-md rounded-full overflow-hidden">
-              <TabsTrigger 
-                value="myStyles" 
-                className="px-8 rounded-full data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
-              >
-                My Styles
-              </TabsTrigger>
               <TabsTrigger 
                 value="explore" 
                 className="px-8 rounded-full data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
@@ -51,24 +44,20 @@ const Library = () => {
                 Explore
               </TabsTrigger>
               <TabsTrigger 
-                value="create" 
+                value="myStyles" 
                 className="px-8 rounded-full data-[state=active]:bg-[#24293A] data-[state=active]:text-white"
               >
-                Create Style
+                My Styles
               </TabsTrigger>
             </TabsList>
           </div>
-
-          <TabsContent value="myStyles" className="flex-grow overflow-hidden m-0">
-            <LibraryMyStyles />
-          </TabsContent>
 
           <TabsContent value="explore" className="flex-grow overflow-hidden m-0">
             <LibraryExploreStyles />
           </TabsContent>
 
-          <TabsContent value="create" className="flex-grow overflow-hidden m-0">
-            <LibraryCreateStyle />
+          <TabsContent value="myStyles" className="flex-grow overflow-hidden m-0">
+            <LibraryMyStyles />
           </TabsContent>
         </Tabs>
       </PageContainer>

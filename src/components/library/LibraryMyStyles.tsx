@@ -1,17 +1,14 @@
-
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Folder, FolderPlus, Star, Clock, Heart, Sparkles, X, Bookmark, Save } from "lucide-react";
+import { Plus, Search, Folder, FolderPlus, Star, Clock, Heart, X } from "lucide-react";
 import { CardContainer } from "@/components/ui/card-container";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import StyleCard from "./StyleCard";
 import { useNavigate } from "react-router-dom";
-import QuickSaveModal from "./QuickSaveModal";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
-import { ActionButton } from "@/components/ui/action-button";
 
 // Define the Style type to fix TypeScript errors
 type Style = {
@@ -42,7 +39,6 @@ const LibraryMyStyles: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeView, setActiveView] = useState("all");
   const [selectedFolder, setSelectedFolder] = useState("All");
-  const [showQuickSaveModal, setShowQuickSaveModal] = useState(false);
   const [savedStyles, setSavedStyles] = useState<Style[]>([]);
   const [folders, setFolders] = useState<Folder[]>([
     { id: "f1", name: "All", count: 0 },
@@ -71,7 +67,10 @@ const LibraryMyStyles: React.FC = () => {
   });
 
   const handleCreateStyle = () => {
-    setSearchParams({ tab: "create" });
+    navigate({
+      pathname: "/dashboard/library",
+      search: `?tab=create`
+    });
   };
 
   const setSearchParams = (params: { tab: string }) => {
@@ -82,7 +81,7 @@ const LibraryMyStyles: React.FC = () => {
   };
 
   const handleQuickSave = () => {
-    setShowQuickSaveModal(true);
+    setSearchParams({ tab: "create" });
   };
 
   const handleSaveInspiration = (newStyle: Style) => {
@@ -261,26 +260,6 @@ const LibraryMyStyles: React.FC = () => {
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Quick save banner */}
-        <CardContainer className="mb-4 p-4 flex items-center justify-between bg-[#1A1F2C]">
-          <div className="flex items-center gap-3">
-            <div className="bg-[#3260ea]/20 rounded-full p-2">
-              <Sparkles className="h-5 w-5 text-[#3260ea]" />
-            </div>
-            <div>
-              <h3 className="font-medium text-white">Have a bookmarked post that inspired you?</h3>
-              <p className="text-sm text-white/70">Quick Save it and reuse it later.</p>
-            </div>
-          </div>
-          <Button 
-            onClick={handleQuickSave}
-            className="whitespace-nowrap bg-[#3260ea] hover:bg-[#2853c6]"
-          >
-            <Save className="h-4 w-4 mr-2" /> 
-            Save a Post
-          </Button>
-        </CardContainer>
-        
         {/* Search bar */}
         <div className="mb-4">
           <div className="relative">
@@ -381,26 +360,11 @@ const LibraryMyStyles: React.FC = () => {
                 >
                   Browse Explore
                 </Button>
-                <Button 
-                  onClick={handleQuickSave}
-                  className="bg-[#3260ea] hover:bg-[#2853c6]"
-                >
-                  <Bookmark className="h-4 w-4 mr-2" />
-                  Quick Save
-                </Button>
               </div>
             </div>
           )}
         </ScrollArea>
       </div>
-      
-      {/* Quick Save Modal */}
-      <QuickSaveModal 
-        isOpen={showQuickSaveModal} 
-        onClose={() => setShowQuickSaveModal(false)} 
-        onSave={handleSaveInspiration}
-        folders={folders.filter(folder => folder.name !== "All").map(folder => folder.name)}
-      />
     </div>
   );
 };

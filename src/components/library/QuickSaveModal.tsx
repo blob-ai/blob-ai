@@ -16,34 +16,34 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CardContainer } from "@/components/ui/card-container";
 import { v4 as uuidv4 } from "uuid";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Bookmark, BookmarkType } from "@/types/bookmark";
 
 interface QuickSaveModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (style: any) => void;
-  folders?: string[];
+  onSave: (bookmark: Omit<Bookmark, "id" | "user_id" | "created_at" | "updated_at">) => void;
 }
 
 const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
   isOpen,
   onClose,
-  onSave,
-  folders = [],
+  onSave
 }) => {
   // State for the form
   const [urlInput, setUrlInput] = useState("");
-  const [comment, setComment] = useState("");
+  const [notes, setNotes] = useState("");
   const [content, setContent] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   const [title, setTitle] = useState("");
-  const [selectedFolder, setSelectedFolder] = useState("Inspiration");
+  const [bookmarkType, setBookmarkType] = useState<BookmarkType>("link");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Mock function to simulate fetching content from URL
   const fetchContentFromURL = async (url: string) => {
     setIsAnalyzing(true);
+    setBookmarkType("link");
+    
     // In a real app, this would call an API to fetch the content
     // For now, we'll simulate a delay and return mock data
     await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -55,70 +55,71 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
     
     setContent(mockContent);
     
-    // Generate mock title and tags based on content
+    // Generate mock title based on content
     const mockTitle = url.includes("twitter") || url.includes("x.com")
       ? "Business Growth Tactics from Alex Hormozi"
       : "Naval's Wisdom on Originality";
     
     setTitle(mockTitle);
-    
-    const mockTags = url.includes("twitter") || url.includes("x.com")
-      ? ["Bold", "Listicle", "Strategic"]
-      : ["Thoughtful", "Direct", "Philosophical"];
-    
-    setSuggestedTags(mockTags);
     setIsAnalyzing(false);
   };
 
   // Handle file upload for OCR
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setUploadedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setUploadedFile(file);
+      setBookmarkType("screenshot");
       setIsAnalyzing(true);
       
+      // Create a preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      
       // In a real app, this would send the file to an OCR service
-      // For now, we'll simulate a delay and return mock data
       setTimeout(() => {
-        setContent("Tech isn't just about features, it's about how those features change our lives.");
         setTitle("Tech Commentary on User Experience");
-        setSuggestedTags(["Analytical", "Clear", "Opinionated"]);
         setIsAnalyzing(false);
-      }, 2000);
+      }, 1500);
     }
   };
 
-  // Save the inspiration
+  // Handle direct text entry
+  const handleTextInput = (text: string) => {
+    if (text.trim()) {
+      setContent(text);
+      setBookmarkType("text");
+    }
+  };
+
+  // Save the bookmark
   const handleSave = () => {
-    const newInspiration = {
-      id: uuidv4(),
-      name: title || "Untitled Inspiration",
-      creatorName: "Unknown Creator",
-      creatorHandle: "",
-      creatorAvatar: "",
-      description: comment || "Saved inspiration",
-      tone: suggestedTags,
-      example: content,
-      date: new Date().toISOString().split('T')[0],
-      isFavorite: false,
-      folder: selectedFolder || "Inspiration",
-      isTemplate: false,
-      source: "user" as const,
-      isSavedInspiration: true
+    const newBookmark: Omit<Bookmark, "id" | "user_id" | "created_at" | "updated_at"> = {
+      title: title || "Untitled Bookmark",
+      content: content,
+      type: bookmarkType,
+      notes: notes,
+      source_url: bookmarkType === "link" ? urlInput : undefined,
+      image_url: imagePreview || undefined,
+      updated_at: new Date().toISOString()
     };
     
-    onSave(newInspiration);
+    onSave(newBookmark);
     resetForm();
-    onClose();
   };
 
   const resetForm = () => {
     setUrlInput("");
-    setComment("");
+    setNotes("");
     setContent("");
     setUploadedFile(null);
-    setSuggestedTags([]);
+    setImagePreview(null);
     setTitle("");
-    setSelectedFolder("Inspiration");
+    setBookmarkType("link");
+    setIsAnalyzing(false);
   };
 
   const handleURLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,26 +132,13 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
     }
   };
 
-  const handleRemoveTag = (tag: string) => {
-    setSuggestedTags(suggestedTags.filter(t => t !== tag));
-  };
-
-  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-      if (!suggestedTags.includes(e.currentTarget.value.trim()) && suggestedTags.length < 5) {
-        setSuggestedTags([...suggestedTags, e.currentTarget.value.trim()]);
-        e.currentTarget.value = '';
-      }
-    }
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[550px] bg-[#1A1F2C] border-white/10 text-white">
         <DialogHeader>
-          <DialogTitle>Save Inspiration</DialogTitle>
+          <DialogTitle>Save Bookmark</DialogTitle>
           <DialogDescription className="text-white/70">
-            Quickly save writing that inspires you for future reference.
+            Quickly bookmark content that inspires you for future reference.
           </DialogDescription>
         </DialogHeader>
         
@@ -214,6 +202,20 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
             </div>
           </div>
           
+          {/* Or enter text directly */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-white/70">Or directly enter text</label>
+            <Textarea
+              placeholder="Type or paste content here..."
+              className="bg-black/20 border-white/10 min-h-[100px]"
+              value={content}
+              onChange={(e) => {
+                handleTextInput(e.target.value);
+                setContent(e.target.value);
+              }}
+            />
+          </div>
+          
           {isAnalyzing && (
             <div className="p-3 bg-white/5 rounded-lg flex items-center justify-center space-x-2">
               <Loader2 className="h-4 w-4 animate-spin text-primary-400" />
@@ -221,7 +223,7 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
             </div>
           )}
           
-          {content && !isAnalyzing && (
+          {(content || imagePreview) && !isAnalyzing && (
             <CardContainer className="bg-black/30 border-white/10 p-4 space-y-4">
               <div>
                 <label className="text-sm font-medium text-white/70 mb-1 block">Title</label>
@@ -229,68 +231,28 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="bg-black/20 border-white/10"
-                  placeholder="Give this inspiration a title"
+                  placeholder="Give this bookmark a title"
                 />
               </div>
               
-              <div>
-                <label className="text-sm font-medium text-white/70 mb-1 block">Content Preview</label>
-                <ScrollArea className="h-24 w-full rounded-md border border-white/10 p-3 bg-black/20 shadow-inner">
-                  <div className="whitespace-pre-wrap">{content}</div>
-                </ScrollArea>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium text-white/70 mb-1 block">Tags (up to 5)</label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {suggestedTags.map((tag) => (
-                    <Badge 
-                      key={tag}
-                      className="bg-primary-500/20 text-primary-400 border-none flex items-center"
-                    >
-                      {tag}
-                      <X 
-                        className="ml-1 h-3 w-3 cursor-pointer" 
-                        onClick={() => handleRemoveTag(tag)}
-                      />
-                    </Badge>
-                  ))}
+              {imagePreview && (
+                <div className="relative">
+                  <label className="text-sm font-medium text-white/70 mb-1 block">Preview</label>
+                  <div className="h-48 overflow-hidden rounded-md">
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
-                <Input
-                  className="bg-black/20 border-white/10"
-                  placeholder="Type and press Enter to add tags"
-                  onKeyDown={handleAddTag}
-                  disabled={suggestedTags.length >= 5}
-                />
-              </div>
-              
-              {/* Add folder selection */}
-              <div>
-                <label className="text-sm font-medium text-white/70 mb-1 block">Save to folder</label>
-                <Select 
-                  value={selectedFolder} 
-                  onValueChange={setSelectedFolder}
-                >
-                  <SelectTrigger className="bg-black/20 border-white/10">
-                    <SelectValue placeholder="Select a folder" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#1A1F2C] border-white/10 text-white">
-                    {folders.length > 0 ? (
-                      folders.map((folder) => (
-                        <SelectItem key={folder} value={folder}>{folder}</SelectItem>
-                      ))
-                    ) : (
-                      <SelectItem value="Inspiration">Inspiration</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
+              )}
               
               <div>
-                <label className="text-sm font-medium text-white/70 mb-1 block">Why did you save this? (optional)</label>
+                <label className="text-sm font-medium text-white/70 mb-1 block">Notes (optional)</label>
                 <Textarea
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
                   placeholder="Add a note about why this inspired you..."
                   className="bg-black/20 border-white/10 min-h-[80px]"
                 />
@@ -308,13 +270,13 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
             Cancel
           </Button>
           <Button
-            disabled={!content || isAnalyzing}
+            disabled={(!content && !imagePreview) || isAnalyzing}
             onClick={handleSave}
             className={`bg-primary-500 hover:bg-primary-600 ${
-              !content || isAnalyzing ? "opacity-50" : ""
+              (!content && !imagePreview) || isAnalyzing ? "opacity-50" : ""
             }`}
           >
-            Save Inspiration
+            Save Bookmark
           </Button>
         </DialogFooter>
       </DialogContent>
