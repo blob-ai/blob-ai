@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -136,7 +135,9 @@ const LibraryExploreStyles: React.FC = () => {
         <BookmarkSection 
           bookmarks={bookmarks}
           onDelete={deleteBookmark}
-          onUpdate={updateBookmark}
+          onUpdate={(bookmark) => {
+            updateBookmark(bookmark.id, bookmark);
+          }}
         />
       )}
       

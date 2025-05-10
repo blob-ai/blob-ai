@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Bookmark } from "@/types/bookmark";
 import { v4 as uuidv4 } from "uuid";
@@ -72,6 +71,8 @@ export const useBookmarks = () => {
     try {
       const newBookmark: Bookmark = {
         ...bookmark,
+        title: bookmark.title || bookmark.name || "Unnamed Bookmark",
+        type: bookmark.type || "text",
         user_id: user.id,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),

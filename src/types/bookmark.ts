@@ -5,7 +5,10 @@ export interface Bookmark {
   id: string;
   user_id: string;
   title: string;
+  name?: string;
   content: string;
+  source?: string;
+  folder?: string;
   source_url?: string;
   image_url?: string;
   notes?: string;

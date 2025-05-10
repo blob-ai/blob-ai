@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { v4 as uuidv4 } from "uuid";
 import { Save, X } from "lucide-react";
-import { Bookmark } from "@/types/bookmark";
+import { Bookmark, BookmarkType } from "@/types/bookmark";
 
 interface QuickSaveModalProps {
   isOpen: boolean;
@@ -35,10 +35,12 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({ isOpen, onClose, onSave
     const bookmarkName = name.trim() || `Bookmark ${new Date().toLocaleDateString()}`;
     
     const bookmark = {
+      title: bookmarkName,
       name: bookmarkName,
       content,
       source,
-      folder: "Inspiration"
+      folder: "Inspiration",
+      type: "text" as BookmarkType
     };
     
     onSave(bookmark);

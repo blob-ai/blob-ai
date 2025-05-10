@@ -25,13 +25,14 @@ const BookmarkSection: React.FC<BookmarkSectionProps> = ({ bookmarks, onDelete, 
 
   const handleStartEditing = (bookmark: Bookmark) => {
     setEditingId(bookmark.id);
-    setEditingName(bookmark.name);
+    setEditingName(bookmark.name || bookmark.title);
   };
 
   const handleSaveEditing = (bookmark: Bookmark) => {
     onUpdate({
       ...bookmark,
-      name: editingName
+      name: editingName,
+      title: editingName // Ensure both name and title are updated
     });
     setEditingId(null);
     toast.success("Bookmark renamed");
@@ -98,7 +99,7 @@ const BookmarkSection: React.FC<BookmarkSectionProps> = ({ bookmarks, onDelete, 
                         </div>
                       ) : (
                         <>
-                          <h4 className="font-medium text-sm">{bookmark.name || "Unnamed Bookmark"}</h4>
+                          <h4 className="font-medium text-sm">{bookmark.name || bookmark.title || "Unnamed Bookmark"}</h4>
                           <div className="flex gap-1">
                             <Button 
                               variant="ghost" 
