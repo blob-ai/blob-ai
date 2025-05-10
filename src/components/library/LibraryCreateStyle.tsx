@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
-  File, FileText, MessageSquare, Save, Settings, Sparkles, 
-  RefreshCw, Sliders, X, CheckCircle, Send, Layout, Type, Lightbulb,
+  File, FileText, MessageSquare, Save, Sparkles, 
+  RefreshCw, X, CheckCircle, Send, Layout, Type, Lightbulb,
   ArrowLeft
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,8 +20,9 @@ interface LibraryCreateStyleProps {
   onBack?: () => void;
 }
 
+// Updated step titles to match new flow
 const stepTitles = [
-  "Name your style",
+  "Choose what to create",
   "Choose creation method",
   "Add details",
   "Review and save"
@@ -65,10 +66,15 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
       
       // Initialize chat if AI method is selected
       if (step === 2 && creationMethod === "chat") {
+        // Different initial message based on creation type
+        const initialMessage = creationType === "style" 
+          ? "Let's build your style together! What kind of tone are you going for? Bold, reflective, funny, educational, or something else?"
+          : "Let's create your content template! What type of content structure do you need? A thread format, a story structure, a job posting, or something else?";
+          
         setChatMessages([
           {
             role: "assistant",
-            content: "Let's build your style together! What kind of tone are you going for? Bold, reflective, funny, educational, or something else?"
+            content: initialMessage
           }
         ]);
         generatePreviewExamples();
@@ -121,7 +127,7 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
   };
   
   const isNextDisabled = () => {
-    if (step === 1) return !styleName;
+    if (step === 1) return false; // No requirements for first step anymore
     if (step === 2) return !creationMethod || (creationMethod === "paste" && !pastedText) || (creationMethod === "upload" && !uploadedFile);
     if (step === 3 && creationMethod !== "chat") return !selectedCategory;
     return false;
@@ -139,29 +145,45 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
     setTimeout(() => {
       let aiResponse = "";
       
-      // Base response on user message content
-      if (currentMessage.toLowerCase().includes("direct") || currentMessage.toLowerCase().includes("bold")) {
-        aiResponse = "I notice you prefer a direct, bold tone. Would you also like your content to be brief and punchy, or more detailed with examples?";
-        if (!selectedTones.includes("Bold")) {
-          setSelectedTones([...selectedTones, "Bold"].slice(0, 3));
-        }
-        if (!selectedTones.includes("Direct")) {
-          setSelectedTones([...selectedTones.filter(t => t !== "Conversational"), "Direct"].slice(0, 3));
-        }
-      } else if (currentMessage.toLowerCase().includes("story") || currentMessage.toLowerCase().includes("narrative")) {
-        aiResponse = "Great! Storytelling is powerful. Do you prefer emotional stories that connect with the reader, or more factual case-study type stories?";
-        if (!selectedFormats.includes("Stories")) {
-          setSelectedFormats([...selectedFormats, "Stories"].slice(0, 2));
-        }
-      } else if (currentMessage.toLowerCase().includes("humor") || currentMessage.toLowerCase().includes("funny")) {
-        aiResponse = "Humor is a great way to engage your audience. Do you prefer subtle wit or more obvious jokes in your content?";
-        if (!selectedTones.includes("Casual")) {
-          setSelectedTones([...selectedTones, "Casual"].slice(0, 3));
+      // Different responses based on creation type
+      if (creationType === "style") {
+        // Style-specific AI response logic
+        if (currentMessage.toLowerCase().includes("direct") || currentMessage.toLowerCase().includes("bold")) {
+          aiResponse = "I notice you prefer a direct, bold tone. Would you also like your content to be brief and punchy, or more detailed with examples?";
+          if (!selectedTones.includes("Bold")) {
+            setSelectedTones([...selectedTones, "Bold"].slice(0, 3));
+          }
+          if (!selectedTones.includes("Direct")) {
+            setSelectedTones([...selectedTones.filter(t => t !== "Conversational"), "Direct"].slice(0, 3));
+          }
+        } else if (currentMessage.toLowerCase().includes("humor") || currentMessage.toLowerCase().includes("funny")) {
+          aiResponse = "Humor is a great way to engage your audience. Do you prefer subtle wit or more obvious jokes in your content?";
+          if (!selectedTones.includes("Casual")) {
+            setSelectedTones([...selectedTones, "Casual"].slice(0, 3));
+          }
+        } else {
+          aiResponse = "Based on your input, I'd suggest mixing some educational content with conversational elements. How do you feel about using questions to engage your readers?";
+          if (selectedTones.length === 0) {
+            setSelectedTones(["Conversational"]);
+          }
         }
       } else {
-        aiResponse = "Based on your input, I'd suggest mixing some educational content with conversational elements. How do you feel about using questions to engage your readers?";
-        if (selectedTones.length === 0) {
-          setSelectedTones(["Conversational"]);
+        // Template-specific AI response logic
+        if (currentMessage.toLowerCase().includes("thread") || currentMessage.toLowerCase().includes("twitter")) {
+          aiResponse = "A thread template would work well for this. Would you like numbered posts, a hook + explanation format, or a step-by-step approach?";
+          if (!selectedFormats.includes("Threads")) {
+            setSelectedFormats([...selectedFormats, "Threads"].slice(0, 2));
+          }
+        } else if (currentMessage.toLowerCase().includes("job") || currentMessage.toLowerCase().includes("hiring")) {
+          aiResponse = "For a job posting template, would you prefer focusing on company culture, job responsibilities, or candidate qualifications first?";
+          if (!selectedFormats.includes("Lists")) {
+            setSelectedFormats([...selectedFormats, "Lists"].slice(0, 2));
+          }
+        } else {
+          aiResponse = "I can help create a template with clear sections. Would you like headings, bullet points, or paragraph-based organization?";
+          if (selectedFormats.length === 0) {
+            setSelectedFormats(["How-to guides"]);
+          }
         }
       }
       
@@ -179,41 +201,76 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
     
     // Simulate generating examples based on selected tones and formats
     setTimeout(() => {
-      const toneBasedExamples = [];
-      
-      if (selectedTones.includes("Bold") || chatMessages.some(m => m.content.toLowerCase().includes("bold"))) {
-        toneBasedExamples.push("Stop looking for shortcuts. The path to success is the path most people avoid.");
-      }
-      
-      if (selectedTones.includes("Educational") || chatMessages.some(m => m.content.toLowerCase().includes("teach"))) {
-        toneBasedExamples.push("The 3 key factors for sustainable growth:\n1. Customer acquisition\n2. Retention strategy\n3. Revenue optimization");
-      }
-      
-      if (selectedTones.includes("Conversational")) {
-        toneBasedExamples.push("Ever wonder why some products just feel right? It's not an accident. It's deep customer understanding.");
-      }
-      
-      if (selectedTones.includes("Direct")) {
-        toneBasedExamples.push("Focus or fail. You can't be exceptional at everything.");
-      }
-      
-      if (selectedFormats.includes("Questions")) {
-        toneBasedExamples.push("What's the one thing you could focus on today that would make everything else easier?");
-      }
-      
-      // If we have examples based on selections, use those
-      if (toneBasedExamples.length > 0) {
-        setPreviewExamples(toneBasedExamples);
+      if (creationType === "style") {
+        // Generate style examples
+        generateStyleExamples();
       } else {
-        // Otherwise use some default examples
-        setPreviewExamples([
-          "This is how your style might sound. The more you tell me, the better the examples.",
-          "Try adding some tones or formats to see more tailored examples."
-        ]);
+        // Generate template examples
+        generateTemplateExamples();
       }
       
       setIsAnalyzing(false);
     }, 1000);
+  };
+
+  // New function to generate style-specific examples
+  const generateStyleExamples = () => {
+    const styleExamples = [];
+    
+    if (selectedTones.includes("Bold") || chatMessages.some(m => m.content.toLowerCase().includes("bold"))) {
+      styleExamples.push("Stop looking for shortcuts. The path to success is the path most people avoid.");
+    }
+    
+    if (selectedTones.includes("Educational") || chatMessages.some(m => m.content.toLowerCase().includes("teach"))) {
+      styleExamples.push("The 3 key factors for sustainable growth:\n1. Customer acquisition\n2. Retention strategy\n3. Revenue optimization");
+    }
+    
+    if (selectedTones.includes("Conversational")) {
+      styleExamples.push("Ever wonder why some products just feel right? It's not an accident. It's deep customer understanding.");
+    }
+    
+    if (selectedTones.includes("Direct")) {
+      styleExamples.push("Focus or fail. You can't be exceptional at everything.");
+    }
+    
+    // If we have examples based on selections, use those
+    if (styleExamples.length > 0) {
+      setPreviewExamples(styleExamples);
+    } else {
+      // Otherwise use some default examples
+      setPreviewExamples([
+        "This is how your style might sound. The more you tell me about tone and vocabulary preferences, the better.",
+        "Try adding some tones or formats to see more tailored language examples."
+      ]);
+    }
+  };
+  
+  // New function to generate template-specific examples
+  const generateTemplateExamples = () => {
+    const templateExamples = [];
+    
+    if (selectedFormats.includes("Threads") || chatMessages.some(m => m.content.toLowerCase().includes("thread"))) {
+      templateExamples.push("🧵 [THREAD]: {topic title}\n\n1️⃣ {intro point}\n\n2️⃣ {main point with detail}\n\n3️⃣ {supporting evidence}\n\n4️⃣ {actionable insight}\n\n5️⃣ {conclusion with CTA}");
+    }
+    
+    if (selectedFormats.includes("Lists") || chatMessages.some(m => m.content.toLowerCase().includes("list"))) {
+      templateExamples.push("📋 {Headline Title}: {Subtitle}\n\n• {First key point}\n• {Second key point with brief explanation}\n• {Third key point with example}\n• {Fourth point with action item}\n\n👉 {Call to action}");
+    }
+    
+    if (selectedFormats.includes("How-to guides")) {
+      templateExamples.push("🔎 HOW TO: {Specific goal}\n\nProblem: {Pain point description}\n\nSolution: {Overview of approach}\n\nStep 1: {First action item}\nStep 2: {Second action with details}\nStep 3: {Final step}\n\nResults: {Expected outcome}\n\n💡 Pro tip: {Insider advice}");
+    }
+    
+    // If we have examples based on selections, use those
+    if (templateExamples.length > 0) {
+      setPreviewExamples(templateExamples);
+    } else {
+      // Otherwise use some default examples
+      setPreviewExamples([
+        "{Title/Headline}\n\n{Opening section}\n\n{Body with key points}\n\n{Call to action}",
+        "Try selecting a format to see specific template structures."
+      ]);
+    }
   };
   
   useEffect(() => {
@@ -229,6 +286,11 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
   };
   
   const handleSaveStyle = () => {
+    if (!styleName.trim()) {
+      toast.error("Please provide a name for your " + creationType);
+      return;
+    }
+    
     toast.success(`${creationType === 'style' ? 'Style' : 'Template'} saved successfully!`);
     if (onBack) {
       onBack();
@@ -271,58 +333,92 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
       {/* Content area */}
       <CardContainer className="max-w-5xl mx-auto w-full bg-[#1A202C] border-white/10 flex-grow overflow-hidden shadow-md">
         <ScrollArea className="h-full p-4">
-          {/* Step 1: Name your style */}
+          {/* Step 1: Choose what to create */}
           {step === 1 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-medium mb-4 text-white">Name your style</h2>
+              <h2 className="text-xl font-medium mb-4 text-white">Choose what to create</h2>
               <p className="text-white/80 mb-6">
-                Give your style a descriptive name that will help you remember what it's for.
+                Select the type of content assistant you want to create. Each serves a different purpose.
               </p>
               
-              <Input
-                placeholder="My Professional Tech Style"
-                value={styleName}
-                onChange={(e) => setStyleName(e.target.value)}
-                className="bg-[#151A24] border-white/10 max-w-md"
-              />
-              
-              <div className="mt-8 pt-6 border-t border-white/10">
-                <h3 className="text-lg font-medium mb-2 text-white">What are you creating?</h3>
-                <div className="flex items-center space-x-6 mt-4">
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      checked={creationType === "style"} 
-                      onCheckedChange={() => setCreationType("style")}
-                    />
-                    <div className="flex items-center">
-                      <Type className="h-4 w-4 mr-2 text-blue-400" />
-                      <span className="text-white">Style (tone & voice)</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                <CardContainer 
+                  className={`transition-all p-5 cursor-pointer ${
+                    creationType === "style" ? "border-[#3260ea] bg-[#151A24]" : "hover:border-white/20"
+                  }`}
+                  onClick={() => setCreationType("style")}
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <div className="p-3 bg-blue-600/20 rounded-full mb-4">
+                      <Type className="h-8 w-8 text-blue-400" />
+                    </div>
+                    <h3 className="text-lg font-medium mb-2">Style</h3>
+                    <p className="text-sm text-white/70 mb-4">
+                      Create a voice assistant that mimics specific tones, vocabulary, and writing patterns.
+                    </p>
+                    
+                    <div className="w-full p-3 bg-[#1A1F2C] rounded-md text-xs text-left">
+                      <p className="font-medium text-white/90 mb-1">Great for creating:</p>
+                      <ul className="space-y-1 text-white/70">
+                        <li>• Educational Expert Voice</li>
+                        <li>• Humorous Reply Style</li>
+                        <li>• Thought Leadership Tone</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="mt-4">
+                      <Switch 
+                        checked={creationType === "style"} 
+                        onCheckedChange={() => setCreationType("style")}
+                      />
                     </div>
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      checked={creationType === "template"} 
-                      onCheckedChange={() => setCreationType("template")}
-                    />
-                    <div className="flex items-center">
-                      <Layout className="h-4 w-4 mr-2 text-emerald-400" />
-                      <span className="text-white">Template (structure)</span>
-                    </div>
-                  </div>
-                </div>
+                </CardContainer>
                 
-                <div className="mt-4 p-3 bg-[#151A24] rounded-md">
-                  {creationType === "style" ? (
-                    <p className="text-sm text-white/80">
-                      A <strong>style</strong> focuses on how something is said—the tone, word choice, and attitude of your writing.
+                <CardContainer 
+                  className={`transition-all p-5 cursor-pointer ${
+                    creationType === "template" ? "border-[#3260ea] bg-[#151A24]" : "hover:border-white/20"
+                  }`}
+                  onClick={() => setCreationType("template")}
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <div className="p-3 bg-emerald-600/20 rounded-full mb-4">
+                      <Layout className="h-8 w-8 text-emerald-400" />
+                    </div>
+                    <h3 className="text-lg font-medium mb-2">Template</h3>
+                    <p className="text-sm text-white/70 mb-4">
+                      Create a structure assistant that generates organized, consistent content formats.
                     </p>
-                  ) : (
-                    <p className="text-sm text-white/80">
-                      A <strong>template</strong> focuses on how content is structured—the format, sections, and organization of your posts.
-                    </p>
-                  )}
-                </div>
+                    
+                    <div className="w-full p-3 bg-[#1A1F2C] rounded-md text-xs text-left">
+                      <p className="font-medium text-white/90 mb-1">Great for creating:</p>
+                      <ul className="space-y-1 text-white/70">
+                        <li>• LinkedIn Job Postings</li>
+                        <li>• Twitter Thread Format</li>
+                        <li>• Educational Carousel Layout</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="mt-4">
+                      <Switch 
+                        checked={creationType === "template"} 
+                        onCheckedChange={() => setCreationType("template")}
+                      />
+                    </div>
+                  </div>
+                </CardContainer>
+              </div>
+              
+              <div className="mt-6 p-4 bg-[#151A24] border border-white/10 rounded-lg">
+                <h4 className="text-lg font-medium mb-2 flex items-center">
+                  <Lightbulb className="h-5 w-5 mr-2 text-amber-400" />
+                  How will this help me?
+                </h4>
+                <p className="text-sm text-white/80">
+                  {creationType === "style" 
+                    ? "A Style assistant will help you maintain a consistent voice across all your content, mimicking specific tones and vocabulary patterns that resonate with your audience."
+                    : "A Template assistant will help you create structurally consistent content more quickly, ensuring all necessary elements are included in the right order and format."}
+                </p>
               </div>
             </div>
           )}
@@ -466,7 +562,7 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
                     <Input
                       value={currentMessage}
                       onChange={(e) => setCurrentMessage(e.target.value)}
-                      placeholder="Describe your preferred style..."
+                      placeholder={`Describe your preferred ${creationType}...`}
                       className="bg-[#1A202C] border-white/10"
                       onKeyPress={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
@@ -484,39 +580,70 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
                     </Button>
                   </div>
                   
-                  {/* Chat Suggestions */}
+                  {/* Chat Suggestions - Updated based on creation type */}
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="bg-transparent border-white/20 hover:bg-white/5 text-xs"
-                      onClick={() => {
-                        setCurrentMessage("I want a bold, direct style for marketing");
-                        setTimeout(() => sendChatMessage(), 100);
-                      }}
-                    >
-                      Bold marketing style
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="bg-transparent border-white/20 hover:bg-white/5 text-xs"
-                      onClick={() => {
-                        setCurrentMessage("I need an educational style for technical content");
-                        setTimeout(() => sendChatMessage(), 100);
-                      }}
-                    >
-                      Educational tech style
-                    </Button>
+                    {creationType === "style" ? (
+                      <>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-transparent border-white/20 hover:bg-white/5 text-xs"
+                          onClick={() => {
+                            setCurrentMessage("I want a bold, direct style for marketing");
+                            setTimeout(() => sendChatMessage(), 100);
+                          }}
+                        >
+                          Bold marketing style
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-transparent border-white/20 hover:bg-white/5 text-xs"
+                          onClick={() => {
+                            setCurrentMessage("I need an educational style for technical content");
+                            setTimeout(() => sendChatMessage(), 100);
+                          }}
+                        >
+                          Educational tech style
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-transparent border-white/20 hover:bg-white/5 text-xs"
+                          onClick={() => {
+                            setCurrentMessage("I want a Twitter thread template with numbered posts");
+                            setTimeout(() => sendChatMessage(), 100);
+                          }}
+                        >
+                          Twitter thread template
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-transparent border-white/20 hover:bg-white/5 text-xs"
+                          onClick={() => {
+                            setCurrentMessage("I need a job posting template for LinkedIn");
+                            setTimeout(() => sendChatMessage(), 100);
+                          }}
+                        >
+                          LinkedIn job post
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
               
-              {/* Right Panel - Style Builder */}
+              {/* Right Panel - Style/Template Builder */}
               <div className="flex-1 h-[500px] md:h-auto">
                 <div className="bg-[#151A24] border border-white/10 rounded-lg p-3 h-full flex flex-col shadow-md">
                   <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-medium text-lg text-white">Style Builder</h3>
+                    <h3 className="font-medium text-lg text-white">
+                      {creationType === "style" ? "Style Builder" : "Template Builder"}
+                    </h3>
                     <Button 
                       variant="ghost" 
                       size="sm" 
@@ -528,70 +655,72 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
                     </Button>
                   </div>
                   
-                  {/* Style Name */}
+                  {/* Style/Template Name */}
                   <div className="mb-4">
-                    <label className="text-sm text-white/70 block mb-1">Style Name</label>
+                    <label className="text-sm text-white/70 block mb-1">Name</label>
                     <Input 
                       value={styleName} 
                       onChange={(e) => setStyleName(e.target.value)}
                       className="bg-[#1A202C] border-white/10"
+                      placeholder={`Give your ${creationType} a name`}
                     />
                   </div>
                   
-                  {/* Tone Tags */}
-                  <div className="mb-4">
-                    <label className="text-sm text-white/70 block mb-1">Tone (select up to 3)</label>
-                    <div className="flex flex-wrap gap-2">
-                      {tones.map((tone) => (
-                        <Badge 
-                          key={tone}
-                          variant={selectedTones.includes(tone) ? "default" : "outline"}
-                          className={`cursor-pointer ${
-                            selectedTones.includes(tone) 
-                              ? "bg-[#3260ea] hover:bg-[#2853c6] text-white" 
-                              : "bg-transparent hover:bg-white/10"
-                          }`}
-                          onClick={() => handleToneToggle(tone)}
-                        >
-                          {tone}
-                          {selectedTones.includes(tone) && (
-                            <X className="ml-1 h-3 w-3" />
-                          )}
-                        </Badge>
-                      ))}
+                  {/* Tone Tags (for style) or Format Tags (for template) */}
+                  {creationType === "style" ? (
+                    <div className="mb-4">
+                      <label className="text-sm text-white/70 block mb-1">Tone (select up to 3)</label>
+                      <div className="flex flex-wrap gap-2">
+                        {tones.map((tone) => (
+                          <Badge 
+                            key={tone}
+                            variant={selectedTones.includes(tone) ? "default" : "outline"}
+                            className={`cursor-pointer ${
+                              selectedTones.includes(tone) 
+                                ? "bg-[#3260ea] hover:bg-[#2853c6] text-white" 
+                                : "bg-transparent hover:bg-white/10"
+                            }`}
+                            onClick={() => handleToneToggle(tone)}
+                          >
+                            {tone}
+                            {selectedTones.includes(tone) && (
+                              <X className="ml-1 h-3 w-3" />
+                            )}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  
-                  {/* Format Tags */}
-                  <div className="mb-4">
-                    <label className="text-sm text-white/70 block mb-1">Format (select up to 2)</label>
-                    <div className="flex flex-wrap gap-2">
-                      {formats.map((format) => (
-                        <Badge 
-                          key={format}
-                          variant={selectedFormats.includes(format) ? "default" : "outline"}
-                          className={`cursor-pointer ${
-                            selectedFormats.includes(format) 
-                              ? "bg-[#3260ea]/80 hover:bg-[#3260ea] text-white" 
-                              : "bg-transparent hover:bg-white/10"
-                          }`}
-                          onClick={() => handleFormatToggle(format)}
-                        >
-                          {format}
-                          {selectedFormats.includes(format) && (
-                            <X className="ml-1 h-3 w-3" />
-                          )}
-                        </Badge>
-                      ))}
+                  ) : (
+                    <div className="mb-4">
+                      <label className="text-sm text-white/70 block mb-1">Format (select up to 2)</label>
+                      <div className="flex flex-wrap gap-2">
+                        {formats.map((format) => (
+                          <Badge 
+                            key={format}
+                            variant={selectedFormats.includes(format) ? "default" : "outline"}
+                            className={`cursor-pointer ${
+                              selectedFormats.includes(format) 
+                                ? "bg-[#3260ea]/80 hover:bg-[#3260ea] text-white" 
+                                : "bg-transparent hover:bg-white/10"
+                            }`}
+                            onClick={() => handleFormatToggle(format)}
+                          >
+                            {format}
+                            {selectedFormats.includes(format) && (
+                              <X className="ml-1 h-3 w-3" />
+                            )}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                   
-                  {/* Preview Examples - Enhanced styling */}
+                  {/* Preview Examples - Style for the specific type */}
                   <div className="flex-grow mb-4 overflow-hidden">
-                    <div className="preview-examples-section">
-                      <div className="preview-examples-heading">
-                        <Lightbulb className="h-5 w-5" />
-                        Preview Examples
+                    <div className="preview-examples-section p-3 bg-[#141821] border border-white/10 rounded-lg">
+                      <div className="flex items-center mb-2 text-sm font-medium text-white">
+                        <Lightbulb className="h-4 w-4 mr-2 text-amber-400" />
+                        {creationType === "style" ? "Style Examples" : "Template Structure"}
                       </div>
                       
                       <div className="max-h-[200px] overflow-y-auto">
@@ -606,7 +735,7 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
                               </div>
                             ) : (
                               previewExamples.map((example, idx) => (
-                                <div key={idx} className="example-content">
+                                <div key={idx} className="p-2 bg-[#1A1F2C] rounded border border-white/5">
                                   <p className="whitespace-pre-wrap text-sm text-white/90">{example}</p>
                                 </div>
                               ))
@@ -616,13 +745,15 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
                       </div>
                       
                       <div className="mt-4 flex justify-center">
-                        <button 
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={refreshExamples}
-                          className="regenerate-examples-button"
+                          className="bg-transparent border-white/20 hover:bg-white/10 text-xs"
                         >
-                          <RefreshCw className="h-4 w-4" />
+                          <RefreshCw className="h-3 w-3 mr-1" />
                           Regenerate Examples
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -776,7 +907,17 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
           {/* Step 4: Review and save */}
           {step === 4 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-medium mb-4 text-white">Review and save your {creationType}</h2>
+              <h2 className="text-xl font-medium mb-4 text-white">Name and save your {creationType}</h2>
+              
+              <div className="mb-4">
+                <label className="text-sm text-white/70 block mb-1">Name your {creationType}</label>
+                <Input 
+                  value={styleName} 
+                  onChange={(e) => setStyleName(e.target.value)}
+                  className="bg-[#151A24] border-white/10 max-w-md"
+                  placeholder={`My ${creationType === "style" ? "Bold Marketing" : "Twitter Thread"} ${creationType}`}
+                />
+              </div>
               
               <CardContainer className="bg-[#151A24] border-white/10 p-4 shadow-md">
                 <div className="space-y-4">
@@ -837,7 +978,7 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
                 <div>
                   <h3 className="font-medium mb-1 text-white">Your {creationType} is ready!</h3>
                   <p className="text-sm text-white/80">
-                    Once saved, you can use this {creationType} for your posts or chat with an AI that mimics this style.
+                    Once saved, you can use this {creationType} for your posts or chat with an AI that mimics this {creationType === "style" ? "style" : "format"}.
                   </p>
                 </div>
               </div>

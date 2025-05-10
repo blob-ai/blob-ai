@@ -9,7 +9,7 @@ import { BookmarkIcon } from "lucide-react";
 
 const Library = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get("tab") || "explore"; // Change default to "explore"
+  const activeTab = searchParams.get("tab") || "explore"; // Default to "explore"
   const navigate = useNavigate();
   const location = useLocation();
   

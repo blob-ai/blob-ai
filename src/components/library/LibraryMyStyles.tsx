@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Folder, FolderPlus, Star, Clock, Heart, X } from "lucide-react";
+import { Plus, Search, Folder, FolderPlus, Star, Clock, Heart, X, Lightbulb } from "lucide-react";
 import { CardContainer } from "@/components/ui/card-container";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import StyleCard from "./StyleCard";
@@ -268,6 +269,48 @@ const LibraryMyStyles: React.FC = () => {
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Onboarding context - ADDED */}
+        <CardContainer className="mb-6 p-4 bg-[#1A1F2C]">
+          <div className="flex items-start gap-3">
+            <div className="bg-[#3260ea]/20 p-2 rounded-full mt-1">
+              <Lightbulb className="h-5 w-5 text-[#3260ea]" />
+            </div>
+            <div>
+              <h3 className="font-medium text-white text-lg mb-1">Start your own content style</h3>
+              <p className="text-white/70 text-sm mb-3">Create personalized styles to simplify your future content creation</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                <div className="p-2 bg-white/5 rounded-md border border-white/10">
+                  <span className="text-xs font-medium text-white/90">Try creating a style for:</span>
+                  <ul className="mt-1 space-y-1">
+                    <li className="text-xs text-white/70 flex items-center">
+                      <div className="h-1 w-1 bg-blue-400 rounded-full mr-2"></div>
+                      Educational Threads
+                    </li>
+                    <li className="text-xs text-white/70 flex items-center">
+                      <div className="h-1 w-1 bg-blue-400 rounded-full mr-2"></div>
+                      Humorous Replies
+                    </li>
+                  </ul>
+                </div>
+                <div className="p-2 bg-white/5 rounded-md border border-white/10">
+                  <span className="text-xs font-medium text-white/90">Or template for:</span>
+                  <ul className="mt-1 space-y-1">
+                    <li className="text-xs text-white/70 flex items-center">
+                      <div className="h-1 w-1 bg-blue-400 rounded-full mr-2"></div>
+                      Crypto Thought Leadership
+                    </li>
+                    <li className="text-xs text-white/70 flex items-center">
+                      <div className="h-1 w-1 bg-blue-400 rounded-full mr-2"></div>
+                      Startup Hiring Announcements
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContainer>
+
         {/* Search bar */}
         <div className="mb-4">
           <div className="relative">
@@ -367,6 +410,12 @@ const LibraryMyStyles: React.FC = () => {
                   className="bg-transparent border-white/20"
                 >
                   Browse Explore
+                </Button>
+                <Button
+                  onClick={handleCreateStyle}
+                  className="bg-[#3260ea] hover:bg-[#2853c6]"
+                >
+                  Create Style
                 </Button>
               </div>
             </div>

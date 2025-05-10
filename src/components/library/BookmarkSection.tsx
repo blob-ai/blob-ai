@@ -1,199 +1,152 @@
 
 import React, { useState } from "react";
-import { HorizontalScrollArea } from "@/components/ui/scroll-area";
 import { CardContainer } from "@/components/ui/card-container";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { 
-  Trash2, 
-  ExternalLink, 
-  ImageIcon, 
-  FileText, 
-  Edit, 
-  Check, 
-  BookmarkIcon
-} from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import { Bookmark } from "@/types/bookmark";
+import { ChevronDown, ChevronUp, Heart, Edit, Trash2, Check, X } from "lucide-react";
 import { toast } from "sonner";
+import { Bookmark } from "@/types/bookmark";
 
 interface BookmarkSectionProps {
   bookmarks: Bookmark[];
   onDelete: (id: string) => void;
-  onUpdate: (id: string, data: Partial<Bookmark>) => void;
+  onUpdate: (bookmark: Bookmark) => void;
 }
 
-const BookmarkSection: React.FC<BookmarkSectionProps> = ({
-  bookmarks,
-  onDelete,
-  onUpdate
-}) => {
+const BookmarkSection: React.FC<BookmarkSectionProps> = ({ bookmarks, onDelete, onUpdate }) => {
+  const [expanded, setExpanded] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingNote, setEditingNote] = useState<string>("");
+  const [editingName, setEditingName] = useState("");
 
-  const handleStartEdit = (id: string, currentNote: string = "") => {
-    setEditingId(id);
-    setEditingNote(currentNote);
+  const handleToggleExpand = () => {
+    setExpanded(!expanded);
   };
 
-  const handleSaveNote = (id: string) => {
-    onUpdate(id, { notes: editingNote });
+  const handleStartEditing = (bookmark: Bookmark) => {
+    setEditingId(bookmark.id);
+    setEditingName(bookmark.name);
+  };
+
+  const handleSaveEditing = (bookmark: Bookmark) => {
+    onUpdate({
+      ...bookmark,
+      name: editingName
+    });
     setEditingId(null);
-    toast.success("Note updated successfully!");
+    toast.success("Bookmark renamed");
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEditing = () => {
     setEditingId(null);
-  };
-
-  const getBookmarkIcon = (type: string) => {
-    switch (type) {
-      case "link":
-        return <ExternalLink className="h-4 w-4 text-blue-400" />;
-      case "screenshot":
-        return <ImageIcon className="h-4 w-4 text-green-400" />;
-      case "text":
-        return <FileText className="h-4 w-4 text-amber-400" />;
-      default:
-        return <BookmarkIcon className="h-4 w-4 text-primary-400" />;
-    }
   };
 
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-white">Your Bookmarks</h2>
-        <Button 
-          variant="outline" 
-          className="bg-transparent border-white/20 text-xs"
-          size="sm"
-        >
-          See all ({bookmarks.length})
+    <CardContainer className="mb-6 p-0 overflow-hidden">
+      <div 
+        className="flex justify-between items-center p-4 cursor-pointer" 
+        onClick={handleToggleExpand}
+      >
+        <div className="flex items-center gap-3">
+          <Heart className="h-5 w-5 text-rose-400" />
+          <h3 className="font-medium text-white">Saved Inspirations</h3>
+          <span className="bg-white/10 px-2 py-0.5 rounded-full text-xs text-white/70">{bookmarks.length}</span>
+        </div>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </Button>
       </div>
 
-      <HorizontalScrollArea className="w-full">
-        <div className="flex gap-4 pb-2 px-1 min-w-max">
-          {bookmarks.map((bookmark) => (
-            <CardContainer 
-              key={bookmark.id} 
-              className="w-[320px] flex-shrink-0 bg-[#1A202C] border-white/10 overflow-hidden"
-            >
-              <div className="p-4 border-b border-white/10">
-                <div className="flex justify-between items-center mb-2">
-                  <div className="flex items-center gap-2">
-                    {getBookmarkIcon(bookmark.type)}
-                    <h3 className="font-medium text-white truncate">
-                      {bookmark.title || "Untitled Bookmark"}
-                    </h3>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white/70 hover:text-red-400 hover:bg-red-400/10 h-8 w-8 p-0"
-                    onClick={() => onDelete(bookmark.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+      {expanded && (
+        <div className="px-4 pb-4">
+          <ScrollArea className="max-h-[300px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {bookmarks.map((bookmark) => (
+                <CardContainer 
+                  key={bookmark.id} 
+                  className="p-3 bg-[#101217] hover:bg-[#14171F] transition-colors border-white/5"
+                >
+                  <div className="flex flex-col h-full">
+                    <div className="flex justify-between items-start mb-2">
+                      {editingId === bookmark.id ? (
+                        <div className="flex items-center gap-2 flex-1">
+                          <Input
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            className="h-7 text-sm py-1 bg-[#1A202C] border-white/10"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleSaveEditing(bookmark);
+                              if (e.key === 'Escape') handleCancelEditing();
+                            }}
+                          />
+                          <Button 
+                            size="sm" 
+                            className="h-7 w-7 p-0" 
+                            onClick={() => handleSaveEditing(bookmark)}
+                          >
+                            <Check className="h-3 w-3" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-7 w-7 p-0" 
+                            onClick={handleCancelEditing}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          <h4 className="font-medium text-sm">{bookmark.name || "Unnamed Bookmark"}</h4>
+                          <div className="flex gap-1">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-6 w-6 p-0 text-white/40 hover:text-white hover:bg-white/10"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleStartEditing(bookmark);
+                              }}
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-6 w-6 p-0 text-white/40 hover:text-red-500 hover:bg-red-500/10"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDelete(bookmark.id);
+                              }}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </div>
 
-                {bookmark.type === 'screenshot' && bookmark.image_url && (
-                  <div className="relative h-36 mb-3">
-                    <img 
-                      src={bookmark.image_url} 
-                      alt={bookmark.title} 
-                      className="w-full h-full object-cover rounded"
-                    />
-                  </div>
-                )}
-                
-                {bookmark.type === 'text' && (
-                  <div className="mb-3 h-36 overflow-y-auto bg-black/20 p-3 rounded">
-                    <p className="text-sm text-white/80 whitespace-pre-wrap">
-                      {bookmark.content}
-                    </p>
-                  </div>
-                )}
+                    {/* Content preview */}
+                    <div className="text-xs text-white/70 mb-2 line-clamp-2 flex-grow">
+                      {bookmark.content && bookmark.content.length > 50 
+                        ? `${bookmark.content.substring(0, 50)}...` 
+                        : bookmark.content || "No content preview available"}
+                    </div>
 
-                {bookmark.type === 'link' && bookmark.source_url && (
-                  <a 
-                    href={bookmark.source_url}
-                    target="_blank"
-                    rel="noopener noreferrer" 
-                    className="mb-3 flex items-center gap-1.5 text-blue-400 hover:underline text-sm"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    {new URL(bookmark.source_url).hostname}
-                  </a>
-                )}
-              </div>
-
-              <div className="p-4">
-                {editingId === bookmark.id ? (
-                  <div className="space-y-2">
-                    <Textarea
-                      value={editingNote}
-                      onChange={(e) => setEditingNote(e.target.value)}
-                      placeholder="Add your notes here..."
-                      className="bg-black/20 border-white/10 h-24 text-sm"
-                    />
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8"
-                        onClick={handleCancelEdit}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="h-8 bg-[#3260ea] hover:bg-[#2853c6]"
-                        onClick={() => handleSaveNote(bookmark.id)}
-                      >
-                        <Check className="h-4 w-4 mr-1" />
-                        Save Note
-                      </Button>
+                    {/* Source metadata */}
+                    <div className="flex justify-between items-center text-[10px] text-white/50 pt-1 border-t border-white/5">
+                      <span>{new Date(bookmark.created_at).toLocaleDateString()}</span>
+                      {bookmark.source && <span>{bookmark.source}</span>}
                     </div>
                   </div>
-                ) : (
-                  <div>
-                    <div className="flex justify-between items-start">
-                      <p className="text-xs text-white/50 mb-1">Notes:</p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-white/70 hover:text-white hover:bg-white/10 h-6 w-6 p-0"
-                        onClick={() => handleStartEdit(bookmark.id, bookmark.notes)}
-                      >
-                        <Edit className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                    {bookmark.notes ? (
-                      <p className="text-sm text-white/80">{bookmark.notes}</p>
-                    ) : (
-                      <p className="text-sm italic text-white/40">No notes added.</p>
-                    )}
-                  </div>
-                )}
-
-                <div className="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
-                  <p className="text-xs text-white/50">
-                    {new Date(bookmark.created_at).toLocaleDateString()}
-                  </p>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 bg-transparent border-white/20 text-xs"
-                  >
-                    Convert to Style
-                  </Button>
-                </div>
-              </div>
-            </CardContainer>
-          ))}
+                </CardContainer>
+              ))}
+            </div>
+          </ScrollArea>
         </div>
-      </HorizontalScrollArea>
-    </div>
+      )}
+    </CardContainer>
   );
 };
 
