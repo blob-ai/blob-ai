@@ -1,14 +1,14 @@
 
-/* Editor Design System Variables */
+/* Editor Design System Variables - Updated with navy palette */
 :root {
   /* Primary palette */
-  --primary-bg: #1e2536;         /* Deep navy blue background */
-  --secondary-bg: #262d3f;       /* Slightly lighter navy for panels */
-  --tertiary-bg: #2a324a;        /* Panel header backgrounds */
+  --primary-bg: #1a2332;         /* Deep navy blue background */
+  --secondary-bg: #242c3d;       /* Slightly lighter navy for panels */
+  --tertiary-bg: #2d3548;        /* Panel header backgrounds */
   --accent-blue: #4a72f5;        /* Bright blue for primary actions */
   --accent-blue-hover: #5b80fa;  /* Hover state */
-  --text-primary: #ffffff;       /* Primary text */
-  --text-secondary: #a1a7b7;     /* Secondary/helper text */
+  --text-primary: #f8fafc;       /* Primary text */
+  --text-secondary: #cbd5e1;     /* Secondary/helper text */
   
   /* Feedback colors */
   --success: #36b37e;            /* Success states */
@@ -16,8 +16,8 @@
   --error: #ff5630;              /* Error states */
   
   /* Subtle UI elements */
-  --border-color: rgba(255, 255, 255, 0.1);  /* Subtle borders */
-  --shadow-color: rgba(0, 0, 0, 0.3);        /* Subtle shadows */
+  --border-color: rgba(148, 163, 184, 0.12);  /* Subtle borders */
+  --shadow-color: rgba(0, 0, 0, 0.25);        /* Subtle shadows */
   
   /* Spacing system */
   --spacing-xs: 4px;
@@ -35,7 +35,8 @@
 
 /* Selection Styles */
 ::selection {
-  background-color: rgba(74, 114, 245, 0.3);
+  background-color: rgba(74, 114, 245, 0.15);
+  color: var(--text-primary);
 }
 
 /* Content Editor Container */
@@ -95,12 +96,39 @@
 }
 
 .selection-toolbar {
+  position: absolute;
+  background: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  padding: var(--spacing-xs);
+  display: flex;
+  gap: var(--spacing-xs);
+  z-index: 1000;
   animation: toolbar-appear 0.15s ease-out;
+}
+
+.selection-button {
+  background: transparent;
+  color: var(--text-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 14px;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.selection-button:hover {
+  background: var(--bg-hover);
+  color: var(--accent-blue);
 }
 
 /* Enhanced Input Fields */
 .enhanced-input {
-  background-color: var(--secondary-bg);
+  background-color: var(--tertiary-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-primary);

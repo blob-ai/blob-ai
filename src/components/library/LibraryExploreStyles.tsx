@@ -112,10 +112,10 @@ const LibraryExploreStyles: React.FC = () => {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Quick save banner */}
-      <CardContainer className="mb-4 p-4 flex items-center justify-between bg-[#1A1F2C]">
+      <CardContainer className="mb-4 p-4 flex items-center justify-between bg-[var(--secondary-bg)]">
         <div className="flex items-center gap-3">
-          <div className="bg-[#3260ea]/20 rounded-full p-2">
-            <Sparkles className="h-5 w-5 text-[#3260ea]" />
+          <div className="bg-[var(--accent-blue)]/20 rounded-full p-2">
+            <Sparkles className="h-5 w-5 text-[var(--accent-blue)]" />
           </div>
           <div>
             <h3 className="font-medium text-white">Have a bookmarked post that inspired you?</h3>
@@ -124,7 +124,7 @@ const LibraryExploreStyles: React.FC = () => {
         </div>
         <Button 
           onClick={() => setShowQuickSaveModal(true)}
-          className="whitespace-nowrap bg-[#3260ea] hover:bg-[#2853c6]"
+          className="whitespace-nowrap bg-[var(--accent-blue)] hover:bg-[var(--accent-blue-hover)]"
         >
           <Save className="h-4 w-4 mr-2" /> 
           Save a Post
@@ -134,10 +134,10 @@ const LibraryExploreStyles: React.FC = () => {
       {/* Bookmarks heading - always show this */}
       <div className="mb-2">
         <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          <BookmarkIcon className="h-5 w-5 text-[#3260ea]" />
+          <BookmarkIcon className="h-5 w-5 text-[var(--accent-blue)]" />
           Your Bookmarks
         </h2>
-        {bookmarks && bookmarks.length === 0 && (
+        {(!bookmarks || bookmarks.length === 0) && (
           <p className="text-white/70 text-sm mt-1">
             No bookmarks yet. Save posts from creators that inspire you.
           </p>
@@ -163,17 +163,17 @@ const LibraryExploreStyles: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 h-4 w-4" />
             <Input
               placeholder="Search creator styles"
-              className="pl-10 bg-[#1A202C] border-white/10 h-10"
+              className="pl-10 bg-[var(--secondary-bg)] border-white/10 h-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <div className="flex gap-2 flex-wrap sm:flex-nowrap">
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-[130px] bg-[#1A202C] border-white/10 h-10">
+              <SelectTrigger className="w-[130px] bg-[var(--secondary-bg)] border-white/10 h-10">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1A202C] border-white/10 text-white">
+              <SelectContent className="bg-[var(--secondary-bg)] border-white/10 text-white">
                 {categories.map((category) => (
                   <SelectItem key={category} value={category}>{category}</SelectItem>
                 ))}
@@ -181,10 +181,10 @@ const LibraryExploreStyles: React.FC = () => {
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[130px] bg-[#1A202C] border-white/10 h-10">
+              <SelectTrigger className="w-[130px] bg-[var(--secondary-bg)] border-white/10 h-10">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1A202C] border-white/10 text-white">
+              <SelectContent className="bg-[var(--secondary-bg)] border-white/10 text-white">
                 {sortOptions.map((option) => (
                   <SelectItem key={option} value={option}>{option}</SelectItem>
                 ))}

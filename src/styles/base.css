@@ -3,35 +3,57 @@
 
 @layer base {
   :root {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 5%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 214 73% 57%;
+    /* Core backgrounds */
+    --bg-primary: #1a2332;      /* Deep navy - main background */
+    --bg-secondary: #242c3d;    /* Slightly lighter navy - panels */
+    --bg-tertiary: #2d3548;     /* Card/section backgrounds */
+    --bg-hover: #353d52;        /* Hover states */
+    
+    /* Blues for primary actions */
+    --accent-primary: #4a72f5;  /* Bright blue - CTAs */
+    --accent-hover: #5b80fa;    /* Lighter blue - hover */
+    --accent-subtle: #374151;   /* Subtle blue-gray */
+    
+    /* Grays for secondary elements */
+    --gray-100: #f8fafc;        /* White text */
+    --gray-300: #cbd5e1;        /* Secondary text */
+    --gray-500: #64748b;        /* Muted text */
+    --gray-700: #334155;        /* Subtle borders */
+    
+    /* Functional colors */
+    --border: rgba(148, 163, 184, 0.12);
+    --shadow: rgba(0, 0, 0, 0.25);
+    
+    /* Update the HSL variables to use the new color system */
+    --background: 217 30% 15%;
+    --foreground: 210 40% 98%;
+    --card: 217 30% 18%;
+    --card-foreground: 210 40% 98%;
+    --popover: 217 30% 18%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 222 89% 62%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 0 0% 15%;
-    --accent-foreground: 0 0% 98%;
+    --secondary: 217 30% 22%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 30% 22%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 30% 22%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 214 73% 57%;
+    --border: 217 30% 25%;
+    --input: 217 30% 25%;
+    --ring: 222 89% 62%;
     --radius: 0.75rem;
     
-    --sidebar-background: 0 0% 7%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 214 73% 57%;
+    --sidebar-background: 217 30% 15%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 222 89% 62%;
     --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 0 0% 15%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 214 73% 57%;
+    --sidebar-accent: 217 30% 22%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 30% 25%;
+    --sidebar-ring: 222 89% 62%;
     
     /* Original Rainbow colors */
     --color-1: 240 100% 50%;
@@ -58,5 +80,9 @@
   body {
     @apply bg-background text-foreground antialiased font-medium;
     font-family: Arial, system-ui, sans-serif;
+  }
+  
+  ::selection {
+    @apply bg-primary/15 text-foreground;
   }
 }

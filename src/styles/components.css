@@ -23,7 +23,7 @@
   }
 
   .card {
-    @apply bg-white/5 rounded-xl shadow-sm border border-white/20 overflow-hidden transition-all duration-300;
+    @apply bg-[var(--secondary-bg)] rounded-xl shadow-sm border border-white/20 overflow-hidden transition-all duration-300;
   }
 
   .card-header {
@@ -35,7 +35,7 @@
   }
 
   .input-field {
-    @apply w-full px-4 py-2 rounded-xl border border-white/20 bg-white/5 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-white;
+    @apply w-full px-4 py-2 rounded-xl border border-white/20 bg-[var(--tertiary-bg)] focus:ring-2 focus:ring-[var(--accent-blue)] focus:border-[var(--accent-blue)] outline-none transition-all text-white;
   }
 
   .input-error {
@@ -79,15 +79,15 @@
   }
   
   .preview-examples-container {
-    @apply bg-[#1A2839] rounded-lg border border-[#3260ea]/30 p-4 shadow-md;
+    @apply bg-[var(--secondary-bg)] rounded-lg border border-[var(--accent-blue)]/30 p-4 shadow-md;
   }
   
   .preview-examples-header {
-    @apply bg-[#3260ea]/10 text-[#3260ea] font-medium rounded-md px-3 py-1.5 inline-flex items-center gap-2 mb-4;
+    @apply bg-[var(--accent-blue)]/10 text-[var(--accent-blue)] font-medium rounded-md px-3 py-1.5 inline-flex items-center gap-2 mb-4;
   }
   
   .preview-cta {
-    @apply bg-[#3260ea] hover:bg-[#2853c6] text-white rounded-md px-4 py-2 font-medium transition-colors shadow-sm hover:shadow flex items-center justify-center gap-2;
+    @apply bg-[var(--accent-blue)] hover:bg-[var(--accent-blue-hover)] text-white rounded-md px-4 py-2 font-medium transition-colors shadow-sm hover:shadow flex items-center justify-center gap-2;
   }
 
   /* Social Media Preview Components */
@@ -169,5 +169,32 @@
 
   .platform-toggle {
     @apply flex items-center justify-center h-8 w-8 rounded-full transition-colors;
+  }
+  
+  /* Selection styles */
+  ::selection {
+    @apply bg-[var(--accent-blue)]/15 text-white;
+  }
+  
+  /* Enhanced Markdown Styling */
+  .markdown-textarea {
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  
+  /* Floating Toolbar Animation */
+  @keyframes toolbar-appear {
+    0% {
+      opacity: 0;
+      transform: translateY(8px) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  .animate-toolbar-appear {
+    animation: toolbar-appear 0.15s ease-out;
   }
 }

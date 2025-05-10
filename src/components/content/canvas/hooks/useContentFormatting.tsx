@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 import { useRef, useEffect, useState } from "react";
 import { 
@@ -56,7 +55,18 @@ const useContentFormatting = () => {
     if (left + toolbarWidth > viewportWidth - 20) left = viewportWidth - toolbarWidth - 20;
     
     // Keep toolbar from going above the viewport
-    if (top < 50) top = 50;
+    if (top < 50) top = 50; // Min top position
+    
+    // If toolbar would be positioned above the viewport, place it below the selection instead
+    if (top < 0) {
+      const selection = window.getSelection();
+      if (selection && !selection.isCollapsed) {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        const containerRect = document.querySelector('textarea')?.getBoundingClientRect() || { top: 0 };
+        top = rect.bottom - containerRect.top + 10; // 10px below the selection
+      }
+    }
     
     return { top: `${top}px`, left: `${left}px` };
   };
@@ -204,7 +214,7 @@ const useContentFormatting = () => {
     return (
       <div
         ref={toolbarRef}
-        className="absolute z-50 bg-[#262d3f] border border-white/20 rounded-lg shadow-lg px-2 py-1.5 flex items-center gap-1.5 animate-fade-in transition-all"
+        className="selection-toolbar"
         style={positionToolbar()}
       >
         {/* Text formatting options */}

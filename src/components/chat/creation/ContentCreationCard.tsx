@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ContentSetup } from "@/types/setup";
@@ -189,7 +190,7 @@ const ContentCreationCard: React.FC<ContentCreationCardProps> = ({
   };
 
   return (
-    <div className="bg-[#0A0A0A] rounded-xl overflow-hidden border border-white/10 shadow-lg font-sans relative">
+    <div className="bg-[var(--primary-bg)] rounded-xl overflow-hidden border border-white/10 shadow-lg font-sans relative">
       <ContentCreationHeader 
         title={title} 
         setTitle={setTitle} 
@@ -198,7 +199,7 @@ const ContentCreationCard: React.FC<ContentCreationCardProps> = ({
         onSelectSetup={handleSelectSetup}
       />
 
-      <ScrollArea className="max-h-[70vh] overflow-y-auto">
+      <ScrollArea className="max-h-[700px] overflow-y-auto">
         <div className="p-4">
           <ContentInput 
             content={content} 
@@ -237,7 +238,7 @@ const ContentCreationCard: React.FC<ContentCreationCardProps> = ({
       </ScrollArea>
 
       {showEmojiPicker && (
-        <div className="absolute bottom-[72px] left-[72px] z-50 bg-[#16181c] rounded-lg shadow-lg border border-white/10 overflow-hidden">
+        <div className="absolute bottom-[72px] left-[72px] z-50 bg-[var(--secondary-bg)] rounded-lg shadow-lg border border-white/10 overflow-hidden">
           <div className="p-3 grid grid-cols-5 gap-2">
             {emojiCategories.map((category) => 
               category.emojis.map((emoji, index) => (

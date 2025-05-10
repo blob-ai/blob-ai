@@ -128,13 +128,13 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
   };
 
   return (
-    <div className="relative flex items-center border-b border-white/10 bg-[#0a0b0e]">
+    <div className="relative flex items-center border-b border-white/10 bg-[var(--primary-bg)]">
       {/* Left scroll button */}
       {showLeftScroll && (
         <Button
           variant="ghost" 
           size="icon"
-          className="absolute left-0 z-10 h-full px-1.5 bg-gradient-to-r from-[#0a0b0e] to-transparent"
+          className="absolute left-0 z-10 h-full px-1.5 bg-gradient-to-r from-[var(--primary-bg)] to-transparent"
           onClick={() => handleScroll('left')}
         >
           <ChevronLeft className="h-5 w-5" />
@@ -199,7 +199,7 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
             className={cn(
               "h-8 px-2 sm:px-2.5 whitespace-nowrap",
               showChatPanel 
-                ? "bg-blue-600 hover:bg-blue-500 text-white" 
+                ? "bg-[var(--accent-blue)] hover:bg-[var(--accent-blue-hover)] text-white" 
                 : "border-white/10 text-white/70 hover:bg-white/5 hover:text-white"
             )}
             onClick={onToggleChatPanel}
@@ -271,7 +271,7 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
           
           <ActionButton 
             size="sm" 
-            className="bg-blue-600 hover:bg-blue-500 text-white h-8 px-3 sm:px-5 whitespace-nowrap"
+            className="bg-[var(--accent-blue)] hover:bg-[var(--accent-blue-hover)] text-white h-8 px-3 sm:px-5 whitespace-nowrap"
             label="Publish"
             onClick={() => onPublish(content)}
           />
@@ -283,7 +283,7 @@ const CanvasToolbar: React.FC<CanvasToolbarProps> = ({
         <Button
           variant="ghost" 
           size="icon"
-          className="absolute right-0 z-10 h-full px-1.5 bg-gradient-to-l from-[#0a0b0e] to-transparent"
+          className="absolute right-0 z-10 h-full px-1.5 bg-gradient-to-l from-[var(--primary-bg)] to-transparent"
           onClick={() => handleScroll('right')}
         >
           <ChevronRight className="h-5 w-5" />

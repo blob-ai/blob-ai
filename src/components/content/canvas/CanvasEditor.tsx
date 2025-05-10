@@ -79,7 +79,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
   // For textarea styling to help show markdown formatting
   const getTextareaClassName = () => {
-    return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea selection:bg-[#4a72f54d]`;
+    return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea selection:bg-[var(--accent-blue)] selection:bg-opacity-15 selection:text-white`;
   };
 
   return (
@@ -87,7 +87,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       <div className="flex items-center mb-4">
         <Avatar className="h-8 w-8 mr-2">
           <AvatarImage src="/placeholder.svg" alt="Your content" />
-          <AvatarFallback className="bg-blue-600">
+          <AvatarFallback className="bg-[var(--accent-blue)]">
             <UserRound className="h-4 w-4" />
           </AvatarFallback>
         </Avatar>
@@ -118,7 +118,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
           onFormat={applyFormat}
           style={{
             position: 'absolute',
-            display: 'none', // Hide the legacy toolbar
+            display: 'none', // Hide the legacy toolbar since we now use the floating toolbar
           }}
           isFloating={true}
         />

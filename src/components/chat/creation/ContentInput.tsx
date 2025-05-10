@@ -87,7 +87,7 @@ const ContentInput: React.FC<ContentInputProps> = ({
         placeholder="Describe your content here"
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className="min-h-32 bg-[#262d3f] border-white/10 text-white placeholder:text-gray-500 text-lg resize-none focus-visible:ring-1 focus-visible:ring-[#4a72f5] focus-visible:ring-offset-0 p-3 font-sans rounded-md"
+        className="min-h-32 bg-[var(--secondary-bg)] border-white/10 text-white placeholder:text-gray-500 text-lg resize-none focus-visible:ring-1 focus-visible:ring-[var(--accent-blue)] focus-visible:ring-offset-0 p-3 font-sans rounded-md selection:bg-[var(--accent-blue)]/15"
       />
       
       {uploadedImages.length > 0 && (
