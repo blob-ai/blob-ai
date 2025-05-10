@@ -61,16 +61,25 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       }
     };
     
+    const handleAIActionEvent = (e: CustomEvent) => {
+      const { action, text, range } = e.detail;
+      if (action && text) {
+        onTextTransform(action, text);
+      }
+    };
+    
     document.addEventListener('applyFormatting', handleCustomFormatEvent as EventListener);
+    document.addEventListener('applyAIAction', handleAIActionEvent as EventListener);
     
     return () => {
       document.removeEventListener('applyFormatting', handleCustomFormatEvent as EventListener);
+      document.removeEventListener('applyAIAction', handleAIActionEvent as EventListener);
     };
-  }, [content, handleFormatting, setContent, textareaRef]);
+  }, [content, handleFormatting, setContent, textareaRef, onTextTransform]);
 
   // For textarea styling to help show markdown formatting
   const getTextareaClassName = () => {
-    return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea`;
+    return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea selection:bg-[#4a72f54d]`;
   };
 
   return (
@@ -99,7 +108,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       {/* Content Analysis Panel - added below the editor */}
       <ContentAnalysisPanel contentAnalysis={contentAnalysis} className="mt-4" />
       
-      {/* Modern floating toolbar that appears near text selection */}
+      {/* Enhanced floating toolbar that appears near text selection */}
       {renderFloatingToolbar()}
       
       {/* Legacy toolbar - can be removed once floating toolbar is fully functional */}

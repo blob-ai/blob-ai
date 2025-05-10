@@ -32,14 +32,14 @@ const CanvasStep: React.FC<CanvasStepProps> = ({
   const [content, setContent] = useState(initialContent);
 
   return (
-    <div className="w-full bg-black border border-white/10 rounded-xl shadow-lg overflow-hidden">
+    <div className="w-full bg-[#1e2536] border border-white/10 rounded-xl shadow-lg overflow-hidden">
       <ContentCanvas
         initialContent={initialContent}
         onContentChange={setContent}
         onPublish={() => onPublish(content)}
         onSaveDraft={() => onSaveDraft(content)}
         onSchedule={(date) => onSchedule(content, date)}
-        buttonColor="#3260ea" // Updated to match sidebar button blue
+        buttonColor="#4a72f5" // Updated to new accent blue
         contentGoal={contentGoal}
         selectedIdea={selectedIdea}
         selectedStyle={selectedStyle}

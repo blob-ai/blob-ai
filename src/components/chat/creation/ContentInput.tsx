@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -86,7 +87,7 @@ const ContentInput: React.FC<ContentInputProps> = ({
         placeholder="Describe your content here"
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className="min-h-32 bg-transparent border-none text-white placeholder:text-gray-500 text-lg resize-none focus-visible:ring-0 focus-visible:ring-offset-0 p-0 font-sans"
+        className="min-h-32 bg-[#262d3f] border-white/10 text-white placeholder:text-gray-500 text-lg resize-none focus-visible:ring-1 focus-visible:ring-[#4a72f5] focus-visible:ring-offset-0 p-3 font-sans rounded-md"
       />
       
       {uploadedImages.length > 0 && (

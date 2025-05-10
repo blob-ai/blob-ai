@@ -96,10 +96,10 @@ const LibraryExploreStyles: React.FC = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const handleSaveBookmark = (newBookmark: Omit<Bookmark, "id" | "user_id" | "created_at" | "updated_at">) => {
+  const handleSaveBookmark = (newBookmark: Omit<Bookmark, "user_id" | "created_at" | "updated_at">) => {
+    // Since the newBookmark already includes an ID field from QuickSaveModal
     const bookmark = {
       ...newBookmark,
-      id: uuidv4(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };

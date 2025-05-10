@@ -5,15 +5,23 @@ import {
   Bold, 
   Italic, 
   Underline,
-  List 
+  List,
+  Wand2,
+  Palette,
+  RefreshCw,
+  MessageCircle
 } from "lucide-react";
 import { applyFormatting, FormattingType, hasFormatting } from "@/lib/formatting";
+
+// Define AI action types
+type AIActionType = "improve" | "tone" | "rewrite" | "comment";
 
 const useContentFormatting = () => {
   const [toolbarVisible, setToolbarVisible] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
   const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null);
   const [activeFormats, setActiveFormats] = useState<FormattingType[]>([]);
+  const [selectedText, setSelectedText] = useState<string>("");
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   // Calculate proper toolbar position based on selection
@@ -82,6 +90,7 @@ const useContentFormatting = () => {
       const textContent = range.toString();
       
       if (textContent && textContent.trim().length > 0) {
+        setSelectedText(textContent);
         setToolbarVisible(true);
         setToolbarPosition(calculateToolbarPosition(selection, editorElement));
         
@@ -149,10 +158,34 @@ const useContentFormatting = () => {
     }
   };
 
+  // Handle AI actions (improve, tone, rewrite, comment)
+  const handleAIAction = (action: AIActionType) => {
+    if (!selectedText || selectedText.trim().length === 0) {
+      toast.info(`Select text first to ${action} it`);
+      return;
+    }
+
+    // Dispatch a custom event for AI actions
+    if (typeof window !== 'undefined' && selectedRange) {
+      const event = new CustomEvent('applyAIAction', { 
+        detail: { 
+          action,
+          text: selectedText,
+          range: selectedRange
+        } 
+      });
+      document.dispatchEvent(event);
+    }
+
+    // Hide the toolbar after action is triggered
+    setToolbarVisible(false);
+  };
+
   // Render the floating toolbar
   const renderFloatingToolbar = () => {
     if (!toolbarVisible) return null;
     
+    // Format options - text formatting tools
     const formatOptions = [
       { id: 'bold' as FormattingType, icon: <Bold className="h-3.5 w-3.5" />, label: "Bold" },
       { id: 'italic' as FormattingType, icon: <Italic className="h-3.5 w-3.5" />, label: "Italic" },
@@ -160,33 +193,61 @@ const useContentFormatting = () => {
       { id: 'list' as FormattingType, icon: <List className="h-3.5 w-3.5" />, label: "List" },
     ];
     
+    // AI action options - AI editing tools
+    const aiOptions = [
+      { id: 'improve' as AIActionType, icon: <Wand2 className="h-3.5 w-3.5" />, label: "Improve" },
+      { id: 'tone' as AIActionType, icon: <Palette className="h-3.5 w-3.5" />, label: "Tone" },
+      { id: 'rewrite' as AIActionType, icon: <RefreshCw className="h-3.5 w-3.5" />, label: "Rewrite" },
+      { id: 'comment' as AIActionType, icon: <MessageCircle className="h-3.5 w-3.5" />, label: "Comment" },
+    ];
+    
     return (
       <div
         ref={toolbarRef}
-        className="absolute z-50 bg-[#16181c] border border-white/20 rounded-lg shadow-lg px-2 py-1 flex items-center gap-1 animate-fade-in"
+        className="absolute z-50 bg-[#262d3f] border border-white/20 rounded-lg shadow-lg px-2 py-1.5 flex items-center gap-1.5 animate-fade-in transition-all"
         style={positionToolbar()}
       >
-        {formatOptions.map((option) => (
-          <button
-            key={option.id}
-            className={`p-1.5 rounded transition-colors flex items-center ${
-              activeFormats.includes(option.id) ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/70'
-            }`}
-            title={option.label}
-            onClick={() => {
-              // This will be connected to the formatting handler in CanvasEditor
-              if (typeof window !== 'undefined') {
-                // Create and dispatch a custom event
-                const event = new CustomEvent('applyFormatting', { 
-                  detail: { format: option.id } 
-                });
-                document.dispatchEvent(event);
-              }
-            }}
-          >
-            {option.icon}
-          </button>
-        ))}
+        {/* Text formatting options */}
+        <div className="flex gap-1">
+          {formatOptions.map((option) => (
+            <button
+              key={option.id}
+              className={`p-2 rounded transition-colors flex items-center justify-center ${
+                activeFormats.includes(option.id) ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/70'
+              }`}
+              title={option.label}
+              onClick={() => {
+                // Dispatch formatting event
+                if (typeof window !== 'undefined') {
+                  const event = new CustomEvent('applyFormatting', { 
+                    detail: { format: option.id } 
+                  });
+                  document.dispatchEvent(event);
+                }
+              }}
+            >
+              {option.icon}
+            </button>
+          ))}
+        </div>
+        
+        {/* Separator */}
+        <div className="w-px h-5 bg-white/20 mx-1"></div>
+        
+        {/* AI action options */}
+        <div className="flex gap-1">
+          {aiOptions.map((option) => (
+            <button
+              key={option.id}
+              className="p-2 rounded transition-colors flex items-center justify-center hover:bg-white/10 text-white/70 hover:text-white"
+              title={option.label}
+              onClick={() => handleAIAction(option.id)}
+            >
+              {option.icon}
+              <span className="sr-only">{option.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
     );
   };
@@ -197,6 +258,8 @@ const useContentFormatting = () => {
     toolbarVisible,
     setToolbarVisible,
     activeFormats,
+    selectedText,
+    selectedRange
   };
 };
 
