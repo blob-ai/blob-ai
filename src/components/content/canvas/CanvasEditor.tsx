@@ -55,15 +55,17 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   // Listen for custom formatting event from the floating toolbar
   useEffect(() => {
     const handleCustomFormatEvent = (e: CustomEvent) => {
-      const { format } = e.detail;
-      if (format && textareaRef.current) {
+      const { format, context } = e.detail;
+      // Only handle events specifically for the content editor
+      if (format && context === 'content-editor' && textareaRef.current) {
         handleFormatting(format as FormattingType, content, setContent, textareaRef);
       }
     };
     
     const handleAIActionEvent = (e: CustomEvent) => {
-      const { action, text, range } = e.detail;
-      if (action && text) {
+      const { action, text, range, context } = e.detail;
+      // Only handle events specifically for the content editor
+      if (action && text && context === 'content-editor') {
         onTextTransform(action, text);
       }
     };
@@ -79,11 +81,11 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
   // For textarea styling to help show markdown formatting
   const getTextareaClassName = () => {
-    return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea selection:bg-opacity-15 selection:bg-[var(--accent-blue)] selection:text-white`;
+    return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea selection:bg-opacity-15 selection:bg-[var(--accent-blue)] selection:text-white content-editor`;
   };
 
   return (
-    <div className="relative flex flex-col h-full" id="canvas-editor-container">
+    <div className="relative flex flex-col h-full" id="canvas-editor-container" data-canvas-editor="true">
       <div className="flex items-center mb-4">
         <Avatar className="h-8 w-8 mr-2">
           <AvatarImage src="/placeholder.svg" alt="Your content" />
@@ -104,6 +106,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         placeholder="Start writing your content here..."
         spellCheck={true}
         data-editor="true"
+        data-content-editor="true"
       />
       
       {/* Content Analysis Panel - added below the editor */}

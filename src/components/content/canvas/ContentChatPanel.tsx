@@ -320,11 +320,11 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
     localMessages;
 
   return (
-    <div className="h-full flex flex-col bg-black border-r border-white/10">
+    <div className="h-full flex flex-col bg-black border-r border-white/10 no-selection-toolbar" data-chat-panel="content-chat">
       <div className="p-4 border-b border-white/10">
         <h2 className="text-lg font-medium flex items-center">
           <Sparkles className="h-4 w-4 text-blue-400 mr-2" />
-          AI Assistant
+          Content Editor Assistant
         </h2>
         
         {selectedIdea && (
@@ -342,16 +342,16 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 no-selection-toolbar">
         {displayMessages.map((message) => (
           <div
             key={message.id}
             className={`flex ${
               message.sender === "user" ? "justify-end" : "justify-start"
-            }`}
+            } no-selection-toolbar`}
           >
             <div
-              className={`max-w-[90%] rounded-lg p-3 ${
+              className={`max-w-[90%] rounded-lg p-3 no-selection-toolbar ${
                 message.sender === "user"
                   ? "bg-blue-600 text-white"
                   : "bg-white/5 border border-white/10"
@@ -368,8 +368,8 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         ))}
         
         {isTyping && (
-          <div className="flex justify-start">
-            <div className="max-w-[90%] rounded-lg p-3 bg-white/5 border border-white/10">
+          <div className="flex justify-start no-selection-toolbar">
+            <div className="max-w-[90%] rounded-lg p-3 bg-white/5 border border-white/10 no-selection-toolbar">
               <div className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0s" }}></div>
                 <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
@@ -384,11 +384,11 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
 
       {/* Quick Actions */}
       {selectedText && (
-        <div className="px-4 py-2 border-t border-white/10 flex space-x-2">
+        <div className="px-4 py-2 border-t border-white/10 flex space-x-2 no-selection-toolbar">
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1 border-white/10 hover:bg-white/10"
+            className="flex-1 border-white/10 hover:bg-white/10 no-selection-toolbar"
             onClick={() => handleQuickAction("improve")}
           >
             <Wand2 className="h-3 w-3 mr-1" /> Improve
@@ -396,7 +396,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1 border-white/10 hover:bg-white/10"
+            className="flex-1 border-white/10 hover:bg-white/10 no-selection-toolbar"
             onClick={() => handleQuickAction("tone")}
           >
             <PenTool className="h-3 w-3 mr-1" /> Tone
@@ -404,7 +404,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1 border-white/10 hover:bg-white/10"
+            className="flex-1 border-white/10 hover:bg-white/10 no-selection-toolbar"
             onClick={() => handleQuickAction("rewrite")}
           >
             <MessageSquare className="h-3 w-3 mr-1" /> Rewrite
@@ -412,18 +412,18 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         </div>
       )}
 
-      <div className="p-4 border-t border-white/10">
-        <Accordion type="single" collapsible defaultValue="suggestions">
-          <AccordionItem value="suggestions" className="border-none">
-            <AccordionTrigger className="py-2 text-sm text-white/70 hover:no-underline">
+      <div className="p-4 border-t border-white/10 no-selection-toolbar">
+        <Accordion type="single" collapsible defaultValue="suggestions" className="no-selection-toolbar">
+          <AccordionItem value="suggestions" className="border-none no-selection-toolbar">
+            <AccordionTrigger className="py-2 text-sm text-white/70 hover:no-underline no-selection-toolbar">
               Suggestions
             </AccordionTrigger>
-            <AccordionContent>
-              <div className="flex flex-wrap gap-2 mb-3">
+            <AccordionContent className="no-selection-toolbar">
+              <div className="flex flex-wrap gap-2 mb-3 no-selection-toolbar">
                 {suggestedPrompts.map((prompt, index) => (
                   <button
                     key={index}
-                    className="px-3 py-1.5 text-sm rounded-full bg-white/5 border border-white/10 text-white/80 hover:bg-white/10"
+                    className="px-3 py-1.5 text-sm rounded-full bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 no-selection-toolbar"
                     onClick={() => handlePromptClick(prompt)}
                   >
                     {prompt}
@@ -434,12 +434,12 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
           </AccordionItem>
         </Accordion>
 
-        <div className="flex items-center gap-2 mt-2">
+        <div className="flex items-center gap-2 mt-2 no-selection-toolbar">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask the AI for help..."
-            className="min-h-[40px] max-h-[120px] bg-white/5 border-white/10 resize-none"
+            className="min-h-[40px] max-h-[120px] bg-white/5 border-white/10 resize-none no-selection-toolbar"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -450,7 +450,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
           <Button
             variant="default"
             size="icon"
-            className="bg-blue-600 hover:bg-blue-500 rounded-full h-10 w-10"
+            className="bg-blue-600 hover:bg-blue-500 rounded-full h-10 w-10 no-selection-toolbar"
             onClick={handleSend}
             disabled={!input.trim()}
           >

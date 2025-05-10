@@ -306,7 +306,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
   };
 
   const handleSendToAI = async (message: string, selection?: string) => {
-    console.log("Sending content to AI:", message);
+    console.log("Sending content to Content Editor AI:", message);
     
     // Prepare the full prompt with selected content if available
     const textToAnalyze = selection || selectedText || "";
@@ -314,10 +314,10 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
       ? `${message}\n\nSelected content:\n${textToAnalyze}`
       : message;
     
-    toast.info(`AI processing request: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`);
+    toast.info(`Content Editor AI processing request: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`);
     
     // Simulate AI processing with a timeout
-    toast.loading("AI is processing your content...", { id: "ai-processing" });
+    toast.loading("Content Editor AI is processing your content...", { id: "ai-processing" });
     
     try {
       // Simulate an AI response

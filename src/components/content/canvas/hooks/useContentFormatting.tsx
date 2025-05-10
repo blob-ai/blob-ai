@@ -91,23 +91,38 @@ const useContentFormatting = () => {
   const isElementInEditor = (element: Node | null): boolean => {
     if (!element) return false;
     
-    // Walk up the DOM tree to find if we're in the editor container
+    // Check if we're in a chat panel or other non-editor area
     let currentNode: Node | null = element;
     while (currentNode) {
-      // Check if we're in the editor container
       if (currentNode.nodeType === Node.ELEMENT_NODE) {
         const el = currentNode as HTMLElement;
-        // Check for data-editor attribute which we added to the textarea
-        if (el.getAttribute('data-editor') === 'true') {
-          return true;
+        
+        // Explicitly exclude chat panels and other areas where toolbar should not appear
+        if (el.classList.contains('no-selection-toolbar') || 
+            el.closest('.chat-container') || 
+            el.closest('[data-chat-panel]')) {
+          return false;
         }
-        // Also check for the container ID to be certain
-        if (el.id === 'canvas-editor-container') {
+      }
+      currentNode = currentNode.parentNode;
+    }
+    
+    // Now check if we're specifically in the editor
+    currentNode = element;
+    while (currentNode) {
+      if (currentNode.nodeType === Node.ELEMENT_NODE) {
+        const el = currentNode as HTMLElement;
+        
+        // Check for the canvas editor container ID or data attribute
+        if (el.id === 'canvas-editor-container' || 
+            el.getAttribute('data-editor') === 'true' ||
+            el.getAttribute('data-content-editor') === 'true') {
           return true;
         }
       }
       currentNode = currentNode.parentNode;
     }
+    
     return false;
   };
 
@@ -142,7 +157,7 @@ const useContentFormatting = () => {
           setToolbarPosition(calculateToolbarPosition(selection, editorContainer));
           
           // Find the textarea to store selection range
-          const textarea = document.querySelector('[data-editor="true"]') as HTMLTextAreaElement;
+          const textarea = document.querySelector('[data-content-editor="true"]') as HTMLTextAreaElement;
           if (textarea) {
             setSelectedRange({
               start: textarea.selectionStart,
@@ -221,7 +236,8 @@ const useContentFormatting = () => {
         detail: { 
           action,
           text: selectedText,
-          range: selectedRange
+          range: selectedRange,
+          context: 'content-editor' // Identify this as coming from the content editor
         } 
       });
       document.dispatchEvent(event);
@@ -256,6 +272,7 @@ const useContentFormatting = () => {
         ref={toolbarRef}
         className="selection-toolbar animate-toolbar-appear"
         style={positionToolbar()}
+        data-testid="content-editor-toolbar"
       >
         {/* Text formatting options */}
         <div className="flex gap-1">
@@ -270,7 +287,10 @@ const useContentFormatting = () => {
                 // Dispatch formatting event
                 if (typeof window !== 'undefined') {
                   const event = new CustomEvent('applyFormatting', { 
-                    detail: { format: option.id } 
+                    detail: { 
+                      format: option.id,
+                      context: 'content-editor' 
+                    } 
                   });
                   document.dispatchEvent(event);
                 }
