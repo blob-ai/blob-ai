@@ -9,6 +9,7 @@ import StyleCard from "./StyleCard";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
+import LibraryCreateStyle from "./LibraryCreateStyle";
 
 // Define the Style type to fix TypeScript errors
 type Style = {
@@ -46,6 +47,7 @@ const LibraryMyStyles: React.FC = () => {
   ]);
   const [newFolderName, setNewFolderName] = useState("");
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+  const [showCreateStyle, setShowCreateStyle] = useState(false);
   const navigate = useNavigate();
 
   const filteredStyles = savedStyles.filter(style => {
@@ -67,10 +69,11 @@ const LibraryMyStyles: React.FC = () => {
   });
 
   const handleCreateStyle = () => {
-    navigate({
-      pathname: "/dashboard/library",
-      search: `?tab=create`
-    });
+    setShowCreateStyle(true);
+  };
+
+  const closeCreateStyle = () => {
+    setShowCreateStyle(false);
   };
 
   const setSearchParams = (params: { tab: string }) => {
@@ -166,6 +169,11 @@ const LibraryMyStyles: React.FC = () => {
 
     toast.success(`Style "${style.name}" deleted`);
   };
+
+  // If Create Style is showing, render that instead
+  if (showCreateStyle) {
+    return <LibraryCreateStyle onBack={closeCreateStyle} />;
+  }
 
   return (
     <div className="flex h-full overflow-hidden">

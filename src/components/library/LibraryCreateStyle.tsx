@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -9,12 +8,17 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   File, FileText, MessageSquare, Save, Settings, Sparkles, 
-  RefreshCw, Sliders, X, CheckCircle, Send, Layout, Type, Lightbulb
+  RefreshCw, Sliders, X, CheckCircle, Send, Layout, Type, Lightbulb,
+  ArrowLeft
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+
+interface LibraryCreateStyleProps {
+  onBack?: () => void;
+}
 
 const stepTitles = [
   "Name your style",
@@ -23,6 +27,7 @@ const stepTitles = [
   "Review and save"
 ];
 
+// ... keep existing code (categories, tones, formats, and type definitions)
 const categories = ["Tech", "Marketing", "Personal Growth", "Business", "Humor", "Education", "Other"];
 const tones = ["Bold", "Thoughtful", "Casual", "Analytical", "Motivational", "Educational", "Sarcastic", "Direct", "Conversational"];
 const formats = ["One-liners", "Threads", "Lists", "Stories", "Questions", "How-to guides"];
@@ -34,7 +39,7 @@ interface ChatMessage {
   content: string;
 }
 
-const LibraryCreateStyle: React.FC = () => {
+const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
   const [step, setStep] = useState(1);
   const [styleName, setStyleName] = useState("");
   const [creationMethod, setCreationMethod] = useState<string | null>(null);
@@ -74,6 +79,8 @@ const LibraryCreateStyle: React.FC = () => {
   const handleBack = () => {
     if (step > 1) {
       setStep(step - 1);
+    } else if (onBack) {
+      onBack();
     }
   };
   
@@ -223,10 +230,25 @@ const LibraryCreateStyle: React.FC = () => {
   
   const handleSaveStyle = () => {
     toast.success(`${creationType === 'style' ? 'Style' : 'Template'} saved successfully!`);
+    if (onBack) {
+      onBack();
+    }
   };
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
+      {/* Back button */}
+      {onBack && (
+        <Button 
+          variant="ghost" 
+          onClick={onBack} 
+          className="self-start mb-4 -ml-2 text-white/70 hover:text-white hover:bg-white/10"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to My Styles
+        </Button>
+      )}
+    
       {/* Step indicator */}
       <div className="mb-6">
         <div className="flex items-center justify-between max-w-2xl mx-auto">
