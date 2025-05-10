@@ -21,7 +21,6 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({ isOpen, onClose, onSave
   const [name, setName] = useState("");
   const [source, setSource] = useState("twitter");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showNameField, setShowNameField] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +49,6 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({ isOpen, onClose, onSave
     setContent("");
     setName("");
     setSource("twitter");
-    setShowNameField(false);
     setIsSubmitting(false);
   };
 
@@ -94,39 +92,19 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({ isOpen, onClose, onSave
               </Select>
             </div>
             
-            {showNameField ? (
-              <div>
-                <div className="flex justify-between items-center">
-                  <Label htmlFor="name" className="text-white/80">Name</Label>
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-7 px-2 text-xs hover:bg-white/5"
-                    onClick={() => setShowNameField(false)}
-                  >
-                    <X className="h-3 w-3 mr-1" />
-                    Hide
-                  </Button>
-                </div>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="bg-[#121720] border-white/10"
-                  placeholder="Add a name to your bookmark..."
-                />
-              </div>
-            ) : (
-              <Button 
-                type="button" 
-                variant="ghost" 
-                className="text-xs px-0 hover:bg-transparent hover:underline text-white/70"
-                onClick={() => setShowNameField(true)}
-              >
-                + Add custom name (optional)
-              </Button>
-            )}
+            <div>
+              <Label htmlFor="name" className="text-white/80 flex items-center gap-2">
+                Name 
+                <span className="text-white/40 text-xs">(Optional)</span>
+              </Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="bg-[#121720] border-white/10"
+                placeholder="Add a name to your bookmark..."
+              />
+            </div>
           </div>
 
           <DialogFooter className="mt-6">

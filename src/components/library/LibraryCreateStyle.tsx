@@ -161,14 +161,6 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
           if (!selectedTones.includes("Casual")) {
             setSelectedTones([...selectedTones, "Casual"].slice(0, 3));
           }
-        } else if (currentMessage.toLowerCase().includes("crypto") || currentMessage.toLowerCase().includes("thought leadership")) {
-          aiResponse = "For crypto thought leadership, I'd recommend a confident, analytical tone with authoritative insights. Would you like to include technical jargon or keep it accessible to beginners?";
-          if (!selectedTones.includes("Analytical")) {
-            setSelectedTones([...selectedTones, "Analytical"].slice(0, 3));
-          }
-          if (selectedCategory === null) {
-            setSelectedCategory("Tech");
-          }
         } else {
           aiResponse = "Based on your input, I'd suggest mixing some educational content with conversational elements. How do you feel about using questions to engage your readers?";
           if (selectedTones.length === 0) {
@@ -186,11 +178,6 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
           aiResponse = "For a job posting template, would you prefer focusing on company culture, job responsibilities, or candidate qualifications first?";
           if (!selectedFormats.includes("Lists")) {
             setSelectedFormats([...selectedFormats, "Lists"].slice(0, 2));
-          }
-        } else if (currentMessage.toLowerCase().includes("educational") || currentMessage.toLowerCase().includes("education")) {
-          aiResponse = "Educational threads work best with a clear structure. Would you prefer to organize by concepts, steps, or myth vs. reality format?";
-          if (!selectedFormats.includes("Threads")) {
-            setSelectedFormats([...selectedFormats, "Threads"].slice(0, 2));
           }
         } else {
           aiResponse = "I can help create a template with clear sections. Would you like headings, bullet points, or paragraph-based organization?";
@@ -246,12 +233,6 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
       styleExamples.push("Focus or fail. You can't be exceptional at everything.");
     }
     
-    // Add crypto thought leadership example if relevant
-    if (chatMessages.some(m => m.content.toLowerCase().includes("crypto")) || 
-        selectedCategory === "Tech" || selectedCategory === "Business") {
-      styleExamples.push("The market doesn't care about your narrative. It cares about fundamentals. DeFi protocols with real yield will outperform hype coins 10x over the next cycle.");
-    }
-    
     // If we have examples based on selections, use those
     if (styleExamples.length > 0) {
       setPreviewExamples(styleExamples);
@@ -276,21 +257,8 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
       templateExamples.push("📋 {Headline Title}: {Subtitle}\n\n• {First key point}\n• {Second key point with brief explanation}\n• {Third key point with example}\n• {Fourth point with action item}\n\n👉 {Call to action}");
     }
     
-    // Add job posting template if relevant
-    if (chatMessages.some(m => m.content.toLowerCase().includes("job")) || 
-        chatMessages.some(m => m.content.toLowerCase().includes("linkedin")) || 
-        chatMessages.some(m => m.content.toLowerCase().includes("hiring"))) {
-      templateExamples.push("🗣 Hey everyone – Exciting opportunity alert! {Company Name} just announced their {Year} {Position} internship. Here's what you need to know:\n\n���� Position: {Position}\n💵 Salary: {Salary Information}\n🌍 Location: {Location Details}\n🎓 Eligibility: {Degree Level}\n📅 Application Deadline: {Application Deadline}\n\n🔗 Apply here: {Application Link}\n\nStay connected with me for more such updates and opportunities! 🌟\n\n#internships #summerinternship #earlycareers #earlycareer #opportunities");
-    }
-    
     if (selectedFormats.includes("How-to guides")) {
       templateExamples.push("🔎 HOW TO: {Specific goal}\n\nProblem: {Pain point description}\n\nSolution: {Overview of approach}\n\nStep 1: {First action item}\nStep 2: {Second action with details}\nStep 3: {Final step}\n\nResults: {Expected outcome}\n\n💡 Pro tip: {Insider advice}");
-    }
-    
-    // Add educational thread template if relevant
-    if (chatMessages.some(m => m.content.toLowerCase().includes("educational")) ||
-        chatMessages.some(m => m.content.toLowerCase().includes("education"))) {
-      templateExamples.push("📚 THREAD: {Educational Topic}\n\nA thread on {brief description of what will be taught}👇\n\n1) {Introduction to concept}\n\n2) {Key principle #1 with simple explanation}\n\n3) {Key principle #2 with example}\n\n4) {Common misconception and correction}\n\n5) {Practical application}\n\n6) {Advanced tip for implementation}\n\n7) {Summary and key takeaway}\n\nSave this thread for later reference!\n\nFollow me @{username} for more educational content on {topic area}\n\n#education #{topic} #{subtopic}");
     }
     
     // If we have examples based on selections, use those
@@ -392,9 +360,9 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
                     <div className="w-full p-3 bg-[#1A1F2C] rounded-md text-xs text-left">
                       <p className="font-medium text-white/90 mb-1">Great for creating:</p>
                       <ul className="space-y-1 text-white/70">
-                        <li>• Crypto Thought Leadership</li>
+                        <li>• Educational Expert Voice</li>
                         <li>• Humorous Reply Style</li>
-                        <li>• Marketing Expert Voice</li>
+                        <li>• Thought Leadership Tone</li>
                       </ul>
                     </div>
                     
@@ -426,8 +394,8 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
                       <p className="font-medium text-white/90 mb-1">Great for creating:</p>
                       <ul className="space-y-1 text-white/70">
                         <li>• LinkedIn Job Postings</li>
-                        <li>• Educational Threads</li>
-                        <li>• Startup Announcements</li>
+                        <li>• Twitter Thread Format</li>
+                        <li>• Educational Carousel Layout</li>
                       </ul>
                     </div>
                     
