@@ -6,6 +6,7 @@ import useContentFormatting from "./hooks/useContentFormatting";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserRound } from "lucide-react";
 import { FormattingType } from "@/lib/formatting";
+import ContentAnalysisPanel, { ContentAnalysis } from "./ContentAnalysisPanel";
 
 interface CanvasEditorProps {
   content: string;
@@ -13,6 +14,7 @@ interface CanvasEditorProps {
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
   onTextTransform: (operation: string, selectedText: string) => void;
+  contentAnalysis: ContentAnalysis | null;
 }
 
 const CanvasEditor: React.FC<CanvasEditorProps> = ({
@@ -20,7 +22,8 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   setContent,
   onKeyDown,
   textareaRef,
-  onTextTransform
+  onTextTransform,
+  contentAnalysis
 }) => {
   const [selection, setSelection] = useState<{ start: number; end: number; text: string } | null>(null);
   const { handleFormatting, renderFloatingToolbar } = useContentFormatting();
@@ -67,11 +70,11 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
   // For textarea styling to help show markdown formatting
   const getTextareaClassName = () => {
-    return `min-h-[calc(100vh-200px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea`;
+    return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea`;
   };
 
   return (
-    <div className="relative">
+    <div className="relative flex flex-col h-full">
       <div className="flex items-center mb-4">
         <Avatar className="h-8 w-8 mr-2">
           <AvatarImage src="/placeholder.svg" alt="Your content" />
@@ -92,6 +95,9 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         placeholder="Start writing your content here..."
         spellCheck={true}
       />
+      
+      {/* Content Analysis Panel - added below the editor */}
+      <ContentAnalysisPanel contentAnalysis={contentAnalysis} className="mt-4" />
       
       {/* Modern floating toolbar that appears near text selection */}
       {renderFloatingToolbar()}

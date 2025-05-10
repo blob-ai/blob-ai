@@ -2,10 +2,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowUp, Sparkles, ChevronDown, ChevronUp, Wand2, MessageSquare, PenTool, Lightbulb } from "lucide-react";
+import { ArrowUp, Sparkles, MessageSquare, PenTool, Wand2, Lightbulb } from "lucide-react";
 import { useChat } from "@/contexts/ChatContext";
 import { toast } from "sonner";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 
@@ -13,13 +12,6 @@ interface Message {
   id: string;
   text: string;
   sender: "user" | "ai";
-}
-
-interface ContentAnalysis {
-  tone?: string;
-  wordCount?: number;
-  readingLevel?: string;
-  improvements?: string[];
 }
 
 interface ContentChatPanelProps {
@@ -117,9 +109,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
   };
   
   const [suggestedPrompts, setSuggestedPrompts] = useState(getContextualPrompts());
-  const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(true);
-  const [contentAnalysis, setContentAnalysis] = useState<ContentAnalysis | null>(null);
 
   // Initialize a thread on component mount
   useEffect(() => {
@@ -138,13 +128,6 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
     
     initializeThread();
   }, [currentThread, createThread]);
-
-  // Analyze content when it changes or selection changes
-  useEffect(() => {
-    if (content) {
-      analyzeContent(content, selectedText);
-    }
-  }, [content, selectedText]);
 
   // Scroll to bottom when messages update
   useEffect(() => {
@@ -237,37 +220,6 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
     }, 1000);
   };
 
-  const analyzeContent = (fullContent: string, selection: string = "") => {
-    // This would ideally be done by a real AI model
-    // Here we're generating mock analysis
-    
-    const textToAnalyze = selection || fullContent;
-    const wordCount = textToAnalyze.split(/\s+/).filter(Boolean).length;
-    
-    let tone = "Neutral";
-    if (textToAnalyze.includes("!")) tone = "Enthusiastic";
-    else if (textToAnalyze.includes("?")) tone = "Inquisitive";
-    else if (textToAnalyze.toLowerCase().includes("we")) tone = "Inclusive";
-    
-    let readingLevel = "Intermediate";
-    const avgWordLength = textToAnalyze.split(/\s+/).filter(Boolean).reduce((sum, word) => sum + word.length, 0) / wordCount;
-    if (avgWordLength > 6) readingLevel = "Advanced";
-    else if (avgWordLength < 4) readingLevel = "Elementary";
-    
-    const improvements = [];
-    if (wordCount < 50) improvements.push("Add more detail");
-    if (!textToAnalyze.includes(",")) improvements.push("Consider using more complex sentences");
-    if (textToAnalyze.split(".").length < 3) improvements.push("Break content into more paragraphs");
-    if (textToAnalyze.includes("very")) improvements.push("Replace intensifiers with stronger words");
-    
-    setContentAnalysis({
-      tone,
-      wordCount,
-      readingLevel,
-      improvements
-    });
-  };
-
   const generateLocalAIResponse = (userInput: string) => {
     let response = "";
     
@@ -301,7 +253,7 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         "Check for consistency in tense"
       ]);
     } else if (userInput.toLowerCase().includes("tone")) {
-      response += `I've analyzed your content's tone. It appears to be ${contentAnalysis?.tone || "neutral"}. To make it more persuasive, consider:\n\n1. Using more emotional language\n2. Adding rhetorical questions\n3. Incorporating personal anecdotes\n4. Addressing the reader directly with "you"`;
+      response += `I've analyzed your content's tone. To make it more persuasive, consider:\n\n1. Using more emotional language\n2. Adding rhetorical questions\n3. Incorporating personal anecdotes\n4. Addressing the reader directly with "you"`;
       setSuggestedPrompts([
         "Make the tone more professional",
         "Make the tone more conversational",
@@ -389,47 +341,6 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
           </div>
         )}
       </div>
-
-      {contentAnalysis && (
-        <div className="p-4 border-b border-white/10">
-          <Accordion type="single" collapsible defaultValue="analysis">
-            <AccordionItem value="analysis" className="border-none">
-              <AccordionTrigger className="py-1 text-sm font-medium hover:no-underline">
-                Content Analysis
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-white/70">Tone:</span>
-                    <Badge variant="outline" className="bg-white/5">{contentAnalysis.tone}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-white/70">Words:</span>
-                    <Badge variant="outline" className="bg-white/5">{contentAnalysis.wordCount}</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-white/70">Reading level:</span>
-                    <Badge variant="outline" className="bg-white/5">{contentAnalysis.readingLevel}</Badge>
-                  </div>
-                  {contentAnalysis.improvements && contentAnalysis.improvements.length > 0 && (
-                    <>
-                      <div className="text-white/70 pt-1">Suggested improvements:</div>
-                      <ul className="space-y-1">
-                        {contentAnalysis.improvements.map((improvement, i) => (
-                          <li key={i} className="text-xs flex items-center">
-                            <span className="h-1 w-1 rounded-full bg-blue-400 mr-2"></span>
-                            {improvement}
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
-      )}
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {displayMessages.map((message) => (

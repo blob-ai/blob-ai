@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
@@ -12,6 +13,7 @@ import useContentFormatting from "./hooks/useContentFormatting";
 import ResizablePanelsWrapper from "./ResizablePanelsWrapper";
 import { ContentVersion } from "./ContentVersionHistory";
 import { FormattingType } from "@/lib/formatting";
+import { ContentAnalysis } from "./ContentAnalysisPanel";
 
 interface ContentCanvasProps {
   initialContent?: string;
@@ -61,6 +63,9 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [showShortcutsGuide, setShowShortcutsGuide] = useState(false);
   const [platformView, setPlatformView] = useState<"default" | "twitter" | "linkedin" | "facebook">("default");
+  
+  // Content analysis state
+  const [contentAnalysis, setContentAnalysis] = useState<ContentAnalysis | null>(null);
   
   // Version history state
   const [versions, setVersions] = useState<ContentVersion[]>([]);
@@ -176,6 +181,44 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
       window.removeEventListener("keydown", handleKeyboardShortcuts);
     };
   }, [showChatPanel, mobileView, showScheduleModal, showVersionHistory, showShortcutsGuide]);
+
+  // Analyze content when it changes or selection changes
+  useEffect(() => {
+    if (content) {
+      analyzeContent(content, selectedText);
+    }
+  }, [content, selectedText]);
+
+  const analyzeContent = (fullContent: string, selection: string = "") => {
+    // This would ideally be done by a real AI model
+    // Here we're generating mock analysis
+    
+    const textToAnalyze = selection || fullContent;
+    const wordCount = textToAnalyze.split(/\s+/).filter(Boolean).length;
+    
+    let tone = "Neutral";
+    if (textToAnalyze.includes("!")) tone = "Enthusiastic";
+    else if (textToAnalyze.includes("?")) tone = "Inquisitive";
+    else if (textToAnalyze.toLowerCase().includes("we")) tone = "Inclusive";
+    
+    let readingLevel = "Intermediate";
+    const avgWordLength = textToAnalyze.split(/\s+/).filter(Boolean).reduce((sum, word) => sum + word.length, 0) / wordCount || 0;
+    if (avgWordLength > 6) readingLevel = "Advanced";
+    else if (avgWordLength < 4) readingLevel = "Elementary";
+    
+    const improvements = [];
+    if (wordCount < 50) improvements.push("Add more detail");
+    if (!textToAnalyze.includes(",")) improvements.push("Consider using more complex sentences");
+    if (textToAnalyze.split(".").length < 3) improvements.push("Break content into more paragraphs");
+    if (textToAnalyze.includes("very")) improvements.push("Replace intensifiers with stronger words");
+    
+    setContentAnalysis({
+      tone,
+      wordCount,
+      readingLevel,
+      improvements
+    });
+  };
 
   const handleAutoSave = () => {
     setIsSaving(true);
@@ -404,6 +447,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
               onKeyDown={handleKeyDown}
               textareaRef={textareaRef}
               onTextTransform={handleSendToAI}
+              contentAnalysis={contentAnalysis}
             />
           ) : (
             <CanvasPreview 
