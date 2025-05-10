@@ -330,9 +330,9 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Content area */}
-      <CardContainer className="max-w-5xl mx-auto w-full bg-[#1A202C] border-white/10 flex-grow overflow-hidden shadow-md">
-        <ScrollArea className="h-full p-4">
+      {/* Content area - adjusted to fix scroll issues */}
+      <CardContainer className="max-w-5xl mx-auto w-full bg-[#1A202C] border-white/10 flex-grow overflow-hidden shadow-md flex flex-col">
+        <div className="p-6 flex-grow overflow-auto">
           {/* Step 1: Choose what to create */}
           {step === 1 && (
             <div className="space-y-6">
@@ -522,7 +522,7 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
           {step === 3 && creationMethod === "chat" && (
             <div className="flex flex-col md:flex-row h-full gap-6">
               {/* Left Panel - Chat Interface */}
-              <div className="flex-1 h-[500px] md:h-auto">
+              <div className="flex-1 h-auto">
                 <div className="bg-[#151A24] border border-white/10 rounded-lg p-3 h-full flex flex-col shadow-md">
                   <h3 className="font-medium text-lg mb-2 text-white">Chat with AI</h3>
                   <p className="text-sm text-white/80 mb-3">
@@ -638,7 +638,7 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
               </div>
               
               {/* Right Panel - Style/Template Builder */}
-              <div className="flex-1 h-[500px] md:h-auto">
+              <div className="flex-1 h-auto">
                 <div className="bg-[#151A24] border border-white/10 rounded-lg p-3 h-full flex flex-col shadow-md">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-medium text-lg text-white">
@@ -984,38 +984,38 @@ const LibraryCreateStyle: React.FC<LibraryCreateStyleProps> = ({ onBack }) => {
               </div>
             </div>
           )}
-        </ScrollArea>
-      </CardContainer>
-      
-      {/* Navigation buttons */}
-      <div className="flex justify-between mt-6">
-        <Button
-          variant="outline"
-          onClick={handleBack}
-          disabled={step === 1}
-          className="bg-transparent border-white/20 hover:bg-white/5"
-        >
-          Back
-        </Button>
+        </div>
         
-        {step < stepTitles.length ? (
+        {/* Navigation buttons - moved inside the card and bottom aligned */}
+        <div className="flex justify-between p-6 border-t border-white/10">
           <Button
-            onClick={handleNext}
-            disabled={isNextDisabled()}
-            className="bg-[#3260ea] hover:bg-[#2853c6]"
+            variant="outline"
+            onClick={handleBack}
+            disabled={step === 1}
+            className="bg-transparent border-white/20 hover:bg-white/5"
           >
-            Continue
+            Back
           </Button>
-        ) : (
-          <Button
-            onClick={handleSaveStyle}
-            className="bg-[#3260ea] hover:bg-[#2853c6]"
-          >
-            <Save className="h-4 w-4 mr-2" />
-            Save {creationType === "style" ? "Style" : "Template"}
-          </Button>
-        )}
-      </div>
+          
+          {step < stepTitles.length ? (
+            <Button
+              onClick={handleNext}
+              disabled={isNextDisabled()}
+              className="bg-[#3260ea] hover:bg-[#2853c6]"
+            >
+              Continue
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSaveStyle}
+              className="bg-[#3260ea] hover:bg-[#2853c6]"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Save {creationType === "style" ? "Style" : "Template"}
+            </Button>
+          )}
+        </div>
+      </CardContainer>
     </div>
   );
 };

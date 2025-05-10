@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PageContainer } from "@/components/ui/page-container";
 import { Button } from "@/components/ui/button";
 import { CardContainer } from "@/components/ui/card-container";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, BookmarkCheck, ChevronRight, MessageSquare, Heart, Repeat, Share2 } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ChevronLeft, BookmarkCheck, MessageSquare, Heart, Repeat, Share2, BarChart, Book, PieChart } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "sonner";
 
 // Sample data - this would come from an API in a real application
 const CREATOR_DATA = {
@@ -78,7 +79,6 @@ const POSTS_DATA = {
 const CreatorDetailPage: React.FC = () => {
   const { creatorId } = useParams<{ creatorId: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("posts");
   const [savedPosts, setSavedPosts] = useState<string[]>([]);
   
   // Get creator data based on ID from URL param
@@ -116,6 +116,13 @@ const CreatorDetailPage: React.FC = () => {
     return num.toString();
   };
   
+  const handleUseStyle = () => {
+    toast.success(`Using ${creator.name}'s style`);
+    navigate('/dashboard/content?step=canvas', { 
+      state: { selectedCreatorStyle: creator }
+    });
+  };
+  
   return (
     <div className="flex flex-col w-full h-full">
       {/* Back navigation */}
@@ -135,60 +142,60 @@ const CreatorDetailPage: React.FC = () => {
       </div>
       
       <PageContainer className="py-6 flex flex-col flex-grow overflow-hidden">
-        {/* Creator profile */}
-        <CardContainer className="mb-6">
-          <div className="flex flex-col md:flex-row md:items-center gap-6">
-            <Avatar className="h-20 w-20 rounded-full border border-white/10">
+        {/* Creator profile with sticky CTA */}
+        <div className="flex justify-between sticky top-0 z-10 bg-background pt-2 pb-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-12 w-12 rounded-full border border-white/10">
               <AvatarImage src={creator.avatar} alt={creator.name} />
               <AvatarFallback>{creator.name[0]}</AvatarFallback>
             </Avatar>
-            
-            <div className="flex-grow">
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                <h1 className="text-2xl font-bold text-white">{creator.name}</h1>
-                <span className="text-white/60">{creator.handle}</span>
-                <Badge className="bg-primary-400/20 text-primary-400 border-none">
-                  {creator.followers} followers
-                </Badge>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold text-white">{creator.name}</h1>
+                <span className="text-white/60 text-sm">{creator.handle}</span>
               </div>
-              
-              <p className="text-white/80 mb-3">{creator.description}</p>
-              
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="bg-black/30 text-white/80 border-white/10">
-                  {creator.category}
-                </Badge>
-                {creator.tone.map((tone, i) => (
-                  <Badge key={i} variant="secondary" className="bg-white/10 text-white/80 border-none">
-                    {tone}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-            
-            <div className="flex flex-col gap-2 md:self-start">
-              <Button className="bg-primary-500 hover:bg-primary-600">
-                Use This Style
-              </Button>
-              <Button variant="outline" className="bg-transparent">
-                Save to Folder
-              </Button>
+              <Badge className="bg-primary-400/20 text-primary-400 border-none mt-1">
+                {creator.followers} followers
+              </Badge>
             </div>
           </div>
-        </CardContainer>
-        
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow flex flex-col overflow-hidden">
-          <TabsList className="bg-black/20 border border-white/10 p-1 w-full mb-6">
-            <TabsTrigger value="posts" className="flex-1">Top Posts</TabsTrigger>
-            <TabsTrigger value="style" className="flex-1">Writing Style</TabsTrigger>
-            <TabsTrigger value="topics" className="flex-1">Content Topics</TabsTrigger>
-          </TabsList>
           
-          {/* Top Posts Tab */}
-          <TabsContent value="posts" className="flex-grow overflow-hidden m-0">
-            <ScrollArea className="h-full">
-              <div className="space-y-4 pb-10">
+          <Button 
+            onClick={handleUseStyle} 
+            className="bg-[#3260ea] hover:bg-[#2853c6] whitespace-nowrap"
+          >
+            Use This Style
+          </Button>
+        </div>
+        
+        <ScrollArea className="flex-grow">
+          <div className="space-y-8">
+            {/* Creator Profile Card */}
+            <CardContainer className="mb-6">
+              <div className="flex flex-col gap-4">
+                <p className="text-white/80">{creator.description}</p>
+                
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline" className="bg-black/30 text-white/80 border-white/10">
+                    {creator.category}
+                  </Badge>
+                  {creator.tone.map((tone, i) => (
+                    <Badge key={i} variant="secondary" className="bg-white/10 text-white/80 border-none">
+                      {tone}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </CardContainer>
+            
+            {/* Top Posts Section */}
+            <section>
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+                <Book className="h-5 w-5 text-[#3260ea]" /> 
+                Top Posts
+              </h2>
+              
+              <div className="space-y-4">
                 {posts.map((post) => (
                   <CardContainer key={post.id} className="hover:bg-black/30 transition-all">
                     <div className="flex flex-col">
@@ -248,140 +255,168 @@ const CreatorDetailPage: React.FC = () => {
                   </CardContainer>
                 ))}
               </div>
-            </ScrollArea>
-          </TabsContent>
-          
-          {/* Writing Style Tab */}
-          <TabsContent value="style" className="m-0 flex-grow overflow-auto">
-            <CardContainer className="mb-6">
-              <h3 className="text-lg font-medium mb-3">Writing Style Analysis</h3>
-              <p className="text-white/80 whitespace-pre-line mb-4">{creator.writingStyle}</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-black/20 rounded-lg p-4 border border-white/10">
-                  <h4 className="font-medium mb-2">Hook Types</h4>
-                  <ul className="list-disc list-inside text-white/70 space-y-1">
-                    <li>Contrarian statements</li>
-                    <li>Philosophical questions</li>
-                    <li>Counterintuitive observations</li>
-                    <li>Direct advice statements</li>
-                  </ul>
-                </div>
-                
-                <div className="bg-black/20 rounded-lg p-4 border border-white/10">
-                  <h4 className="font-medium mb-2">Structure Patterns</h4>
-                  <ul className="list-disc list-inside text-white/70 space-y-1">
-                    <li>Short, impactful sentences</li>
-                    <li>Occasional numbered lists</li>
-                    <li>Threads with building ideas</li>
-                    <li>Consistent use of white space</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContainer>
+            </section>
             
-            <CardContainer>
-              <h3 className="text-lg font-medium mb-3">Language Analysis</h3>
+            {/* Writing Patterns Section */}
+            <section>
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+                <BarChart className="h-5 w-5 text-[#3260ea]" />
+                Writing Patterns
+              </h2>
               
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-2">Sentence Structure</h4>
-                  <div className="bg-black/20 rounded-lg p-3 border border-white/10">
-                    <p className="text-white/70">
-                      Primarily uses short, direct sentences. Avoids complex structures. 
-                      Occasionally uses sentence fragments for emphasis. Average sentence 
-                      length: 8-12 words.
-                    </p>
+              <CardContainer className="mb-6">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-3">Writing Style Analysis</h3>
+                    <p className="text-white/80 whitespace-pre-line mb-4">{creator.writingStyle}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-black/20 rounded-lg p-4 border border-white/10">
+                      <h4 className="font-medium mb-2 text-white">Hook Types</h4>
+                      <ul className="list-disc list-inside text-white/70 space-y-1">
+                        <li>Contrarian statements</li>
+                        <li>Philosophical questions</li>
+                        <li>Counterintuitive observations</li>
+                        <li>Direct advice statements</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-black/20 rounded-lg p-4 border border-white/10">
+                      <h4 className="font-medium mb-2 text-white">Structure Patterns</h4>
+                      <ul className="list-disc list-inside text-white/70 space-y-1">
+                        <li>Short, impactful sentences</li>
+                        <li>Occasional numbered lists</li>
+                        <li>Threads with building ideas</li>
+                        <li>Consistent use of white space</li>
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-medium mb-3">Language Analysis</h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-medium mb-2 text-white">Sentence Structure</h4>
+                        <div className="bg-black/20 rounded-lg p-3 border border-white/10">
+                          <p className="text-white/70">
+                            Primarily uses short, direct sentences. Avoids complex structures. 
+                            Occasionally uses sentence fragments for emphasis. Average sentence 
+                            length: 8-12 words.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-medium mb-2 text-white">Vocabulary</h4>
+                        <div className="bg-black/20 rounded-lg p-3 border border-white/10">
+                          <p className="text-white/70">
+                            Precise word choice. Avoids unnecessary jargon. Uses accessible language 
+                            to explain complex concepts. Rarely uses excessive adjectives.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-medium mb-2 text-white">Rhetorical Devices</h4>
+                        <div className="bg-black/20 rounded-lg p-3 border border-white/10">
+                          <p className="text-white/70">
+                            Frequently uses paradox, aphorism, and juxtaposition. Employs metaphors 
+                            sparingly but effectively. Often presents ideas as universal truths. Uses 
+                            repetition for emphasis.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2">Vocabulary</h4>
-                  <div className="bg-black/20 rounded-lg p-3 border border-white/10">
-                    <p className="text-white/70">
-                      Precise word choice. Avoids unnecessary jargon. Uses accessible language 
-                      to explain complex concepts. Rarely uses excessive adjectives.
-                    </p>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2">Rhetorical Devices</h4>
-                  <div className="bg-black/20 rounded-lg p-3 border border-white/10">
-                    <p className="text-white/70">
-                      Frequently uses paradox, aphorism, and juxtaposition. Employs metaphors 
-                      sparingly but effectively. Often presents ideas as universal truths. Uses 
-                      repetition for emphasis.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContainer>
-          </TabsContent>
-          
-          {/* Content Topics Tab */}
-          <TabsContent value="topics" className="m-0 flex-grow overflow-auto">
-            <CardContainer className="mb-6">
-              <h3 className="text-lg font-medium mb-3">Main Content Themes</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                {creator.contentTopics.map((topic, i) => (
-                  <div 
-                    key={i} 
-                    className="bg-black/30 border border-white/10 rounded-lg p-3 flex items-center justify-center text-center"
-                  >
-                    <span className="text-white/80">{topic}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContainer>
+              </CardContainer>
+            </section>
             
-            <CardContainer>
-              <h3 className="text-lg font-medium mb-3">Topic Analysis</h3>
+            {/* Strategy + Topics Section */}
+            <section>
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+                <PieChart className="h-5 w-5 text-[#3260ea]" />
+                Strategy & Topics
+              </h2>
               
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="font-medium">Content Distribution</h4>
+              <CardContainer className="mb-6">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-3">Main Content Themes</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                      {creator.contentTopics.map((topic, i) => (
+                        <div 
+                          key={i} 
+                          className="bg-black/30 border border-white/10 rounded-lg p-3 flex items-center justify-center text-center"
+                        >
+                          <span className="text-white/80">{topic}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="bg-black/20 h-14 rounded-lg border border-white/10 overflow-hidden flex">
-                    <div className="bg-primary-400/80 h-full" style={{ width: '35%' }} title="Wealth creation: 35%"></div>
-                    <div className="bg-primary-400/60 h-full" style={{ width: '25%' }} title="Happiness: 25%"></div>
-                    <div className="bg-primary-400/40 h-full" style={{ width: '20%' }} title="Reading & Learning: 20%"></div>
-                    <div className="bg-primary-400/30 h-full" style={{ width: '15%' }} title="Mental models: 15%"></div>
-                    <div className="bg-primary-400/20 h-full" style={{ width: '5%' }} title="Technology: 5%"></div>
-                  </div>
-                  <div className="flex justify-between mt-2 text-xs text-white/60">
-                    <span>Wealth creation (35%)</span>
-                    <span>Happiness (25%)</span>
-                    <span>Other (40%)</span>
+                  
+                  <div>
+                    <h3 className="text-lg font-medium mb-3">Content Distribution</h3>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <div className="bg-black/20 h-14 rounded-lg border border-white/10 overflow-hidden flex">
+                          <div className="bg-[#3260ea]/80 h-full" style={{ width: '35%' }} title="Wealth creation: 35%"></div>
+                          <div className="bg-[#3260ea]/60 h-full" style={{ width: '25%' }} title="Happiness: 25%"></div>
+                          <div className="bg-[#3260ea]/40 h-full" style={{ width: '20%' }} title="Reading & Learning: 20%"></div>
+                          <div className="bg-[#3260ea]/30 h-full" style={{ width: '15%' }} title="Mental models: 15%"></div>
+                          <div className="bg-[#3260ea]/20 h-full" style={{ width: '5%' }} title="Technology: 5%"></div>
+                        </div>
+                        <div className="flex justify-between mt-2 text-xs text-white/60">
+                          <span>Wealth creation (35%)</span>
+                          <span>Happiness (25%)</span>
+                          <span>Other (40%)</span>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-medium mb-2 text-white">Common Hashtags</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {['#wealth', '#happiness', '#reading', '#philosophy', '#technology', '#business'].map((tag, i) => (
+                            <Badge key={i} className="bg-black/30 border-white/10">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-medium mb-2 text-white">Content Strategy</h4>
+                        <div className="bg-black/20 rounded-lg p-3 border border-white/10">
+                          <p className="text-white/70">
+                            Focuses on timeless wisdom rather than current events. Rarely posts about 
+                            personal life. Maintains consistent themes across posts. Publishes threads 
+                            for complex topics. Uses single tweets for aphorisms and observations.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2">Common Hashtags</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {['#wealth', '#happiness', '#reading', '#philosophy', '#technology', '#business'].map((tag, i) => (
-                      <Badge key={i} className="bg-black/30 border-white/10">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2">Content Strategy</h4>
-                  <div className="bg-black/20 rounded-lg p-3 border border-white/10">
-                    <p className="text-white/70">
-                      Focuses on timeless wisdom rather than current events. Rarely posts about 
-                      personal life. Maintains consistent themes across posts. Publishes threads 
-                      for complex topics. Uses single tweets for aphorisms and observations.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContainer>
-          </TabsContent>
-        </Tabs>
+              </CardContainer>
+            </section>
+
+            {/* Mobile sticky bottom CTA */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-[#0F1218] border-t border-white/10">
+              <Button 
+                onClick={handleUseStyle} 
+                className="bg-[#3260ea] hover:bg-[#2853c6] w-full"
+              >
+                Use This Style
+              </Button>
+            </div>
+            
+            {/* Add bottom padding for mobile to account for sticky button */}
+            <div className="h-16 md:hidden"></div>
+          </div>
+        </ScrollArea>
       </PageContainer>
     </div>
   );

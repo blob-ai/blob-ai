@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { CardContainer } from "@/components/ui/card-container";
-import { Search, Save, Sparkles } from "lucide-react";
+import { Search, Save, Sparkles, BookmarkIcon } from "lucide-react";
 import CreatorCard from "./CreatorCard";
 import BookmarkSection from "./BookmarkSection";
 import QuickSaveModal from "./QuickSaveModal";
@@ -118,7 +119,7 @@ const LibraryExploreStyles: React.FC = () => {
           </div>
           <div>
             <h3 className="font-medium text-white">Have a bookmarked post that inspired you?</h3>
-            <p className="text-sm text-white/70">Quick Save it and reuse it later.</p>
+            <p className="text-sm text-white/80">Quick Save it and reuse it later.</p>
           </div>
         </div>
         <Button 
@@ -130,7 +131,20 @@ const LibraryExploreStyles: React.FC = () => {
         </Button>
       </CardContainer>
 
-      {/* Bookmarks section */}
+      {/* Bookmarks heading - always show this */}
+      <div className="mb-2">
+        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <BookmarkIcon className="h-5 w-5 text-[#3260ea]" />
+          Your Bookmarks
+        </h2>
+        {bookmarks && bookmarks.length === 0 && (
+          <p className="text-white/70 text-sm mt-1">
+            No bookmarks yet. Save posts from creators that inspire you.
+          </p>
+        )}
+      </div>
+
+      {/* Bookmarks section - show only if bookmarks exist */}
       {bookmarks && bookmarks.length > 0 && (
         <BookmarkSection 
           bookmarks={bookmarks}
@@ -141,7 +155,7 @@ const LibraryExploreStyles: React.FC = () => {
         />
       )}
       
-      {/* Search and filters */}
+      {/* Creator Inspiration section */}
       <div className="mt-6">
         <h2 className="text-xl font-bold text-white mb-4">Creator Inspiration</h2>
         <div className="flex flex-col sm:flex-row gap-3 mb-6 px-1">
