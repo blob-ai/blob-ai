@@ -7,7 +7,8 @@ import {
   MessageSquare, 
   FileText, 
   Users,
-  BookmarkIcon
+  BookmarkIcon,
+  PanelLeftClose
 } from "lucide-react";
 
 // Import refactored sidebar components
@@ -17,7 +18,7 @@ import SidebarSection from "./sidebar/SidebarSection";
 import SidebarFooter from "./sidebar/SidebarFooter";
 
 const Sidebar = () => {
-  const { isSidebarOpen } = useSidebar();
+  const { isSidebarOpen, toggleSidebar } = useSidebar();
 
   // Main navigation items - renamed Library and changed icon
   const navItems = [
@@ -61,7 +62,7 @@ const Sidebar = () => {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 h-full bg-black border-r border-white/10 z-30 transition-all duration-300 ease-in-out",
+        "fixed left-0 top-0 h-full bg-black z-30 transition-all duration-300 ease-in-out overflow-hidden",
         isSidebarOpen ? "w-72" : "w-0"
       )}
     >

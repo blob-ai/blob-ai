@@ -1,15 +1,18 @@
 
 import React from 'react';
 import { TextShimmer } from "@/components/ui/text-shimmer";
-import { PenLine } from "lucide-react";
+import { PenLine, PanelLeftClose } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from 'react-router-dom';
 import ContentCreationModal from '@/components/content/ContentCreationModal';
 import { toast } from 'sonner';
+import { useSidebar } from "@/components/layouts/SidebarProvider";
+import { Button } from "@/components/ui/button";
 
 const SidebarHeader: React.FC = () => {
   const navigate = useNavigate();
   const [showCreationModal, setShowCreationModal] = React.useState(false);
+  const { toggleSidebar } = useSidebar();
 
   const handleOptionSelect = (option: string) => {
     setShowCreationModal(false);
@@ -26,14 +29,26 @@ const SidebarHeader: React.FC = () => {
 
   return (
     <div className="flex flex-col px-4 pt-5 pb-1">
-      <h2 className="text-lg font-bold px-1 mb-7">
-        <TextShimmer 
-          duration={5}
-          className="[--base-color:theme(colors.primary.600)] [--base-gradient-color:theme(colors.primary.400)]"
+      <div className="flex justify-between items-center mb-7">
+        <h2 className="text-lg font-bold px-1">
+          <TextShimmer 
+            duration={5}
+            className="[--base-color:theme(colors.primary.600)] [--base-gradient-color:theme(colors.primary.400)]"
+          >
+            inspire.me
+          </TextShimmer>
+        </h2>
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-white hover:bg-white/10 rounded-full"
+          onClick={toggleSidebar}
+          aria-label="Close sidebar"
         >
-          inspire.me
-        </TextShimmer>
-      </h2>
+          <PanelLeftClose className="h-5 w-5" />
+        </Button>
+      </div>
 
       <button
         className={cn(

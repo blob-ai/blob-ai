@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Bell, LogOut, Menu, User, Settings, CreditCard } from "lucide-react";
+import { LogOut, User, Settings, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -39,19 +39,22 @@ export function AppHeader({ className }: AppHeaderProps) {
   return (
     <>
       <header className={cn(
-        "bg-black z-20 w-full sticky top-0 border-b border-white/10", 
+        "bg-black z-20 w-full sticky top-0", 
         className
       )}>
         <div className="flex items-center justify-between h-16 px-4 w-full max-w-[1200px] mx-auto">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/10 rounded-full"
-              onClick={toggleSidebar}
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
+            {!isSidebarOpen && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:flex text-white hover:bg-white/10 rounded-full"
+                onClick={toggleSidebar}
+                aria-label="Open sidebar"
+              >
+                <PanelRight className="h-5 w-5" />
+              </Button>
+            )}
             
             <h1 className="text-lg font-bold md:hidden">
               <TextShimmer 
@@ -63,16 +66,7 @@ export function AppHeader({ className }: AppHeaderProps) {
             </h1>
           </div>
           
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="relative text-white hover:bg-white/10 rounded-full"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-primary-600 rounded-full"></span>
-            </Button>
-            
+          <div className="flex items-center">
             <div className="flex items-center">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -122,3 +116,6 @@ export function AppHeader({ className }: AppHeaderProps) {
     </>
   );
 }
+
+// Import PanelRight icon for when sidebar is closed
+import { PanelRight } from "lucide-react";
