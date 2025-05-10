@@ -105,6 +105,9 @@
   display: flex;
   gap: var(--spacing-xs);
   z-index: 1000;
+}
+
+.animate-toolbar-appear {
   animation: toolbar-appear 0.15s ease-out;
 }
 

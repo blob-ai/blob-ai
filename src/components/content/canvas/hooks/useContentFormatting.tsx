@@ -27,7 +27,7 @@ const useContentFormatting = () => {
   // Calculate proper toolbar position based on selection
   const calculateToolbarPosition = (
     selection: Selection | null, 
-    container: HTMLTextAreaElement
+    container: HTMLElement
   ) => {
     if (!selection || selection.isCollapsed) return { top: 0, left: 0 };
     
@@ -64,8 +64,11 @@ const useContentFormatting = () => {
       if (selection && !selection.isCollapsed) {
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
-        const containerRect = document.querySelector('.markdown-textarea')?.getBoundingClientRect() || { top: 0 };
-        top = rect.bottom - containerRect.top + 10; // 10px below the selection
+        const editorContainer = document.getElementById('canvas-editor-container');
+        if (editorContainer) {
+          const containerRect = editorContainer.getBoundingClientRect();
+          top = rect.bottom - containerRect.top + 10; // 10px below the selection
+        }
       }
     }
     
@@ -84,6 +87,30 @@ const useContentFormatting = () => {
     setActiveFormats(formats);
   };
 
+  // Helper to check if an element is part of the editor
+  const isElementInEditor = (element: Node | null): boolean => {
+    if (!element) return false;
+    
+    // Walk up the DOM tree to find if we're in the editor container
+    let currentNode: Node | null = element;
+    while (currentNode) {
+      // Check if we're in the editor container
+      if (currentNode.nodeType === Node.ELEMENT_NODE) {
+        const el = currentNode as HTMLElement;
+        // Check for data-editor attribute which we added to the textarea
+        if (el.getAttribute('data-editor') === 'true') {
+          return true;
+        }
+        // Also check for the container ID to be certain
+        if (el.id === 'canvas-editor-container') {
+          return true;
+        }
+      }
+      currentNode = currentNode.parentNode;
+    }
+    return false;
+  };
+
   // Monitor selection changes
   useEffect(() => {
     const handleSelectionChange = () => {
@@ -93,27 +120,12 @@ const useContentFormatting = () => {
         return;
       }
       
-      // Only show toolbar if the selection is within our editor textarea
-      // Find the textarea with markdown-textarea class - this is specific to our editor
-      const editorElement = document.querySelector('.markdown-textarea');
-      if (!editorElement) return;
-      
-      // Check if the selection is inside the editor element
-      let isSelectionInEditor = false;
+      // Get the node where the selection is happening
       const range = selection.getRangeAt(0);
-      let node = range.commonAncestorContainer;
-      
-      // Traverse up the DOM to check if the selection is within the editor
-      while (node) {
-        if (node === editorElement) {
-          isSelectionInEditor = true;
-          break;
-        }
-        node = node.parentNode;
-      }
+      const node = range.commonAncestorContainer;
       
       // Only proceed if selection is in the editor
-      if (!isSelectionInEditor) {
+      if (!isElementInEditor(node)) {
         setToolbarVisible(false);
         return;
       }
@@ -123,17 +135,24 @@ const useContentFormatting = () => {
       if (textContent && textContent.trim().length > 0) {
         setSelectedText(textContent);
         setToolbarVisible(true);
-        setToolbarPosition(calculateToolbarPosition(selection, editorElement as HTMLTextAreaElement));
         
-        // Store the selection range for applying formatting
-        const textarea = editorElement as HTMLTextAreaElement;
-        setSelectedRange({
-          start: textarea.selectionStart,
-          end: textarea.selectionEnd
-        });
-        
-        // Check which formats are active
-        checkActiveFormats(textContent);
+        // Find the editor container for positioning
+        const editorContainer = document.getElementById('canvas-editor-container');
+        if (editorContainer) {
+          setToolbarPosition(calculateToolbarPosition(selection, editorContainer));
+          
+          // Find the textarea to store selection range
+          const textarea = document.querySelector('[data-editor="true"]') as HTMLTextAreaElement;
+          if (textarea) {
+            setSelectedRange({
+              start: textarea.selectionStart,
+              end: textarea.selectionEnd
+            });
+            
+            // Check which formats are active
+            checkActiveFormats(textContent);
+          }
+        }
       } else {
         setToolbarVisible(false);
       }
