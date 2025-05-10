@@ -465,10 +465,7 @@ const ChatInterface = () => {
               <Sparkles className="h-14 w-14 mx-auto" />
             </div>
             <h2 className="text-2xl font-bold mb-2">What can I help with?</h2>
-            <p className="text-base text-white/70 max-w-lg mb-8">
-              I can analyze accounts for patterns, create templates based 
-              on successful content, or help you draft new content.
-            </p>
+            <p className="text-base text-white/70 max-w-lg mb-8">Start asking questions or select a task below. I’ll guide you from there.</p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl mx-auto px-4 mb-16">
               <Button variant="outline" className="flex flex-col items-start w-full h-[100px] px-4 py-3 bg-[#18191B]/80 hover:bg-[#1C1D20]/90 border border-[#2A2B32] rounded-2xl transition-colors text-left group" onClick={() => handleQuickAction('analyze')}>
