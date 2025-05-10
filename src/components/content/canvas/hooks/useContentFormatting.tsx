@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 import { useRef, useEffect, useState } from "react";
 import { 
@@ -63,7 +64,7 @@ const useContentFormatting = () => {
       if (selection && !selection.isCollapsed) {
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
-        const containerRect = document.querySelector('textarea')?.getBoundingClientRect() || { top: 0 };
+        const containerRect = document.querySelector('.markdown-textarea')?.getBoundingClientRect() || { top: 0 };
         top = rect.bottom - containerRect.top + 10; // 10px below the selection
       }
     }
@@ -92,17 +93,37 @@ const useContentFormatting = () => {
         return;
       }
       
-      // Only show toolbar if the selection is within our editor
-      const editorElement = document.querySelector('textarea');
+      // Only show toolbar if the selection is within our editor textarea
+      // Find the textarea with markdown-textarea class - this is specific to our editor
+      const editorElement = document.querySelector('.markdown-textarea');
       if (!editorElement) return;
       
+      // Check if the selection is inside the editor element
+      let isSelectionInEditor = false;
       const range = selection.getRangeAt(0);
+      let node = range.commonAncestorContainer;
+      
+      // Traverse up the DOM to check if the selection is within the editor
+      while (node) {
+        if (node === editorElement) {
+          isSelectionInEditor = true;
+          break;
+        }
+        node = node.parentNode;
+      }
+      
+      // Only proceed if selection is in the editor
+      if (!isSelectionInEditor) {
+        setToolbarVisible(false);
+        return;
+      }
+      
       const textContent = range.toString();
       
       if (textContent && textContent.trim().length > 0) {
         setSelectedText(textContent);
         setToolbarVisible(true);
-        setToolbarPosition(calculateToolbarPosition(selection, editorElement));
+        setToolbarPosition(calculateToolbarPosition(selection, editorElement as HTMLTextAreaElement));
         
         // Store the selection range for applying formatting
         const textarea = editorElement as HTMLTextAreaElement;
@@ -214,7 +235,7 @@ const useContentFormatting = () => {
     return (
       <div
         ref={toolbarRef}
-        className="selection-toolbar"
+        className="selection-toolbar animate-toolbar-appear"
         style={positionToolbar()}
       >
         {/* Text formatting options */}

@@ -83,7 +83,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   };
 
   return (
-    <div className="relative flex flex-col h-full">
+    <div className="relative flex flex-col h-full" id="canvas-editor-container">
       <div className="flex items-center mb-4">
         <Avatar className="h-8 w-8 mr-2">
           <AvatarImage src="/placeholder.svg" alt="Your content" />
@@ -103,6 +103,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         className={getTextareaClassName()}
         placeholder="Start writing your content here..."
         spellCheck={true}
+        data-editor="true"
       />
       
       {/* Content Analysis Panel - added below the editor */}
