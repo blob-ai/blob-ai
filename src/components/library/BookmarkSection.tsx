@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { HorizontalScrollArea } from "@/components/ui/scroll-area";
 import { CardContainer } from "@/components/ui/card-container";
 import { Button } from "@/components/ui/button";
 import { 
@@ -71,7 +71,7 @@ const BookmarkSection: React.FC<BookmarkSectionProps> = ({
         </Button>
       </div>
 
-      <ScrollArea className="w-full" orientation="horizontal">
+      <HorizontalScrollArea className="w-full">
         <div className="flex gap-4 pb-2 px-1 min-w-max">
           {bookmarks.map((bookmark) => (
             <CardContainer 
@@ -192,7 +192,7 @@ const BookmarkSection: React.FC<BookmarkSectionProps> = ({
             </CardContainer>
           ))}
         </div>
-      </ScrollArea>
+      </HorizontalScrollArea>
     </div>
   );
 };

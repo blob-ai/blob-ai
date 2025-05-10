@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Dialog,
@@ -103,8 +102,7 @@ const QuickSaveModal: React.FC<QuickSaveModalProps> = ({
       type: bookmarkType,
       notes: notes,
       source_url: bookmarkType === "link" ? urlInput : undefined,
-      image_url: imagePreview || undefined,
-      updated_at: new Date().toISOString()
+      image_url: imagePreview || undefined
     };
     
     onSave(newBookmark);
