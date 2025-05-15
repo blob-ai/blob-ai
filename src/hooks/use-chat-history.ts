@@ -94,7 +94,7 @@ export function useChatHistory() {
         id: msg.id,
         threadId: msg.thread_id,
         content: msg.content,
-        role: msg.role,
+        role: msg.role as 'user' | 'assistant', // Cast the role to the correct type
         createdAt: msg.created_at
       }));
 
@@ -204,11 +204,11 @@ export function useChatHistory() {
         }
       }
 
-      const formattedMessage = {
+      const formattedMessage: ChatMessage = {
         id: data.id,
         threadId: data.thread_id,
         content: data.content,
-        role: data.role,
+        role: data.role as 'user' | 'assistant', // Cast the role to the correct type
         createdAt: data.created_at
       };
 
