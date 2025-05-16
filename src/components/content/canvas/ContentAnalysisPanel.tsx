@@ -79,4 +79,4 @@ const ContentAnalysisPanel: React.FC<ContentAnalysisPanelProps> = ({
 };
 
 export default ContentAnalysisPanel;
-export type { ContentAnalysis };
+// Remove the duplicate export here - it's already exported at the top
