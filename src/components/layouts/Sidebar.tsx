@@ -1,26 +1,42 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSidebar } from "./SidebarProvider";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
   MessageSquare, 
-  FileText, 
-  Users,
   BookmarkIcon,
-  PanelLeftClose
+  Users,
+  Plus
 } from "lucide-react";
+import { useChat } from "@/contexts/ChatContext";
+import { supabase } from "@/integrations/supabase/client";
 
 // Import refactored sidebar components
 import SidebarHeader from "./sidebar/SidebarHeader";
 import SidebarNavItem from "./sidebar/SidebarNavItem";
 import SidebarSection from "./sidebar/SidebarSection";
 import SidebarFooter from "./sidebar/SidebarFooter";
+import { Button } from "@/components/ui/button";
 
 const Sidebar = () => {
-  const { isSidebarOpen, toggleSidebar } = useSidebar();
+  const { isSidebarOpen } = useSidebar();
+  const { threads, loadThreads, createThread } = useChat();
 
-  // Main navigation items - renamed Library and changed icon
+  // Load threads when component mounts
+  useEffect(() => {
+    loadThreads();
+  }, [loadThreads]);
+
+  // Format threads for sidebar display
+  const recentChats = threads.map(thread => ({
+    id: thread.id,
+    name: thread.title,
+    path: `/dashboard/chat/${thread.id}`,
+    lastMessageAt: thread.lastMessageAt
+  }));
+
+  // Main navigation items
   const navItems = [
     {
       name: "AI Chat",
@@ -28,7 +44,10 @@ const Sidebar = () => {
       icon: <MessageSquare className="h-6 w-6" />,
       exact: false,
       hasAction: true,
-      action: () => window.location.href = '/dashboard/chat/new'
+      action: async () => {
+        const threadId = await createThread();
+        window.location.href = `/dashboard/chat/${threadId}`;
+      }
     },
     {
       name: "Dashboard",
@@ -52,12 +71,10 @@ const Sidebar = () => {
     { name: "Web3 Posts", path: "/dashboard/workspace/web3", icon: <Users className="h-5 w-5 text-primary-400" /> }
   ];
 
-  // Recent chats data
-  const recentChats = [
-    { name: "Content Strategy Chat 1", path: "/dashboard/chat/1" },
-    { name: "Content Strategy Chat 2", path: "/dashboard/chat/2" },
-    { name: "Content Strategy Chat 3", path: "/dashboard/chat/3" }
-  ];
+  const handleNewChat = async () => {
+    const threadId = await createThread();
+    window.location.href = `/dashboard/chat/${threadId}`;
+  };
 
   return (
     <aside
@@ -88,8 +105,49 @@ const Sidebar = () => {
             {/* Workspaces Section */}
             <SidebarSection title="Your workspaces" items={workspaces} />
 
-            {/* Recent Chats Section */}
-            <SidebarSection title="Recent chats" items={recentChats} />
+            {/* Recent Chats Section with Create New Chat button */}
+            <div className="mt-8 px-2">
+              <div className="px-4 py-2.5 flex justify-between items-center">
+                <h3 className="text-xs font-medium text-white/50">
+                  Recent chats
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-white/50 hover:text-white hover:bg-white/10"
+                  onClick={handleNewChat}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              {recentChats.length > 0 ? (
+                <ul className="space-y-1.5">
+                  {recentChats.map((thread) => (
+                    <li key={thread.id}>
+                      <NavLink
+                        to={thread.path}
+                        className={({ isActive }) =>
+                          cn(
+                            "flex items-center gap-3.5 px-4 py-2.5 rounded-xl transition-colors",
+                            "hover:bg-white/5",
+                            isActive
+                              ? "bg-white/5 text-primary-400"
+                              : "text-white/70"
+                          )
+                        }
+                      >
+                        <MessageSquare className="h-4 w-4 text-white/50" />
+                        <span className="truncate text-[15px]">{thread.name}</span>
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="px-4 py-2 text-sm text-white/50 italic">
+                  No recent chats
+                </div>
+              )}
+            </div>
           </nav>
 
           <SidebarFooter />

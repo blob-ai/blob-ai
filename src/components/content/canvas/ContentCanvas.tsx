@@ -1,11 +1,10 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import CanvasToolbar from "./CanvasToolbar";
 import CanvasEditor from "./CanvasEditor";
 import CanvasPreview from "./CanvasPreview";
-import ContentChatPanel from "./ContentChatPanel";
+import ContentEditorChatPanel from "./ContentEditorChatPanel";
 import ScheduleModal from "./ScheduleModal";
 import ContentVersionHistory from "./ContentVersionHistory";
 import KeyboardShortcutsGuide from "./KeyboardShortcutsGuide";
@@ -14,6 +13,7 @@ import ResizablePanelsWrapper from "./ResizablePanelsWrapper";
 import { ContentVersion } from "./ContentVersionHistory";
 import { FormattingType } from "@/lib/formatting";
 import { ContentAnalysis } from "./ContentAnalysisPanel";
+import { ContentEditorProvider } from "@/contexts/ContentEditorContext";
 
 interface ContentCanvasProps {
   initialContent?: string;
@@ -484,23 +484,24 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
   );
 
   return (
-    <ResizablePanelsWrapper
-      leftPanel={
-        <ContentChatPanel 
-          onSendMessage={handleSendToAI}
-          selectedText={selectedText}
-          content={content}
-          contentGoal={contentGoal}
-          selectedIdea={selectedIdea}
-        />
-      }
-      rightPanel={canvasContent}
-      initialLeftSize={25}
-      initialRightSize={75}
-      collapsible={true}
-      isLeftPanelCollapsed={!showChatPanel}
-      onCollapseChange={(collapsed) => setShowChatPanel(!collapsed)}
-    />
+    <ContentEditorProvider>
+      <ResizablePanelsWrapper
+        leftPanel={
+          <ContentEditorChatPanel 
+            selectedText={selectedText}
+            content={content}
+            contentGoal={contentGoal}
+            selectedIdea={selectedIdea}
+          />
+        }
+        rightPanel={canvasContent}
+        initialLeftSize={25}
+        initialRightSize={75}
+        collapsible={true}
+        isLeftPanelCollapsed={!showChatPanel}
+        onCollapseChange={(collapsed) => setShowChatPanel(!collapsed)}
+      />
+    </ContentEditorProvider>
   );
 };
 
