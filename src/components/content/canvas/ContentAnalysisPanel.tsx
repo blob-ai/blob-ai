@@ -23,7 +23,11 @@ const ContentAnalysisPanel: React.FC<ContentAnalysisPanelProps> = ({
   if (!contentAnalysis) return null;
 
   return (
-    <div className={`border-t border-white/10 ${className}`}>
+    <div 
+      className={`border-t border-white/10 ${className}`}
+      id="content-analysis-panel"
+      data-content-analysis="true"
+    >
       <Accordion type="single" collapsible defaultValue="analysis">
         <AccordionItem value="analysis" className="border-none">
           <AccordionTrigger className="py-3 px-4 text-sm font-medium hover:no-underline">
@@ -32,8 +36,8 @@ const ContentAnalysisPanel: React.FC<ContentAnalysisPanelProps> = ({
               Content Analysis
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 pb-4">
-            <div className="space-y-2 text-sm">
+          <AccordionContent className="px-4 pb-4 content-analysis-panel" data-accordion-content="true">
+            <div className="space-y-2 text-sm no-selection-toolbar">
               <div className="flex justify-between">
                 <span className="text-white/70">Tone:</span>
                 <Badge variant="outline" className="bg-white/5">{contentAnalysis.tone}</Badge>

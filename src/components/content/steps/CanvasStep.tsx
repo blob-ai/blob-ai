@@ -43,6 +43,8 @@ const CanvasStep: React.FC<CanvasStepProps> = ({
         contentGoal={contentGoal}
         selectedIdea={selectedIdea}
         selectedStyle={selectedStyle}
+        data-editor-container="true"
+        className="editor-content-area"
       />
     </div>
   );

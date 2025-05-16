@@ -1,3 +1,4 @@
+
 //src/components/content/canvas/hooks/useContentFormatting.tsx: Core logic for the floating toolbar
 import { toast } from "sonner";
 import { useRef, useEffect, useState } from "react";
@@ -97,10 +98,16 @@ const useContentFormatting = () => {
       if (currentNode.nodeType === Node.ELEMENT_NODE) {
         const el = currentNode as HTMLElement;
         
-        // Explicitly exclude chat panels and other areas where toolbar should not appear
+        // Explicitly exclude areas where toolbar should not appear
         if (el.classList.contains('no-selection-toolbar') || 
             el.closest('.chat-container') || 
-            el.closest('[data-chat-panel]')) {
+            el.closest('[data-chat-panel]') ||
+            el.closest('[data-content-analysis]') || 
+            el.closest('.content-analysis-panel') ||
+            el.closest('.accordion-content') ||
+            el.closest('[role="tabpanel"]') ||
+            el.id === 'content-analysis-panel' ||
+            el.getAttribute('data-accordion-content') === 'true') {
           return false;
         }
       }
@@ -116,7 +123,8 @@ const useContentFormatting = () => {
         // Check for the canvas editor container ID or data attribute
         if (el.id === 'canvas-editor-container' || 
             el.getAttribute('data-editor') === 'true' ||
-            el.getAttribute('data-content-editor') === 'true') {
+            el.getAttribute('data-content-editor') === 'true' ||
+            el.classList.contains('editor-content-area')) {
           return true;
         }
       }
