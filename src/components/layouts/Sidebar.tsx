@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useSidebar } from "./SidebarProvider";
 import { cn } from "@/lib/utils";
 import { 
@@ -10,24 +10,15 @@ import {
   BookmarkIcon,
   PanelLeftClose
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 // Import refactored sidebar components
 import SidebarHeader from "./sidebar/SidebarHeader";
 import SidebarNavItem from "./sidebar/SidebarNavItem";
 import SidebarSection from "./sidebar/SidebarSection";
 import SidebarFooter from "./sidebar/SidebarFooter";
-import { useChatHistory } from "@/hooks/use-chat-history";
 
 const Sidebar = () => {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
-  const navigate = useNavigate();
-  const { threads, loadThreads, isLoadingThreads, selectThread } = useChatHistory();
-
-  // Load the threads when the component mounts
-  useEffect(() => {
-    loadThreads(5); // Load initial 5 threads
-  }, [loadThreads]);
 
   // Main navigation items - renamed Library and changed icon
   const navItems = [
@@ -37,7 +28,7 @@ const Sidebar = () => {
       icon: <MessageSquare className="h-6 w-6" />,
       exact: false,
       hasAction: true,
-      action: () => navigate('/dashboard/chat')
+      action: () => window.location.href = '/dashboard/chat/new'
     },
     {
       name: "Dashboard",
@@ -61,12 +52,12 @@ const Sidebar = () => {
     { name: "Web3 Posts", path: "/dashboard/workspace/web3", icon: <Users className="h-5 w-5 text-primary-400" /> }
   ];
 
-  // Convert chat threads to the format expected by SidebarSection
-  const recentChats = threads.map(thread => ({
-    name: thread.title,
-    path: `/dashboard/chat/${thread.id}`,
-    onClick: () => selectThread(thread)
-  }));
+  // Recent chats data
+  const recentChats = [
+    { name: "Content Strategy Chat 1", path: "/dashboard/chat/1" },
+    { name: "Content Strategy Chat 2", path: "/dashboard/chat/2" },
+    { name: "Content Strategy Chat 3", path: "/dashboard/chat/3" }
+  ];
 
   return (
     <aside
@@ -97,12 +88,8 @@ const Sidebar = () => {
             {/* Workspaces Section */}
             <SidebarSection title="Your workspaces" items={workspaces} />
 
-            {/* Recent Chats Section - Now uses actual chat threads */}
-            <SidebarSection 
-              title="Recent chats" 
-              items={recentChats} 
-              isLoading={isLoadingThreads}
-            />
+            {/* Recent Chats Section */}
+            <SidebarSection title="Recent chats" items={recentChats} />
           </nav>
 
           <SidebarFooter />
