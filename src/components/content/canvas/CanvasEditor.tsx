@@ -85,7 +85,12 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   };
 
   return (
-    <div className="relative flex flex-col h-full" id="canvas-editor-container" data-canvas-editor="true">
+    <div 
+      className="relative flex flex-col h-full" 
+      id="canvas-editor-container" 
+      data-canvas-editor="true"
+      data-editor="true"
+    >
       <div className="flex items-center mb-4">
         <Avatar className="h-8 w-8 mr-2">
           <AvatarImage src="/placeholder.svg" alt="Your content" />

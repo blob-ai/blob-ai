@@ -1,5 +1,4 @@
 
-//src/components/content/canvas/hooks/useContentFormatting.tsx: Core logic for the floating toolbar
 import { toast } from "sonner";
 import { useRef, useEffect, useState } from "react";
 import { 
@@ -104,10 +103,11 @@ const useContentFormatting = () => {
             el.closest('[data-chat-panel]') ||
             el.closest('[data-content-analysis]') || 
             el.closest('.content-analysis-panel') ||
+            el.closest('#content-analysis-panel') ||
+            el.closest('[data-content-analysis="true"]') ||
             el.closest('.accordion-content') ||
             el.closest('[role="tabpanel"]') ||
-            el.id === 'content-analysis-panel' ||
-            el.getAttribute('data-accordion-content') === 'true') {
+            el.closest('[data-accordion-content="true"]')) {
           return false;
         }
       }

@@ -192,6 +192,11 @@
   position: relative;
 }
 
+/* Add specific exclusion for content analysis panel */
+[data-content-analysis="true"] {
+  position: relative;
+}
+
 /* Improve toolbar appearance */
 .editor-content-area .selection-toolbar {
   background-color: rgba(45, 53, 72, 0.95);
