@@ -17,7 +17,11 @@ const useContentFormatting = () => {
   const toolbarRef = useRef<HTMLDivElement>(null);
   
   // Destructure sub-hooks
-  const { toolbarVisible, setToolbarVisible } = useToolbarVisibility(setSelectedText, setSelectedRange, setActiveFormats);
+  const { toolbarVisible, setToolbarVisible } = useToolbarVisibility(
+    setSelectedText, 
+    setSelectedRange, 
+    setActiveFormats
+  );
   
   const { 
     toolbarPosition, 
@@ -25,18 +29,51 @@ const useContentFormatting = () => {
     calculateToolbarPosition
   } = useToolbarPosition(toolbarRef);
   
-  const { handleAIAction } = useAIActions(selectedText, selectedRange, setToolbarVisible);
+  const { handleAIAction } = useAIActions(
+    selectedText, 
+    selectedRange, 
+    setToolbarVisible
+  );
   
-  const { handleFormatting } = useFormattingActions(activeFormats, setActiveFormats);
+  const { handleFormatting: handleFormattingAction } = useFormattingActions(
+    activeFormats, 
+    setActiveFormats
+  );
+  
+  // Apply formatting handler
+  const handleFormatting = (
+    format: FormattingType, 
+    content: string, 
+    setContent: (content: string) => void, 
+    textareaRef: React.RefObject<HTMLTextAreaElement>
+  ) => {
+    handleFormattingAction(format, content, setContent, textareaRef);
+  };
+  
+  // Helper to handle formatting from the toolbar
+  const handleToolbarFormatting = (format: FormattingType) => {
+    // Dispatch a custom event for formatting
+    if (typeof window !== 'undefined') {
+      const event = new CustomEvent('applyFormatting', { 
+        detail: { 
+          format,
+          context: 'content-editor' 
+        } 
+      });
+      document.dispatchEvent(event);
+    }
+  };
   
   // Render floating toolbar UI
   const renderFloatingToolbar = () => {
     if (!toolbarVisible) return null;
+    
     return renderToolbarUI({
       toolbarRef,
       positionToolbar,
       activeFormats,
-      handleAIAction
+      handleAIAction,
+      handleFormatting: handleToolbarFormatting
     });
   };
 

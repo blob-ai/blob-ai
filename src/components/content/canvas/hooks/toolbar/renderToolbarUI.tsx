@@ -12,12 +12,14 @@ import {
 } from "lucide-react";
 import { FormattingType } from "@/lib/formatting";
 import { AIActionType } from "./useAIActions";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface RenderToolbarProps {
   toolbarRef: RefObject<HTMLDivElement>;
   positionToolbar: () => Record<string, string>;
   activeFormats: FormattingType[];
   handleAIAction: (action: AIActionType) => void;
+  handleFormatting: (format: FormattingType) => void;
 }
 
 /**
@@ -27,7 +29,8 @@ export const renderToolbarUI = ({
   toolbarRef,
   positionToolbar,
   activeFormats,
-  handleAIAction
+  handleAIAction,
+  handleFormatting
 }: RenderToolbarProps) => {
   // Format options - text formatting tools
   const formatOptions = [
@@ -46,56 +49,57 @@ export const renderToolbarUI = ({
   ];
   
   return (
-    <div
-      ref={toolbarRef}
-      className="selection-toolbar animate-toolbar-appear"
-      style={positionToolbar()}
-      data-testid="content-editor-toolbar"
-    >
-      {/* Text formatting options */}
-      <div className="flex gap-1">
-        {formatOptions.map((option) => (
-          <button
-            key={option.id}
-            className={`p-2 rounded transition-colors flex items-center justify-center ${
-              activeFormats.includes(option.id) ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/70'
-            }`}
-            title={option.label}
-            onClick={() => {
-              // Dispatch formatting event
-              if (typeof window !== 'undefined') {
-                const event = new CustomEvent('applyFormatting', { 
-                  detail: { 
-                    format: option.id,
-                    context: 'content-editor' 
-                  } 
-                });
-                document.dispatchEvent(event);
-              }
-            }}
-          >
-            {option.icon}
-          </button>
-        ))}
+    <TooltipProvider>
+      <div
+        ref={toolbarRef}
+        className="selection-toolbar animate-toolbar-appear bg-[#242c3d] shadow-lg"
+        style={positionToolbar()}
+        data-testid="content-editor-toolbar"
+      >
+        {/* Text formatting options */}
+        <div className="flex gap-1">
+          {formatOptions.map((option) => (
+            <Tooltip key={option.id}>
+              <TooltipTrigger asChild>
+                <button
+                  className={`p-2 rounded transition-colors flex items-center justify-center ${
+                    activeFormats.includes(option.id) ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/70'
+                  }`}
+                  onClick={() => handleFormatting(option.id)}
+                >
+                  {option.icon}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="bg-[#16181c] text-white text-xs">
+                {option.label}
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
+        
+        {/* Separator */}
+        <div className="w-px h-5 bg-white/20 mx-1"></div>
+        
+        {/* AI action options */}
+        <div className="flex gap-1">
+          {aiOptions.map((option) => (
+            <Tooltip key={option.id}>
+              <TooltipTrigger asChild>
+                <button
+                  className="p-2 rounded transition-colors flex items-center justify-center hover:bg-white/10 text-white/70 hover:text-white"
+                  onClick={() => handleAIAction(option.id)}
+                >
+                  {option.icon}
+                  <span className="sr-only">{option.label}</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="bg-[#16181c] text-white text-xs">
+                {option.label}
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
       </div>
-      
-      {/* Separator */}
-      <div className="w-px h-5 bg-white/20 mx-1"></div>
-      
-      {/* AI action options */}
-      <div className="flex gap-1">
-        {aiOptions.map((option) => (
-          <button
-            key={option.id}
-            className="p-2 rounded transition-colors flex items-center justify-center hover:bg-white/10 text-white/70 hover:text-white"
-            title={option.label}
-            onClick={() => handleAIAction(option.id)}
-          >
-            {option.icon}
-            <span className="sr-only">{option.label}</span>
-          </button>
-        ))}
-      </div>
-    </div>
+    </TooltipProvider>
   );
 };

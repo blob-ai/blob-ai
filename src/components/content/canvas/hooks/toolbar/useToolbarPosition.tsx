@@ -1,4 +1,5 @@
-import { useState, RefObject } from "react";
+
+import { useState, RefObject, useEffect } from "react";
 
 /**
  * Hook to handle toolbar positioning based on text selection
@@ -7,22 +8,44 @@ export const useToolbarPosition = (toolbarRef: RefObject<HTMLDivElement>) => {
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
 
   // Calculate proper toolbar position based on selection
-  const calculateToolbarPosition = (
-    selection: Selection | null, 
-    container: HTMLElement
-  ) => {
-    if (!selection || selection.isCollapsed) return { top: 0, left: 0 };
+  const calculateToolbarPosition = () => {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed || !selection.rangeCount) return;
     
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
+    
+    // Find the editor container
+    const editorContainer = document.getElementById('canvas-editor-container') || 
+                           document.querySelector('[data-editor="true"]');
+    
+    if (!editorContainer) return;
+    
+    const containerRect = editorContainer.getBoundingClientRect();
     
     // Position the toolbar above the selection
-    return {
+    setToolbarPosition({
       top: rect.top - containerRect.top - (toolbarRef.current?.offsetHeight || 0) - 10,
       left: rect.left + (rect.width / 2) - containerRect.left - (toolbarRef.current?.offsetWidth || 0) / 2
-    };
+    });
   };
+
+  // Update position when selection changes
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      calculateToolbarPosition();
+    };
+    
+    document.addEventListener("selectionchange", handleSelectionChange);
+    
+    // Also calculate on resize since positions may change
+    window.addEventListener("resize", handleSelectionChange);
+    
+    return () => {
+      document.removeEventListener("selectionchange", handleSelectionChange);
+      window.removeEventListener("resize", handleSelectionChange);
+    };
+  }, []);
 
   // Ensure toolbar stays within viewport bounds
   const positionToolbar = () => {
@@ -54,7 +77,7 @@ export const useToolbarPosition = (toolbarRef: RefObject<HTMLDivElement>) => {
       }
     }
     
-    return { top: `${top}px`, left: `${left}px` };
+    return { top: `${top}px`, left: `${left}px`, position: 'absolute' };
   };
 
   return { toolbarPosition, setToolbarPosition, calculateToolbarPosition, positionToolbar };

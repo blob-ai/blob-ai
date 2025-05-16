@@ -34,11 +34,9 @@ export const isElementInEditor = (element: Node | null): boolean => {
     if (currentNode.nodeType === Node.ELEMENT_NODE) {
       const el = currentNode as HTMLElement;
       
-      // Check for the canvas editor container ID or data attribute
-      if (el.id === 'canvas-editor-container' || 
-          el.getAttribute('data-editor') === 'true' ||
-          el.getAttribute('data-content-editor') === 'true' ||
-          el.classList.contains('editor-content-area')) {
+      // Check for the main content editor specifically
+      if (el.getAttribute('data-content-editor') === 'true' ||
+          el.classList.contains('markdown-textarea')) {
         return true;
       }
     }

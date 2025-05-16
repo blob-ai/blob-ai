@@ -18,7 +18,9 @@ export const useToolbarVisibility = (
   useEffect(() => {
     const handleSelectionChange = () => {
       const selection = window.getSelection();
-      if (!selection || selection.isCollapsed) {
+      
+      // Hide toolbar if no selection or empty selection
+      if (!selection || selection.isCollapsed || !selection.rangeCount) {
         setToolbarVisible(false);
         return;
       }
@@ -37,7 +39,6 @@ export const useToolbarVisibility = (
       
       if (textContent && textContent.trim().length > 0) {
         setSelectedText(textContent);
-        setToolbarVisible(true);
         
         // Find the textarea to store selection range
         const textarea = document.querySelector('[data-content-editor="true"]') as HTMLTextAreaElement;
@@ -49,14 +50,28 @@ export const useToolbarVisibility = (
           
           // Check which formats are active
           setActiveFormats(checkActiveFormats(textContent));
+          
+          // Show the toolbar
+          setToolbarVisible(true);
         }
       } else {
         setToolbarVisible(false);
       }
     };
     
-    document.addEventListener("selectionchange", handleSelectionChange);
-    return () => document.removeEventListener("selectionchange", handleSelectionChange);
+    // Add debounce to avoid excessive updates
+    let timeout: NodeJS.Timeout;
+    const debouncedSelectionChange = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(handleSelectionChange, 100);
+    };
+    
+    document.addEventListener("selectionchange", debouncedSelectionChange);
+    
+    return () => {
+      document.removeEventListener("selectionchange", debouncedSelectionChange);
+      clearTimeout(timeout);
+    };
   }, [setSelectedText, setSelectedRange, setActiveFormats]);
   
   return { toolbarVisible, setToolbarVisible };
