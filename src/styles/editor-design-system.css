@@ -177,7 +177,7 @@
 }
 
 /* Editor-specific containment for selection toolbar */
-#canvas-editor-container {
+#canvas-editor-container, #theme-selection-container, [data-editor-container="true"] {
   position: relative;
 }
 
@@ -237,3 +237,4 @@ form {
 .theme-selection-form {
   position: relative;
 }
+

@@ -105,7 +105,7 @@ export const useToolbarPosition = (toolbarRef: RefObject<HTMLDivElement>) => {
       top: `${top}px`, 
       left: `${left}px`, 
       position: 'absolute',
-      zIndex: 9999 // Ensure high z-index to appear above other elements
+      zIndex: '9999' // Convert zIndex to string to match Record<string, string> type
     };
   };
 
