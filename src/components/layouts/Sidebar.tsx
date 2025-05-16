@@ -1,5 +1,6 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { NavLink } from "react-router-dom";
 import { useSidebar } from "./SidebarProvider";
 import { cn } from "@/lib/utils";
 import { 
@@ -10,14 +11,13 @@ import {
   Plus
 } from "lucide-react";
 import { useChat } from "@/contexts/ChatContext";
-import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 // Import refactored sidebar components
 import SidebarHeader from "./sidebar/SidebarHeader";
 import SidebarNavItem from "./sidebar/SidebarNavItem";
 import SidebarSection from "./sidebar/SidebarSection";
 import SidebarFooter from "./sidebar/SidebarFooter";
-import { Button } from "@/components/ui/button";
 
 const Sidebar = () => {
   const { isSidebarOpen } = useSidebar();
