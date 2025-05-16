@@ -1,4 +1,4 @@
-
+///src/components/content/canvas/hooks/useContentFormatting.tsx: Core logic for the floating toolbar
 import { toast } from "sonner";
 import { useRef, useEffect, useState } from "react";
 import { 
