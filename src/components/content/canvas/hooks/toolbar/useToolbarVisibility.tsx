@@ -31,6 +31,7 @@ export const useToolbarVisibility = (
       
       // Only proceed if selection is in the editor
       if (!isElementInEditor(node)) {
+        console.log("Selection not in editor area:", node);
         setToolbarVisible(false);
         return;
       }
@@ -38,20 +39,37 @@ export const useToolbarVisibility = (
       const textContent = range.toString();
       
       if (textContent && textContent.trim().length > 0) {
+        console.log("Selected text:", textContent);
         setSelectedText(textContent);
         
-        // Find the textarea to store selection range
-        const textarea = document.querySelector('[data-content-editor="true"]') as HTMLTextAreaElement;
-        if (textarea) {
-          setSelectedRange({
-            start: textarea.selectionStart,
-            end: textarea.selectionEnd
-          });
+        // Find the textarea to store selection range (try multiple element types)
+        const editor = document.querySelector('[data-content-editor="true"]') as HTMLTextAreaElement 
+                      || document.querySelector('textarea') as HTMLTextAreaElement
+                      || document.querySelector('input[type="text"]') as HTMLInputElement;
+                      
+        if (editor) {
+          const selectedRange = {
+            start: editor.selectionStart || 0,
+            end: editor.selectionEnd || 0
+          };
+          
+          setSelectedRange(selectedRange);
           
           // Check which formats are active
           setActiveFormats(checkActiveFormats(textContent));
           
           // Show the toolbar
+          console.log("Showing toolbar");
+          setToolbarVisible(true);
+        } else {
+          // Handle selection in non-input elements (like contentEditable)
+          setSelectedRange({
+            start: 0,
+            end: textContent.length
+          });
+          
+          setActiveFormats(checkActiveFormats(textContent));
+          console.log("Showing toolbar for non-input element");
           setToolbarVisible(true);
         }
       } else {

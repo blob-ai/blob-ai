@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Book, Users, MessageSquare, Award, DollarSign, Share, Info } from "lucide-react";
 import ContentGoalSelector from "./ContentGoalSelector";
+import useContentFormatting from "../canvas/hooks/useContentFormatting";
 
 interface ThemeSelectionFormProps {
   onSubmit: (theme: string, categories: string[], goal: string) => void;
@@ -28,6 +28,8 @@ const ThemeSelectionForm: React.FC<ThemeSelectionFormProps> = ({ onSubmit }) => 
   const [theme, setTheme] = useState("");
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  // Import the floating toolbar hook
+  const { renderFloatingToolbar } = useContentFormatting();
 
   // Update available categories when goal changes
   useEffect(() => {
@@ -66,7 +68,7 @@ const ThemeSelectionForm: React.FC<ThemeSelectionFormProps> = ({ onSubmit }) => 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 theme-selection-form" data-editor="true">
       {step === 1 ? (
         <ContentGoalSelector 
           selectedGoal={selectedGoal} 
@@ -115,6 +117,7 @@ const ThemeSelectionForm: React.FC<ThemeSelectionFormProps> = ({ onSubmit }) => 
               value={theme}
               onChange={(e) => setTheme(e.target.value)}
               className="bg-white/5 border-white/10 text-white"
+              data-content-editor="true"
             />
           </div>
 
@@ -127,6 +130,9 @@ const ThemeSelectionForm: React.FC<ThemeSelectionFormProps> = ({ onSubmit }) => 
           </Button>
         </>
       )}
+      
+      {/* Render the floating toolbar */}
+      {renderFloatingToolbar()}
     </form>
   );
 };

@@ -52,7 +52,7 @@ export const renderToolbarUI = ({
     <TooltipProvider>
       <div
         ref={toolbarRef}
-        className="selection-toolbar animate-toolbar-appear bg-[#242c3d] shadow-lg"
+        className="selection-toolbar animate-toolbar-appear bg-[#242c3d] shadow-xl z-[9999]"
         style={positionToolbar()}
         data-testid="content-editor-toolbar"
       >
@@ -65,7 +65,11 @@ export const renderToolbarUI = ({
                   className={`p-2 rounded transition-colors flex items-center justify-center ${
                     activeFormats.includes(option.id) ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white/70'
                   }`}
-                  onClick={() => handleFormatting(option.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleFormatting(option.id);
+                  }}
                 >
                   {option.icon}
                 </button>
@@ -87,7 +91,11 @@ export const renderToolbarUI = ({
               <TooltipTrigger asChild>
                 <button
                   className="p-2 rounded transition-colors flex items-center justify-center hover:bg-white/10 text-white/70 hover:text-white"
-                  onClick={() => handleAIAction(option.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleAIAction(option.id);
+                  }}
                 >
                   {option.icon}
                   <span className="sr-only">{option.label}</span>

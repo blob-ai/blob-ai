@@ -1,3 +1,4 @@
+
 /* Editor Design System Variables - Updated with navy palette */
 :root {
   /* Primary palette */
@@ -109,13 +110,16 @@
   padding: var(--spacing-xs);
   display: flex;
   gap: var(--spacing-xs);
-  z-index: 1000;
+  z-index: 9999; /* Ensure high z-index */
   pointer-events: auto;
   backdrop-filter: blur(4px);
+  /* Fixed size to prevent layout shifts */
+  min-width: 180px;
 }
 
 .animate-toolbar-appear {
   animation: toolbar-appear 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
 }
 
 .selection-button {
@@ -177,6 +181,27 @@
   position: relative;
 }
 
+/* Add a global toolbar container */
+.global-toolbar-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Global style for making toolbars available in all content areas */
+body {
+  position: relative;
+}
+
+/* Make all forms that might contain text have position relative */
+form {
+  position: relative;
+}
+
 /* Class to identify elements that should not trigger toolbar */
 .no-selection-toolbar {
   position: relative;
@@ -197,10 +222,18 @@
   position: relative;
 }
 
-/* Improve toolbar appearance */
-.editor-content-area .selection-toolbar {
-  background-color: rgba(45, 53, 72, 0.95);
-  backdrop-filter: blur(4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+/* Improve tooltip appearance */
+.tooltip-content {
+  background-color: rgba(22, 24, 28, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 10000;
+}
+
+/* Make theme selection form properly positioned */
+.theme-selection-form {
+  position: relative;
 }

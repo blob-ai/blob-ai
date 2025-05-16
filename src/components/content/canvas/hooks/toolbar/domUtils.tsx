@@ -34,9 +34,17 @@ export const isElementInEditor = (element: Node | null): boolean => {
     if (currentNode.nodeType === Node.ELEMENT_NODE) {
       const el = currentNode as HTMLElement;
       
-      // Check for the main content editor specifically
+      // Check for editors across different steps/routes
       if (el.getAttribute('data-content-editor') === 'true' ||
-          el.classList.contains('markdown-textarea')) {
+          el.classList.contains('markdown-textarea') ||
+          // Include theme selection form elements
+          el.classList.contains('theme-selection-form') ||
+          // Common input types that should support selection
+          (el.tagName === 'INPUT' && el.getAttribute('type') !== 'checkbox') ||
+          el.tagName === 'TEXTAREA' ||
+          // Parent containers that might contain editable content
+          el.closest('[data-editor="true"]') ||
+          el.closest('#canvas-editor-container')) {
         return true;
       }
     }
