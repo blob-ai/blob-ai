@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
@@ -33,6 +32,8 @@ interface ContentCanvasProps {
     source: "user" | "creator";
     tone: string[];
   } | null;
+  className?: string;
+  "data-editor-container"?: string;
 }
 
 const ContentCanvas: React.FC<ContentCanvasProps> = ({
@@ -43,7 +44,10 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
   onSchedule,
   buttonColor,
   contentGoal,
-  selectedIdea
+  selectedIdea,
+  selectedStyle,
+  className,
+  "data-editor-container": dataEditorContainer
 }) => {
   const [content, setContent] = useState(initialContent);
   
@@ -420,7 +424,7 @@ const ContentCanvas: React.FC<ContentCanvasProps> = ({
   };
 
   const canvasContent = (
-    <div className="flex flex-col h-full">
+    <div className={`flex flex-col h-full ${className || ""}`} data-editor-container={dataEditorContainer}>
       <CanvasToolbar
         onToggleMobileView={() => setMobileView(!mobileView)}
         onToggleChatPanel={toggleChatPanel}
