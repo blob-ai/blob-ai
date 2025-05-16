@@ -8,7 +8,7 @@ import ChatPage from '@/pages/ChatPage';
 import { SidebarProvider } from '@/components/layouts/SidebarProvider';
 import { ChatProvider } from '@/contexts/ChatContext';
 import { ContentEditorProvider } from '@/contexts/ContentEditorContext';
-import '@/styles/index.css';
+import './index.css';
 
 function App() {
   return (
