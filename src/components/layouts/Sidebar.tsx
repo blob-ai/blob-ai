@@ -10,15 +10,19 @@ import {
   BookmarkIcon,
   PanelLeftClose
 } from "lucide-react";
+import { useParams } from "react-router-dom";
 
 // Import refactored sidebar components
 import SidebarHeader from "./sidebar/SidebarHeader";
 import SidebarNavItem from "./sidebar/SidebarNavItem";
 import SidebarSection from "./sidebar/SidebarSection";
 import SidebarFooter from "./sidebar/SidebarFooter";
+import { useChatThreads } from "@/hooks/useChatThreads";
 
 const Sidebar = () => {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
+  const { threadId } = useParams();
+  const { threads, isLoading, handleThreadRename, handleThreadDelete } = useChatThreads(threadId);
 
   // Main navigation items - renamed Library and changed icon
   const navItems = [
@@ -52,13 +56,6 @@ const Sidebar = () => {
     { name: "Web3 Posts", path: "/dashboard/workspace/web3", icon: <Users className="h-5 w-5 text-primary-400" /> }
   ];
 
-  // Recent chats data
-  const recentChats = [
-    { name: "Content Strategy Chat 1", path: "/dashboard/chat/1" },
-    { name: "Content Strategy Chat 2", path: "/dashboard/chat/2" },
-    { name: "Content Strategy Chat 3", path: "/dashboard/chat/3" }
-  ];
-
   return (
     <aside
       className={cn(
@@ -89,7 +86,13 @@ const Sidebar = () => {
             <SidebarSection title="Your workspaces" items={workspaces} />
 
             {/* Recent Chats Section */}
-            <SidebarSection title="Recent chats" items={recentChats} />
+            <SidebarSection 
+              title="Recent chats" 
+              chatThreads={threads}
+              onThreadRename={handleThreadRename}
+              onThreadDelete={handleThreadDelete}
+              isLoading={isLoading}
+            />
           </nav>
 
           <SidebarFooter />

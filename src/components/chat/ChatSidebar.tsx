@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageSquare, Plus, Search, Trash2, Edit, Check, X } from "lucide-react";
@@ -184,6 +185,10 @@ export function ChatSidebar({ visible }: ChatSidebarProps) {
                             onChange={(e) => setEditedTitle(e.target.value)}
                             className="h-8 flex-1 bg-white/5 border-white/10"
                             autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleSaveEdit(thread.id);
+                              if (e.key === 'Escape') handleCancelEdit();
+                            }}
                           />
                           <Button
                             variant="ghost"
