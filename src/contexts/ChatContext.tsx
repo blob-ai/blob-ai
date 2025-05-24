@@ -201,7 +201,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await supabase.from("chat_messages").insert({
         thread_id: threadId,
         content: message.text,
-        role: message.sender,
+        role: message.sender, // Use sender directly as it should be 'user' or 'assistant'
       });
       
       await supabase
@@ -255,16 +255,21 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(response.error.message || "Failed to send message");
       }
 
+      const assistantMessage: ChatMessage = {
+        id: response.data.id || `ai-${Date.now()}`,
+        text: response.data.content,
+        sender: "assistant",
+        threadId: threadId,
+        timestamp: Date.now()
+      };
+
       setMessages(prev => {
         const filtered = prev.filter(msg => msg.id !== typingMessageId);
-        return [...filtered, {
-          id: response.data.id || `ai-${Date.now()}`,
-          text: response.data.content,
-          sender: "assistant",
-          threadId: threadId,
-          timestamp: Date.now()
-        }];
+        return [...filtered, assistantMessage];
       });
+
+      // Save the assistant message with correct role
+      await saveMessage(assistantMessage, threadId);
       
       if (messages.length <= 1) {
         const title = content.length > 30 
@@ -347,18 +352,23 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       console.log("Parsed analysis:", parsedAnalysis);
       
+      const assistantMessage: ChatMessage = {
+        id: response.data.id || `ai-${Date.now()}`,
+        text: `I've analyzed ${posts.length} ${posts.length === 1 ? 'post' : 'posts'} and identified key patterns that drive engagement.`,
+        sender: "assistant",
+        analysisResult: true,
+        analysisData: parsedAnalysis,
+        threadId: threadId,
+        timestamp: Date.now()
+      };
+
       setMessages(prev => {
         const filtered = prev.filter(msg => msg.id !== typingMessageId);
-        return [...filtered, {
-          id: response.data.id || `ai-${Date.now()}`,
-          text: `I've analyzed ${posts.length} ${posts.length === 1 ? 'post' : 'posts'} and identified key patterns that drive engagement.`,
-          sender: "assistant",
-          analysisResult: true,
-          analysisData: parsedAnalysis,
-          threadId: threadId,
-          timestamp: Date.now()
-        }];
+        return [...filtered, assistantMessage];
       });
+
+      // Save the assistant message with correct role
+      await saveMessage(assistantMessage, threadId);
       
       if (messages.length <= 1) {
         const title = `Analysis of ${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`;
@@ -451,17 +461,22 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: title || "New Content"
       };
 
+      const assistantMessage: ChatMessage = {
+        id: response.data.id || `ai-${Date.now()}`,
+        text: `✅ Created "${generatedContent.title}"`,
+        sender: "assistant",
+        contentPreview: generatedContent,
+        threadId: threadId,
+        timestamp: Date.now()
+      };
+
       setMessages(prev => {
         const filtered = prev.filter(msg => msg.id !== typingMessageId);
-        return [...filtered, {
-          id: response.data.id || `ai-${Date.now()}`,
-          text: `✅ Created "${generatedContent.title}"`,
-          sender: "assistant",
-          contentPreview: generatedContent,
-          threadId: threadId,
-          timestamp: Date.now()
-        }];
+        return [...filtered, assistantMessage];
       });
+
+      // Save the assistant message with correct role
+      await saveMessage(assistantMessage, threadId);
       
       if (messages.length <= 1) {
         const threadTitle = `Content: ${generatedContent.title}`;
@@ -515,7 +530,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const message: ChatMessage = {
           id: msg.id,
           text: msg.content as string,
-          sender: msg.role as "user" | "assistant",
+          sender: msg.role === 'assistant' ? 'assistant' : 'user', // Ensure correct role mapping
           threadId: threadId,
           timestamp: new Date(msg.created_at).getTime(),
         };
