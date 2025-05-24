@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { FormattingType } from "@/lib/formatting";
 import { checkActiveFormats } from "./toolbarUtils";
-import { isElementInEditor } from "./domUtils";
 
 /**
  * Hook to handle the visibility of the toolbar based on text selection
@@ -14,7 +13,7 @@ export const useToolbarVisibility = (
 ) => {
   const [toolbarVisible, setToolbarVisible] = useState(false);
   
-  // Monitor selection changes
+  // Monitor selection changes specifically for the Canvas Editor
   useEffect(() => {
     const handleSelectionChange = () => {
       const selection = window.getSelection();
@@ -22,73 +21,87 @@ export const useToolbarVisibility = (
       // Hide toolbar if no selection or empty selection
       if (!selection || selection.isCollapsed || !selection.rangeCount) {
         setToolbarVisible(false);
+        setSelectedText("");
+        setSelectedRange(null);
         return;
       }
       
-      // Get the node where the selection is happening
+      // Get the selected text
+      const textContent = selection.toString();
+      
+      if (!textContent || textContent.trim().length === 0) {
+        setToolbarVisible(false);
+        setSelectedText("");
+        setSelectedRange(null);
+        return;
+      }
+      
+      // Check if selection is within the Canvas Editor
       const range = selection.getRangeAt(0);
-      const node = range.commonAncestorContainer;
+      const container = range.commonAncestorContainer;
       
-      // Only proceed if selection is in the editor
-      if (!isElementInEditor(node)) {
-        console.log("Selection not in editor area:", node);
+      // Find the Canvas Editor textarea
+      const canvasTextarea = document.querySelector('[data-content-editor="true"]') as HTMLTextAreaElement;
+      
+      if (!canvasTextarea) {
         setToolbarVisible(false);
         return;
       }
       
-      const textContent = range.toString();
+      // Check if the selection is within the Canvas Editor or if it's a textarea selection
+      const isInCanvasEditor = canvasTextarea.contains(container) || 
+                              container === canvasTextarea || 
+                              container.parentElement === canvasTextarea ||
+                              (container.nodeType === Node.TEXT_NODE && canvasTextarea.contains(container.parentNode));
       
-      if (textContent && textContent.trim().length > 0) {
-        console.log("Selected text:", textContent);
-        setSelectedText(textContent);
+      // For textarea selections, use the textarea's selection properties
+      if (canvasTextarea === document.activeElement && canvasTextarea.selectionStart !== canvasTextarea.selectionEnd) {
+        const start = canvasTextarea.selectionStart || 0;
+        const end = canvasTextarea.selectionEnd || 0;
+        const selectedText = canvasTextarea.value.substring(start, end);
         
-        // Find the textarea to store selection range (try multiple element types)
-        const editor = document.querySelector('[data-content-editor="true"]') as HTMLTextAreaElement 
-                      || document.querySelector('textarea') as HTMLTextAreaElement
-                      || document.querySelector('input[type="text"]') as HTMLInputElement;
-                      
-        if (editor) {
-          const selectedRange = {
-            start: editor.selectionStart || 0,
-            end: editor.selectionEnd || 0
-          };
-          
-          setSelectedRange(selectedRange);
-          
-          // Check which formats are active
-          setActiveFormats(checkActiveFormats(textContent));
-          
-          // Show the toolbar
-          console.log("Showing toolbar");
+        if (selectedText && selectedText.trim().length > 0) {
+          console.log("Canvas Editor selection detected:", selectedText);
+          setSelectedText(selectedText);
+          setSelectedRange({ start, end });
+          setActiveFormats(checkActiveFormats(selectedText));
           setToolbarVisible(true);
-        } else {
-          // Handle selection in non-input elements (like contentEditable)
-          setSelectedRange({
-            start: 0,
-            end: textContent.length
-          });
-          
-          setActiveFormats(checkActiveFormats(textContent));
-          console.log("Showing toolbar for non-input element");
-          setToolbarVisible(true);
+          return;
         }
-      } else {
-        setToolbarVisible(false);
       }
+      
+      // For other selections within the editor container
+      if (isInCanvasEditor && textContent.trim().length > 0) {
+        console.log("Canvas Editor text selection:", textContent);
+        setSelectedText(textContent);
+        setSelectedRange({
+          start: 0,
+          end: textContent.length
+        });
+        setActiveFormats(checkActiveFormats(textContent));
+        setToolbarVisible(true);
+        return;
+      }
+      
+      // Hide toolbar if selection is not in Canvas Editor
+      setToolbarVisible(false);
+      setSelectedText("");
+      setSelectedRange(null);
     };
     
-    // Add debounce to avoid excessive updates
-    let timeout: NodeJS.Timeout;
-    const debouncedSelectionChange = () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(handleSelectionChange, 100);
+    // Handle both selection change and mouse up events
+    const handleMouseUp = () => {
+      // Small delay to ensure selection is registered
+      setTimeout(handleSelectionChange, 10);
     };
     
-    document.addEventListener("selectionchange", debouncedSelectionChange);
+    // Add event listeners
+    document.addEventListener("selectionchange", handleSelectionChange);
+    document.addEventListener("mouseup", handleMouseUp);
     
     return () => {
-      document.removeEventListener("selectionchange", debouncedSelectionChange);
-      clearTimeout(timeout);
+      document.removeEventListener("selectionchange", handleSelectionChange);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [setSelectedText, setSelectedRange, setActiveFormats]);
   
