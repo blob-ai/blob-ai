@@ -10,7 +10,7 @@ import {
   BookmarkIcon,
   PanelLeftClose
 } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 // Import refactored sidebar components
 import SidebarHeader from "./sidebar/SidebarHeader";
@@ -18,11 +18,14 @@ import SidebarNavItem from "./sidebar/SidebarNavItem";
 import SidebarSection from "./sidebar/SidebarSection";
 import SidebarFooter from "./sidebar/SidebarFooter";
 import { useChatThreads } from "@/hooks/useChatThreads";
+import { useChat } from "@/contexts/ChatContext";
 
 const Sidebar = () => {
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const { threadId } = useParams();
+  const navigate = useNavigate();
   const { threads, isLoading, handleThreadRename, handleThreadDelete } = useChatThreads(threadId);
+  const { setCurrentThread } = useChat();
 
   // Main navigation items - renamed Library and changed icon
   const navItems = [
@@ -55,6 +58,14 @@ const Sidebar = () => {
     { name: "Personal X Account", path: "/dashboard/workspace/personal-x", icon: <Users className="h-5 w-5 text-primary-400" /> },
     { name: "Web3 Posts", path: "/dashboard/workspace/web3", icon: <Users className="h-5 w-5 text-primary-400" /> }
   ];
+
+  const handleThreadSelect = (selectedThreadId: string) => {
+    const thread = threads.find(t => t.id === selectedThreadId);
+    if (thread) {
+      setCurrentThread(thread);
+      navigate(`/dashboard/chat/${selectedThreadId}`);
+    }
+  };
 
   return (
     <aside
@@ -91,6 +102,7 @@ const Sidebar = () => {
               chatThreads={threads}
               onThreadRename={handleThreadRename}
               onThreadDelete={handleThreadDelete}
+              onThreadSelect={handleThreadSelect}
               isLoading={isLoading}
             />
           </nav>

@@ -26,6 +26,7 @@ interface SidebarSectionProps {
   chatThreads?: ChatThread[];
   onThreadRename?: (threadId: string, newTitle: string) => void;
   onThreadDelete?: (threadId: string) => void;
+  onThreadSelect?: (threadId: string) => void;
   isLoading?: boolean;
 }
 
@@ -35,6 +36,7 @@ const SidebarSection: React.FC<SidebarSectionProps> = ({
   chatThreads = [],
   onThreadRename,
   onThreadDelete,
+  onThreadSelect,
   isLoading = false
 }) => {
   const [editingThread, setEditingThread] = useState<string | null>(null);
@@ -61,6 +63,12 @@ const SidebarSection: React.FC<SidebarSectionProps> = ({
   const handleDeleteThread = (threadId: string) => {
     if (onThreadDelete) {
       onThreadDelete(threadId);
+    }
+  };
+
+  const handleThreadClick = (threadId: string) => {
+    if (onThreadSelect) {
+      onThreadSelect(threadId);
     }
   };
 
@@ -150,16 +158,14 @@ const SidebarSection: React.FC<SidebarSectionProps> = ({
                 </div>
               ) : (
                 <div className="flex items-center justify-between group hover:bg-white/5 rounded-xl transition-colors">
-                  <NavLink
-                    to={thread.path || `/dashboard/chat/${thread.id}`}
-                    className={({ isActive }) =>
-                      cn(
-                        "flex-1 flex flex-col gap-1 px-4 py-2.5 text-left transition-colors",
-                        isActive || thread.isActive
-                          ? "text-primary-400"
-                          : "text-white/70 hover:text-white"
-                      )
-                    }
+                  <button
+                    onClick={() => handleThreadClick(thread.id)}
+                    className={cn(
+                      "flex-1 flex flex-col gap-1 px-4 py-2.5 text-left transition-colors",
+                      thread.isActive
+                        ? "text-primary-400"
+                        : "text-white/70 hover:text-white"
+                    )}
                   >
                     <span className="truncate text-[15px] font-medium">
                       {thread.title}
@@ -167,7 +173,7 @@ const SidebarSection: React.FC<SidebarSectionProps> = ({
                     <span className="text-xs text-white/40">
                       {formatTimeAgo(thread.lastMessageAt)}
                     </span>
-                  </NavLink>
+                  </button>
                   
                   <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity pr-2">
                     <Button
