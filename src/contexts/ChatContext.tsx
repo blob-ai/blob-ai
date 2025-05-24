@@ -240,8 +240,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setIsTyping(true);
       
-      await saveMessage(userMessage, threadId);
-      
       const response = await supabase.functions.invoke("chat-completions", {
         body: {
           threadId,
