@@ -39,42 +39,42 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <Routes>
-              {/* Landing page route */}
-              <Route index element={<Index />} />
-              
-              {/* Auth route */}
-              <Route path="/auth" element={<Auth />} />
-              
-              {/* Redirect /chat to dashboard/chat */}
-              <Route path="/chat" element={<Navigate to="/dashboard/chat" replace />} />
-              
-              {/* Dashboard routes wrapped in SidebarProvider and Layout, protected by AuthGuard */}
-              <Route path="/dashboard" element={
-                <AuthGuard>
-                  <SidebarProvider>
-                    <ChatProvider>
+            <ChatProvider>
+              <Routes>
+                {/* Landing page route */}
+                <Route index element={<Index />} />
+                
+                {/* Auth route */}
+                <Route path="/auth" element={<Auth />} />
+                
+                {/* Redirect /chat to dashboard/chat */}
+                <Route path="/chat" element={<Navigate to="/dashboard/chat" replace />} />
+                
+                {/* Dashboard routes wrapped in SidebarProvider and Layout, protected by AuthGuard */}
+                <Route path="/dashboard" element={
+                  <AuthGuard>
+                    <SidebarProvider>
                       <Layout />
-                    </ChatProvider>
-                  </SidebarProvider>
-                </AuthGuard>
-              }>
-                {/* Redirect /dashboard to /dashboard/chat for default view */}
-                <Route index element={<Navigate to="/dashboard/chat" replace />} />
-                <Route path="chat" element={<ChatInterface />} />
-                <Route path="chat/:threadId" element={<ChatInterface />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="workspace" element={<Workspace />} />
-                <Route path="workspace/:id" element={<Workspace />} />
-                <Route path="templates" element={<Templates />} />
-                <Route path="content" element={<ContentCreationPage />} />
-                <Route path="library" element={<Library />} />
-                <Route path="library/creator/:creatorId" element={<CreatorDetailPage />} />
-              </Route>
-              
-              {/* 404 page */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+                    </SidebarProvider>
+                  </AuthGuard>
+                }>
+                  {/* Redirect /dashboard to /dashboard/chat for default view */}
+                  <Route index element={<Navigate to="/dashboard/chat" replace />} />
+                  <Route path="chat" element={<ChatInterface />} />
+                  <Route path="chat/:threadId" element={<ChatInterface />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="workspace" element={<Workspace />} />
+                  <Route path="workspace/:id" element={<Workspace />} />
+                  <Route path="templates" element={<Templates />} />
+                  <Route path="content" element={<ContentCreationPage />} />
+                  <Route path="library" element={<Library />} />
+                  <Route path="library/creator/:creatorId" element={<CreatorDetailPage />} />
+                </Route>
+                
+                {/* 404 page */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ChatProvider>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
