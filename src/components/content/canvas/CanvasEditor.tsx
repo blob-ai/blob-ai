@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import ContentEditingToolbar from "./ContentEditingToolbar";
@@ -30,53 +31,60 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   const [showQuickActions, setShowQuickActions] = useState(false);
   const { handleFormatting, renderFloatingToolbar } = useContentFormatting();
 
-  // Calculate position for floating quick actions
+  // Simplified position calculation
   const calculateQuickActionsPosition = (textarea: HTMLTextAreaElement, selectionStart: number, selectionEnd: number) => {
-    const textBeforeSelection = textarea.value.substring(0, selectionStart);
-    const lines = textBeforeSelection.split('\n');
-    const currentLine = lines.length - 1;
-    const currentCol = lines[lines.length - 1].length;
-    
-    // Get textarea's bounding box
     const rect = textarea.getBoundingClientRect();
-    const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 24;
-    const fontSize = parseInt(getComputedStyle(textarea).fontSize) || 16;
     
-    // Estimate position based on line and column
-    const top = rect.top + (currentLine * lineHeight) - 40; // 40px above the line
-    const left = rect.left + (currentCol * (fontSize * 0.6)) + (rect.width / 2); // Approximate character width
-    
-    // Keep within viewport bounds
-    const viewportTop = Math.max(50, top);
-    const viewportLeft = Math.max(50, Math.min(window.innerWidth - 200, left));
+    // Position the toolbar above the textarea, centered
+    const top = rect.top - 50; // 50px above the textarea
+    const left = rect.left + (rect.width / 2); // Center horizontally
     
     return {
-      top: viewportTop,
-      left: viewportLeft
+      top: Math.max(10, top), // Don't go above viewport
+      left: Math.max(10, Math.min(window.innerWidth - 200, left)) // Stay within viewport
     };
   };
 
-  const handleTextSelect = () => {
-    if (textareaRef.current) {
-      const start = textareaRef.current.selectionStart;
-      const end = textareaRef.current.selectionEnd;
+  const handleTextSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+    const textarea = e.target as HTMLTextAreaElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    
+    console.log("Selection event triggered:", { start, end });
+    
+    if (start !== end && start !== undefined && end !== undefined) {
+      const selectedText = content.substring(start, end);
+      console.log("Text selected:", selectedText);
       
-      if (start !== end) {
-        const selectedText = content.substring(start, end);
-        const position = calculateQuickActionsPosition(textareaRef.current, start, end);
+      if (selectedText.trim()) {
+        const position = calculateQuickActionsPosition(textarea, start, end);
+        console.log("Calculated position:", position);
         
         setSelection({ start, end, text: selectedText });
         setQuickActionsPosition(position);
         setShowQuickActions(true);
-      } else {
-        setSelection(null);
-        setShowQuickActions(false);
       }
+    } else {
+      console.log("No text selected, hiding actions");
+      setSelection(null);
+      setShowQuickActions(false);
     }
   };
 
+  // Also handle mouse up events for better selection detection
+  const handleMouseUp = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    setTimeout(() => {
+      handleTextSelect(e as any);
+    }, 10); // Small delay to ensure selection is registered
+  };
+
   const handleQuickAction = (action: 'improve' | 'tone' | 'rewrite') => {
-    if (!selection) return;
+    if (!selection) {
+      console.log("No selection available for action:", action);
+      return;
+    }
+    
+    console.log("Quick action triggered:", action, "for text:", selection.text);
     
     // Map actions to the expected operation strings
     const actionMap = {
@@ -131,9 +139,11 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
   // Hide quick actions when clicking outside or when content changes
   useEffect(() => {
-    const handleClickOutside = () => {
-      setShowQuickActions(false);
-      setSelection(null);
+    const handleClickOutside = (e: MouseEvent) => {
+      if (textareaRef.current && !textareaRef.current.contains(e.target as Node)) {
+        setShowQuickActions(false);
+        setSelection(null);
+      }
     };
 
     const handleScroll = () => {
@@ -143,19 +153,21 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     window.addEventListener('scroll', handleScroll);
     
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [showQuickActions]);
+  }, [showQuickActions, textareaRef]);
 
   // For textarea styling to help show markdown formatting
   const getTextareaClassName = () => {
     return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea selection:bg-opacity-15 selection:bg-[var(--accent-blue)] selection:text-white content-editor`;
   };
+
+  console.log("Render state:", { showQuickActions, selection, quickActionsPosition });
 
   return (
     <div 
@@ -174,29 +186,32 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         <div className="text-sm text-white/70">Your post</div>
       </div>
       
-      <Textarea
-        ref={textareaRef}
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        onSelect={handleTextSelect}
-        onKeyDown={onKeyDown}
-        className={getTextareaClassName()}
-        placeholder="Start writing your content here..."
-        spellCheck={true}
-        data-editor="true"
-        data-content-editor="true"
-      />
+      <div className="relative">
+        <Textarea
+          ref={textareaRef}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          onSelect={handleTextSelect}
+          onMouseUp={handleMouseUp}
+          onKeyDown={onKeyDown}
+          className={getTextareaClassName()}
+          placeholder="Start writing your content here..."
+          spellCheck={true}
+          data-editor="true"
+          data-content-editor="true"
+        />
+        
+        {/* Floating Quick Actions - positioned relative to selected text */}
+        <FloatingQuickActions
+          selectedText={selection?.text || ""}
+          onAction={handleQuickAction}
+          position={quickActionsPosition}
+          isVisible={showQuickActions}
+        />
+      </div>
       
       {/* Content Analysis Panel - added below the editor */}
       <ContentAnalysisPanel contentAnalysis={contentAnalysis} className="mt-4" />
-      
-      {/* Floating Quick Actions - positioned relative to selected text */}
-      <FloatingQuickActions
-        selectedText={selection?.text || ""}
-        onAction={handleQuickAction}
-        position={quickActionsPosition}
-        isVisible={showQuickActions}
-      />
       
       {/* Contextual floating toolbar that appears only for textarea selections */}
       {renderFloatingToolbar()}

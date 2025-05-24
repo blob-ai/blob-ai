@@ -17,7 +17,10 @@ const FloatingQuickActions: React.FC<FloatingQuickActionsProps> = ({
   position,
   isVisible
 }) => {
+  console.log("FloatingQuickActions render:", { selectedText, isVisible, position });
+
   if (!isVisible || !selectedText.trim()) {
+    console.log("Not rendering - isVisible:", isVisible, "selectedText:", selectedText);
     return null;
   }
 
@@ -42,16 +45,16 @@ const FloatingQuickActions: React.FC<FloatingQuickActionsProps> = ({
   return (
     <TooltipProvider>
       <div
-        className={`fixed z-50 bg-black/90 border border-white/10 rounded-lg px-2 py-1 shadow-xl animate-fade-in ${
-          isVisible ? 'opacity-100' : 'opacity-0'
-        }`}
+        className="fixed z-[9999] bg-black/90 border border-white/10 rounded-lg px-2 py-1 shadow-xl animate-fade-in"
         style={{
           top: `${position.top}px`,
           left: `${position.left}px`,
           transform: 'translateX(-50%)',
-          transition: 'opacity 0.2s ease-out, transform 0.2s ease-out'
+          transition: 'opacity 0.2s ease-out, transform 0.2s ease-out',
+          pointerEvents: 'auto'
         }}
         data-testid="floating-quick-actions"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex gap-1">
           {quickActions.map((action) => (
@@ -64,6 +67,7 @@ const FloatingQuickActions: React.FC<FloatingQuickActionsProps> = ({
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    console.log("Action clicked:", action.id);
                     onAction(action.id);
                   }}
                 >
