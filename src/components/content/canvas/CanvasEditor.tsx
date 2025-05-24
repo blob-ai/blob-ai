@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import ContentEditingToolbar from "./ContentEditingToolbar";
@@ -31,18 +30,51 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   const [showQuickActions, setShowQuickActions] = useState(false);
   const { handleFormatting, renderFloatingToolbar } = useContentFormatting();
 
-  // Simplified position calculation
+  // More accurate position calculation based on actual text selection
   const calculateQuickActionsPosition = (textarea: HTMLTextAreaElement, selectionStart: number, selectionEnd: number) => {
     const rect = textarea.getBoundingClientRect();
     
-    // Position the toolbar above the textarea, centered
-    const top = rect.top - 50; // 50px above the textarea
-    const left = rect.left + (rect.width / 2); // Center horizontally
+    // Create a temporary element to measure text dimensions
+    const tempElement = document.createElement('div');
+    tempElement.style.cssText = window.getComputedStyle(textarea).cssText;
+    tempElement.style.position = 'absolute';
+    tempElement.style.visibility = 'hidden';
+    tempElement.style.height = 'auto';
+    tempElement.style.width = `${textarea.offsetWidth - 24}px`; // Account for padding
+    tempElement.style.wordWrap = 'break-word';
+    tempElement.style.whiteSpace = 'pre-wrap';
     
-    return {
-      top: Math.max(10, top), // Don't go above viewport
-      left: Math.max(10, Math.min(window.innerWidth - 200, left)) // Stay within viewport
-    };
+    document.body.appendChild(tempElement);
+    
+    try {
+      // Get text before selection to calculate position
+      const textBeforeSelection = content.substring(0, selectionStart);
+      const selectedText = content.substring(selectionStart, selectionEnd);
+      
+      // Set the text content up to the selection start
+      tempElement.textContent = textBeforeSelection;
+      const textBeforeHeight = tempElement.offsetHeight;
+      const textBeforeWidth = tempElement.offsetWidth;
+      
+      // Add the selected text to get the end position
+      tempElement.textContent = textBeforeSelection + selectedText;
+      const textWithSelectionHeight = tempElement.offsetHeight;
+      
+      // Calculate approximate position
+      const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight) || 24;
+      const approximateLines = Math.floor(textBeforeHeight / lineHeight);
+      
+      // Position the toolbar above the selection
+      const top = rect.top + (approximateLines * lineHeight) - 50; // 50px above the text
+      const left = rect.left + Math.min(textBeforeWidth % textarea.offsetWidth, textarea.offsetWidth / 2);
+      
+      return {
+        top: Math.max(10, top), // Don't go above viewport
+        left: Math.max(10, Math.min(window.innerWidth - 200, left)) // Stay within viewport
+      };
+    } finally {
+      document.body.removeChild(tempElement);
+    }
   };
 
   const handleTextSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
