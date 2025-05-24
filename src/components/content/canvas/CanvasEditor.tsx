@@ -79,18 +79,6 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
     };
   }, [content, handleFormatting, setContent, textareaRef, onTextTransform]);
 
-  // Enhanced textarea event handlers for better selection detection
-  const handleMouseUp = (e: React.MouseEvent<HTMLTextAreaElement>) => {
-    handleTextSelect();
-  };
-
-  const handleKeyUp = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Handle text selection via keyboard (Shift + arrow keys)
-    if (e.shiftKey || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-      handleTextSelect();
-    }
-  };
-
   // For textarea styling to help show markdown formatting
   const getTextareaClassName = () => {
     return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea selection:bg-opacity-15 selection:bg-[var(--accent-blue)] selection:text-white content-editor`;
@@ -118,8 +106,6 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onSelect={handleTextSelect}
-        onMouseUp={handleMouseUp}
-        onKeyUp={handleKeyUp}
         onKeyDown={onKeyDown}
         className={getTextareaClassName()}
         placeholder="Start writing your content here..."
@@ -134,7 +120,7 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       {/* Enhanced floating toolbar that appears near text selection */}
       {renderFloatingToolbar()}
       
-      {/* Legacy toolbar - hidden since we now use the floating toolbar */}
+      {/* Legacy toolbar - can be removed once floating toolbar is fully functional */}
       {selection && (
         <ContentEditingToolbar
           onSelect={handleTextOperation}
