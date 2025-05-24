@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import ContentEditingToolbar from "./ContentEditingToolbar";
+import FloatingQuickActions from "./FloatingQuickActions";
 import useContentFormatting from "./hooks/useContentFormatting";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserRound } from "lucide-react";
@@ -26,7 +26,35 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
   contentAnalysis
 }) => {
   const [selection, setSelection] = useState<{ start: number; end: number; text: string } | null>(null);
+  const [quickActionsPosition, setQuickActionsPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [showQuickActions, setShowQuickActions] = useState(false);
   const { handleFormatting, renderFloatingToolbar } = useContentFormatting();
+
+  // Calculate position for floating quick actions
+  const calculateQuickActionsPosition = (textarea: HTMLTextAreaElement, selectionStart: number, selectionEnd: number) => {
+    const textBeforeSelection = textarea.value.substring(0, selectionStart);
+    const lines = textBeforeSelection.split('\n');
+    const currentLine = lines.length - 1;
+    const currentCol = lines[lines.length - 1].length;
+    
+    // Get textarea's bounding box
+    const rect = textarea.getBoundingClientRect();
+    const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 24;
+    const fontSize = parseInt(getComputedStyle(textarea).fontSize) || 16;
+    
+    // Estimate position based on line and column
+    const top = rect.top + (currentLine * lineHeight) - 40; // 40px above the line
+    const left = rect.left + (currentCol * (fontSize * 0.6)) + (rect.width / 2); // Approximate character width
+    
+    // Keep within viewport bounds
+    const viewportTop = Math.max(50, top);
+    const viewportLeft = Math.max(50, Math.min(window.innerWidth - 200, left));
+    
+    return {
+      top: viewportTop,
+      left: viewportLeft
+    };
+  };
 
   const handleTextSelect = () => {
     if (textareaRef.current) {
@@ -35,11 +63,33 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       
       if (start !== end) {
         const selectedText = content.substring(start, end);
+        const position = calculateQuickActionsPosition(textareaRef.current, start, end);
+        
         setSelection({ start, end, text: selectedText });
+        setQuickActionsPosition(position);
+        setShowQuickActions(true);
       } else {
         setSelection(null);
+        setShowQuickActions(false);
       }
     }
+  };
+
+  const handleQuickAction = (action: 'improve' | 'tone' | 'rewrite') => {
+    if (!selection) return;
+    
+    // Map actions to the expected operation strings
+    const actionMap = {
+      'improve': 'improve',
+      'tone': 'tone',
+      'rewrite': 'rewrite'
+    };
+    
+    onTextTransform(actionMap[action], selection.text);
+    
+    // Hide quick actions after action is taken
+    setShowQuickActions(false);
+    setSelection(null);
   };
 
   const handleTextOperation = (operation: string) => {
@@ -79,6 +129,29 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
     };
   }, [content, handleFormatting, setContent, textareaRef, onTextTransform]);
 
+  // Hide quick actions when clicking outside or when content changes
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setShowQuickActions(false);
+      setSelection(null);
+    };
+
+    const handleScroll = () => {
+      if (showQuickActions) {
+        setShowQuickActions(false);
+        setSelection(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [showQuickActions]);
+
   // For textarea styling to help show markdown formatting
   const getTextareaClassName = () => {
     return `min-h-[calc(100vh-300px)] bg-transparent resize-none text-white border-none p-0 text-lg leading-relaxed focus-visible:ring-0 focus-visible:outline-none markdown-textarea selection:bg-opacity-15 selection:bg-[var(--accent-blue)] selection:text-white content-editor`;
@@ -116,6 +189,14 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       
       {/* Content Analysis Panel - added below the editor */}
       <ContentAnalysisPanel contentAnalysis={contentAnalysis} className="mt-4" />
+      
+      {/* Floating Quick Actions - positioned relative to selected text */}
+      <FloatingQuickActions
+        selectedText={selection?.text || ""}
+        onAction={handleQuickAction}
+        position={quickActionsPosition}
+        isVisible={showQuickActions}
+      />
       
       {/* Contextual floating toolbar that appears only for textarea selections */}
       {renderFloatingToolbar()}

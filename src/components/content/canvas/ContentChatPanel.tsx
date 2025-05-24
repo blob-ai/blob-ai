@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowUp, Sparkles, MessageSquare, PenTool, Wand2, Lightbulb } from "lucide-react";
+import { ArrowUp, Sparkles, Lightbulb } from "lucide-react";
 import { useChat } from "@/contexts/ChatContext";
 import { toast } from "sonner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -290,26 +290,6 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
     setInput(prompt);
   };
 
-  const handleQuickAction = (action: string) => {
-    if (selectedText) {
-      let actionPrompt = "";
-      switch(action) {
-        case "improve":
-          actionPrompt = `Improve this selected text: "${selectedText}"`;
-          break;
-        case "tone":
-          actionPrompt = `Analyze and suggest a better tone for: "${selectedText}"`;
-          break;
-        case "rewrite":
-          actionPrompt = `Rewrite this to be more engaging: "${selectedText}"`;
-          break;
-      }
-      setInput(actionPrompt);
-    } else {
-      toast.info("Please select text to use quick actions");
-    }
-  };
-
   // Determine which messages to show - ChatContext if available, otherwise local
   const displayMessages = chatMessages.length > 0 && activeThreadId ? 
     chatMessages.map(msg => ({
@@ -381,36 +361,6 @@ const ContentChatPanel: React.FC<ContentChatPanelProps> = ({
         
         <div ref={messagesEndRef} />
       </div>
-
-      {/* Quick Actions */}
-      {selectedText && (
-        <div className="px-4 py-2 border-t border-white/10 flex space-x-2 no-selection-toolbar">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex-1 border-white/10 hover:bg-white/10 no-selection-toolbar"
-            onClick={() => handleQuickAction("improve")}
-          >
-            <Wand2 className="h-3 w-3 mr-1" /> Improve
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex-1 border-white/10 hover:bg-white/10 no-selection-toolbar"
-            onClick={() => handleQuickAction("tone")}
-          >
-            <PenTool className="h-3 w-3 mr-1" /> Tone
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex-1 border-white/10 hover:bg-white/10 no-selection-toolbar"
-            onClick={() => handleQuickAction("rewrite")}
-          >
-            <MessageSquare className="h-3 w-3 mr-1" /> Rewrite
-          </Button>
-        </div>
-      )}
 
       <div className="p-4 border-t border-white/10 no-selection-toolbar">
         <Accordion type="single" collapsible defaultValue="suggestions" className="no-selection-toolbar">
