@@ -6,6 +6,7 @@ import { isElementInEditor } from "./domUtils";
 
 /**
  * Hook to handle the visibility of the toolbar based on text selection
+ * This is specifically for the CanvasEditor textarea only
  */
 export const useToolbarVisibility = (
   setSelectedText: (text: string) => void,
@@ -29,9 +30,19 @@ export const useToolbarVisibility = (
       const range = selection.getRangeAt(0);
       const node = range.commonAncestorContainer;
       
-      // Only proceed if selection is in the editor
-      if (!isElementInEditor(node)) {
-        console.log("Selection not in editor area:", node);
+      // Check if selection is specifically in the content editor textarea
+      const isInContentEditor = node.nodeType === Node.TEXT_NODE 
+        ? node.parentElement?.closest('[data-content-editor="true"]') !== null
+        : (node as Element).closest('[data-content-editor="true"]') !== null;
+      
+      // Also check if we're NOT in the chat panel
+      const isInChatPanel = node.nodeType === Node.TEXT_NODE
+        ? node.parentElement?.closest('[data-chat-panel="content-chat"]') !== null
+        : (node as Element).closest('[data-chat-panel="content-chat"]') !== null;
+      
+      // Only show toolbar if selection is in content editor and NOT in chat panel
+      if (!isInContentEditor || isInChatPanel) {
+        console.log("Selection not in content editor or is in chat panel:", node);
         setToolbarVisible(false);
         return;
       }
@@ -39,13 +50,11 @@ export const useToolbarVisibility = (
       const textContent = range.toString();
       
       if (textContent && textContent.trim().length > 0) {
-        console.log("Selected text:", textContent);
+        console.log("Selected text in content editor:", textContent);
         setSelectedText(textContent);
         
-        // Find the textarea to store selection range (try multiple element types)
-        const editor = document.querySelector('[data-content-editor="true"]') as HTMLTextAreaElement 
-                      || document.querySelector('textarea') as HTMLTextAreaElement
-                      || document.querySelector('input[type="text"]') as HTMLInputElement;
+        // Find the textarea specifically in the content editor
+        const editor = document.querySelector('[data-content-editor="true"]') as HTMLTextAreaElement;
                       
         if (editor) {
           const selectedRange = {
@@ -59,17 +68,17 @@ export const useToolbarVisibility = (
           setActiveFormats(checkActiveFormats(textContent));
           
           // Show the toolbar
-          console.log("Showing toolbar");
+          console.log("Showing toolbar for content editor selection");
           setToolbarVisible(true);
         } else {
-          // Handle selection in non-input elements (like contentEditable)
+          // Handle selection in non-input elements within the content editor
           setSelectedRange({
             start: 0,
             end: textContent.length
           });
           
           setActiveFormats(checkActiveFormats(textContent));
-          console.log("Showing toolbar for non-input element");
+          console.log("Showing toolbar for content editor non-input element");
           setToolbarVisible(true);
         }
       } else {

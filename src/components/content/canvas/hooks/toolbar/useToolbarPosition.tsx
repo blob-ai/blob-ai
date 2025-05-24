@@ -62,12 +62,12 @@ export const useToolbarPosition = (toolbarRef: RefObject<HTMLDivElement>) => {
     
     return () => {
       document.removeEventListener("selectionchange", handleSelectionChange);
-      window.addEventListener("resize", handleSelectionChange);
+      window.removeEventListener("resize", handleSelectionChange);
     };
   }, []);
 
-  // Ensure toolbar stays within viewport bounds
-  const positionToolbar = () => {
+  // Ensure toolbar stays within viewport bounds and return as Record<string, string>
+  const positionToolbar = (): Record<string, string> => {
     if (!toolbarRef.current) return {};
     
     const toolbar = toolbarRef.current;

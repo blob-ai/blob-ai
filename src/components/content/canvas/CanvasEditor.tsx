@@ -117,10 +117,10 @@ const CanvasEditor: React.FC<CanvasEditorProps> = ({
       {/* Content Analysis Panel - added below the editor */}
       <ContentAnalysisPanel contentAnalysis={contentAnalysis} className="mt-4" />
       
-      {/* Enhanced floating toolbar that appears near text selection */}
+      {/* Contextual floating toolbar that appears only for textarea selections */}
       {renderFloatingToolbar()}
       
-      {/* Legacy toolbar - can be removed once floating toolbar is fully functional */}
+      {/* Legacy toolbar - hidden since we now use the floating toolbar */}
       {selection && (
         <ContentEditingToolbar
           onSelect={handleTextOperation}
