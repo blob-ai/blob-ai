@@ -50,8 +50,10 @@ serve(async (req) => {
 
     const { threadId, content, systemPrompt } = reqBody;
     
+    console.log('Request received:', { threadId, contentLength: content?.length, hasSystemPrompt: !!systemPrompt });
+    
     if (!threadId || !content) {
-      console.error('Missing required parameters');
+      console.error('Missing required parameters:', { threadId: !!threadId, content: !!content });
       return new Response(
         JSON.stringify({ error: 'Missing required parameters: threadId and content are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -59,8 +61,10 @@ serve(async (req) => {
     }
 
     // Create Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://wmstewknmipfvuqojfxl.supabase.co';
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || 'https://irncqqrztsgplzbhfkrs.supabase.co';
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    console.log('Using Supabase URL:', supabaseUrl);
     
     if (!supabaseServiceKey) {
       console.error('SUPABASE_SERVICE_ROLE_KEY is not set');
@@ -100,6 +104,8 @@ serve(async (req) => {
             { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
+        
+        console.log('User authenticated successfully:', userId);
       } catch (e) {
         console.error('Auth token verification error:', e);
         return new Response(
@@ -221,7 +227,7 @@ serve(async (req) => {
     }
     
     const completion = await openAIResponse.json();
-    console.log('OpenAI response:', JSON.stringify(completion));
+    console.log('OpenAI response received successfully');
     
     if (!completion.choices || !completion.choices[0] || !completion.choices[0].message) {
       console.error('Invalid response structure from OpenAI:', completion);
@@ -291,6 +297,7 @@ serve(async (req) => {
     }
     
     // Return successful response
+    console.log('Chat completion successful, returning response');
     return new Response(
       JSON.stringify({
         id: savedAssistantMessage?.id || `ai-${Date.now()}`,

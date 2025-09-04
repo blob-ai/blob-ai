@@ -21,7 +21,7 @@ const AssistantMessageContent: React.FC<AssistantMessageContentProps> = ({ conte
     
     const finishList = () => {
       if (currentListItems.length > 0) {
-        processedLines.push(<ul className={styles.messageContent}>{currentListItems}</ul>);
+        processedLines.push(<ul key={`list-${processedLines.length}`} className={styles.messageContent}>{currentListItems}</ul>);
         currentListItems = [];
         inList = false;
       }
@@ -30,7 +30,7 @@ const AssistantMessageContent: React.FC<AssistantMessageContentProps> = ({ conte
     const finishCodeBlock = () => {
       if (inCodeBlock) {
         processedLines.push(
-          <pre className={styles.messageContent}>
+          <pre key={`code-${processedLines.length}`} className={styles.messageContent}>
             <code className={codeLanguage ? `language-${codeLanguage}` : ''}>{codeContent}</code>
           </pre>
         );
@@ -87,7 +87,7 @@ const AssistantMessageContent: React.FC<AssistantMessageContentProps> = ({ conte
       if (headingMatch) {
         finishList();
         processedLines.push(
-          <h3 className={cn("font-bold text-white mt-3 mb-2", styles.messageContent)}>{headingMatch[1]}</h3>
+          <h3 key={`heading-${index}`} className={cn("font-bold text-white mt-3 mb-2", styles.messageContent)}>{headingMatch[1]}</h3>
         );
         return;
       }
@@ -165,7 +165,7 @@ const AssistantMessageContent: React.FC<AssistantMessageContentProps> = ({ conte
         if (inList) {
           finishList();
         } else {
-          processedLines.push(<div className="my-2"></div>);
+          processedLines.push(<div key={`spacer-${index}`} className="my-2"></div>);
         }
         return;
       }
@@ -185,6 +185,7 @@ const AssistantMessageContent: React.FC<AssistantMessageContentProps> = ({ conte
       
       processedLines.push(
         <p 
+          key={`paragraph-${index}`}
           className="mb-2" 
           dangerouslySetInnerHTML={{ __html: enhancedLine }}
         />
