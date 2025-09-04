@@ -333,6 +333,30 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          stripe_customer_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          stripe_customer_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          stripe_customer_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -348,7 +372,6 @@ export type Database = {
           last_chat_reset: string | null
           name: string | null
           plan_tier: string
-          stripe_customer_id: string | null
           total_tokens_used: number | null
           updated_at: string | null
           username: string | null
@@ -367,7 +390,6 @@ export type Database = {
           last_chat_reset?: string | null
           name?: string | null
           plan_tier?: string
-          stripe_customer_id?: string | null
           total_tokens_used?: number | null
           updated_at?: string | null
           username?: string | null
@@ -386,7 +408,6 @@ export type Database = {
           last_chat_reset?: string | null
           name?: string | null
           plan_tier?: string
-          stripe_customer_id?: string | null
           total_tokens_used?: number | null
           updated_at?: string | null
           username?: string | null
@@ -617,7 +638,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_stripe_customer_id: {
+        Args: { p_user_id: string }
+        Returns: string
+      }
+      upsert_stripe_customer_id: {
+        Args: { p_customer_id: string; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
