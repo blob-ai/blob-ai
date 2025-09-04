@@ -192,6 +192,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "content_drafts_setup_id_fkey"
+            columns: ["setup_id"]
+            isOneToOne: false
+            referencedRelation: "public_templates"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "content_drafts_thread_id_fkey"
             columns: ["thread_id"]
             isOneToOne: false
@@ -635,7 +642,39 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_templates: {
+        Row: {
+          configuration: Json | null
+          created_at: string | null
+          examples: Json | null
+          id: string | null
+          is_template: boolean | null
+          name: string | null
+          updated_at: string | null
+          usage_count: number | null
+        }
+        Insert: {
+          configuration?: Json | null
+          created_at?: string | null
+          examples?: Json | null
+          id?: string | null
+          is_template?: boolean | null
+          name?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Update: {
+          configuration?: Json | null
+          created_at?: string | null
+          examples?: Json | null
+          id?: string | null
+          is_template?: boolean | null
+          name?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_stripe_customer_id: {
